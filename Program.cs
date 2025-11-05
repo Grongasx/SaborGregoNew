@@ -65,7 +65,6 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapPost("/logout", async (HttpContext ctx) =>
 {
-    Console.WriteLine("--- ENDPOINT /logout FOI CHAMADO ---");
     await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.Redirect("/");
 });
