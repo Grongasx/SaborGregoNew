@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sabor Grego</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-orange: #ff6b35;
+            --primary-gold: #f7931e;
+            --accent-green: #4caf50;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-light: #f5f5f5;
+            --text-White: #b0b0b0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(26, 26, 26, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            color: var(--text-White) !important;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-orange) !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-gold));
+            border: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--accent-green);
+            border: none;
+            font-weight: 600;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+        
+        .badge {
+            font-weight: 600;
+        }
+        
+        .footer {
+            background: rgba(26, 26, 26, 0.95);
+            border-top: 1px solid rgba(255, 107, 53, 0.2);
+            margin-top: auto;
+        }
+        
+        .form-control, .form-select {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            color: var(--text-light);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: var(--card-bg);
+            border-color: var(--primary-orange);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-bg), rgba(255, 107, 53, 0.1));
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status-preparing {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .status-ready {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-delivering {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .btn-whatsapp a {
+        color:#fff; 
+        text-decoration:none; 
+        display:block; 
+        }
+        .btn-whatsapp {
+            
+            position:fixed; 
+            right:75px; 
+            bottom:30px; 
+            transform: translate(-50%, -50%);  
+            background-color:rgb(37, 211, 102); 
+            width:60px; height:60px; 
+            text-align:center; 
+            line-height:58px; 
+            font-size:1.8em; 
+            color:#ffffff; 
+            font-weight:100; 
+            border-radius:50%; 
+        }
+        .btn-whatsapp:before,
+        .btn-whatsapp:after
+        {
+        content: '';
+            display:block;
+            position: absolute;
+            border-radius:50%;
+            border:1px solid #25d366;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            top: -20px;
+            animation: animate 1.5s linear infinite;
+            opacity:0;
+            backface-visibility:hidden;    
+        }
+        .pulsaDelay:after { animation-delay: .5s; }
+        @@keyframes animate {
+        0%   { transform: scale(0.5); opacity:0; }
+        50%  { opacity:1; }
+        100% { transform: scale(1.2); opacity:0; }
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-fire"></i> Sabor Grego
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Produto" asp-action="Cardapio">Cardápio</a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                    <li>
+                        <a class="nav-link" asp-controller="Admin" asp-action="PainelAdmin">Painel de Administrador</a>
+                    </li>
+                    }
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" asp-controller="Pedido" asp-action="Cart">
+                            <i class="bi bi-cart3"></i>
+                            <span class="cart-badge" id="cartCount">0</span>
+                        </a>
+                    </li>
+                    @if (User.Identity != null && User.Identity!.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Usuario" asp-action="Profile">@User.Identity.Name</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="/Logout">
+                                <button type="submit" class="nav-link btn btn-link border-0">Sair</button>
+                            </form>
+                        </li>
+                    }
+                    else 
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Usuario/Cadastro">Registrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Usuario/Login">Entrar</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow-1">
+        @RenderBody()
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <a href="https://youtu.be/DLzxrzFCyOs?si=HH9NtL_Sijfc69l1" target="_blank">
+            <div class="btn-whatsapp pulsaDelay"><i class="fa fa-whatsapp"></i></div>
+        </a>
+    </main>
+
+    <footer class="footer py-4 mt-5">
+        
+        <div class="container text-center">
+            <p class="mb-0 text-white text-White">© 2025 - SaborGrego. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Cart management
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cartCount');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        // Update cart count on page load
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+    </script>
+    
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

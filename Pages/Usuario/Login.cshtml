@@ -1,0 +1,120 @@
+@page
+@model SaborGregoNew.Pages.Usuario.LoginModel;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(247, 147, 30, 0.05) 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="bi bi-box-arrow-in-right" style="font-size: 3rem; color: #ff6b35;"></i>
+                            </div>
+                            <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">Acessar Conta</h2>
+                            <p class="text-white-50">Bem-vindo(a) de volta!</p>
+                        </div>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+
+                        <form method="post" id="loginForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label fw-semibold text-white">
+                                    <i class="bi bi-envelope me-1"></i>E-mail
+                                </label>
+                                <input 
+                                    asp-for="LoginDto.Email" 
+                                    id="email" 
+                                    type="email"
+                                    class="form-control form-control-lg" 
+                                    placeholder="seu@email.com"
+                                    required
+                                />
+                                <span asp-validation-for="LoginDto.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="senha" class="form-label fw-semibold text-white">
+                                    <i class="bi bi-lock me-1"></i>Senha
+                                </label>
+                                <div class="input-group">
+                                    <input 
+                                        asp-for="LoginDto.Senha" 
+                                        id="senha" 
+                                        type="password"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Sua senha"
+                                        required
+                                    />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="LoginDto.Senha" class="text-danger small"></span>
+                            </div>
+
+                            <div class="text-end mb-4">
+                                <a href="/Usuario/RecuperarSenha" class="text-decoration-none small" style="color: #ff6b35;">
+                                    Esqueceu a senha?
+                                </a>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                class="btn btn-lg w-100 text-white fw-semibold mb-3"
+                                style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;"
+                            >
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                            </button>
+
+                            <div class="text-center">
+                                <p class="text-white-50 mb-0">
+                                    Não tem uma conta? 
+                                    <a href="/Usuario/Cadastro" class="text-decoration-none fw-semibold" style="color: #ff6b35;">
+                                        Criar Conta
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle mostrar/ocultar senha (Reutilizado do Cadastro)
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const senhaInput = document.getElementById('senha');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                senhaInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Feedback visual no submit (opcional, mas bom para UX)
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Aqui você pode adicionar lógica de validação adicional antes de prosseguir
+
+            // Feedback visual de carregamento
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Entrando...';
+            submitBtn.disabled = true;
+        });
+    </script>
+}

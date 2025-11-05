@@ -1,0 +1,35 @@
+@page
+@model SaborGregoNew.Pages.IndexModel;
+
+
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div>
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <p>usuario está autenticado</p>
+    }
+    @if (User.IsInRole( "Cliente"))
+    {
+        <p>usuario é um Cliente</p>
+    }
+    @if (User.IsInRole( "Cozinheiro"))
+    {
+        <p>usuario é um Cozinheiro</p>
+    }
+    @if (User.IsInRole( "Entregador"))
+    {
+        <p>usuario é um Entregador</p>
+    }
+    @if (User.IsInRole( "Admin"))
+    {
+        <p>usuario é um Admin</p>
+    }
+    else
+    {
+        <p>usuario não está autenticado</p>
+    }
+</div>
