@@ -36,7 +36,7 @@ public class UsuarioService
     public async Task<Usuario?> Logar(LoginUserDTO dto)
     {
         // A checagem de null/vazio é feita pelo ModelState no PageModel.
-        
+
         var usuario = await _usuarioRepository.GetByEmail(dto.Email);
 
         // 1. O Serviço retorna NULL se o usuário não existir OU se a senha não bater
