@@ -416,3 +416,17 @@ C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNew\obj\Debug\net9.0\refi
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNew\obj\Debug\net9.0\SaborGregoNew.pdb
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNew\obj\Debug\net9.0\SaborGregoNew.genruntimeconfig.cache
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNew\obj\Debug\net9.0\ref\SaborGregoNew.dll
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.csproj.AssemblyReference.cache
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\rpswa.dswa.cache.json
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.AssemblyInfoInputs.cache
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.AssemblyInfo.cs
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.csproj.CoreCompileInputs.cache
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.MvcApplicationPartsAssemblyInfo.cs
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.MvcApplicationPartsAssemblyInfo.cache
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.RazorAssemblyInfo.cache
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.RazorAssemblyInfo.cs
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.sourcelink.json
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.dll
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\refint\SaborGregoNew.dll
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.pdb

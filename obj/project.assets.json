@@ -5792,6 +5792,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "Microsoft.AspNetCore.Authentication.Cookies >= 2.3.0",
       "Microsoft.Data.SqlClient >= 6.1.2",
       "Microsoft.Data.Sqlite >= 9.0.10",
       "Microsoft.Data.Sqlite.Core >= 9.0.10",
@@ -5804,8 +5805,7 @@
       "Microsoft.Extensions.Caching.Memory >= 9.0.10",
       "SQLite >= 3.13.0",
       "Swashbuckle.AspNetCore >= 9.0.6",
-      "System.Memory.Data >= 9.0.10",
-      "microsoft.aspnetcore.authentication.cookies >= 2.3.0"
+      "System.Memory.Data >= 9.0.10"
     ]
   },
   "packageFolders": {
@@ -5814,11 +5814,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNew\\SaborGregoNew.csproj",
+      "projectUniqueName": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
       "projectName": "SaborGregoNew",
-      "projectPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNew\\SaborGregoNew.csproj",
+      "projectPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
       "packagesPath": "C:\\Users\\Latitude\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNew\\obj\\",
+      "outputPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Latitude\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -5851,6 +5851,10 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Cookies": {
+            "target": "Package",
+            "version": "[2.3.0, )"
+          },
           "Microsoft.Data.SqlClient": {
             "target": "Package",
             "version": "[6.1.2, )"
@@ -5906,10 +5910,6 @@
           "System.Memory.Data": {
             "target": "Package",
             "version": "[9.0.10, )"
-          },
-          "microsoft.aspnetcore.authentication.cookies": {
-            "target": "Package",
-            "version": "[2.3.0, )"
           }
         },
         "imports": [

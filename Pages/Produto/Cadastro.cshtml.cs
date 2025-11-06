@@ -33,7 +33,7 @@ namespace SaborGregoNew.Pages.Produto
             try
             {
                 Console.WriteLine("Cadastro de produto");
-                await _produtoService.createProduto(ProdutoDto);
+                await _produtoService.Create(ProdutoDto);
                 return RedirectToPage("/Index");
             }
             catch (Exception ex)
