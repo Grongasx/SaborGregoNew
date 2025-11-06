@@ -1,0 +1,48 @@
+@page "{id:int}"
+@model SaborGregoNew.Pages.Usuario.EditarEnderecoModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{    ViewData["Title"] = "Editar Endereço";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">@ViewData["Title"]</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <input type="hidden" asp-for="Endereco.Id" />
+                <input type="hidden" asp-for="Endereco.UsuarioId" />
+                <div class="mb-3">
+                    <label asp-for="Endereco.Apelido"></label>
+                    <input asp-for="Endereco.Apelido" class="form-control" />
+                    <span asp-validation-for="Endereco.Apelido" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Endereco.Logradouro"></label>
+                    <input asp-for="Endereco.Logradouro" class="form-control" />
+                    <span asp-validation-for="Endereco.Logradouro" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Endereco.Numero"></label>
+                        <input asp-for="Endereco.Numero" class="form-control" />
+                        <span asp-validation-for="Endereco.Numero" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="Endereco.Complemento"></label>
+                        <input asp-for="Endereco.Complemento" class="form-control" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Endereco.Bairro"></label>
+                    <input asp-for="Endereco.Bairro" class="form-control" />
+                    <span asp-validation-for="Endereco.Bairro" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                <a asp-page="/Usuario/ListaEnderecos" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>

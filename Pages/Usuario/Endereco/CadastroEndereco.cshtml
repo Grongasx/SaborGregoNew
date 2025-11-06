@@ -1,0 +1,124 @@
+@page
+@model SaborGregoNew.Pages.Usuario.CadastroEnderecoModel;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Cadastro de Endereço";
+}
+
+@if (User.Identity == null)
+{
+    <p>Usuario não Autenticado</p>
+}
+else
+{
+    <div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(247, 147, 30, 0.05) 100%);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-box-arrow-in-right" style="font-size: 3rem; color: #ff6b35;"></i>
+                                </div>
+                                <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">Acessar Conta</h2>
+                                <p class="text-white-50">Bem-vindo(a) de volta!</p>
+                            </div>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                            
+
+                            <form method="post" id="CadastroEndereco">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-envelope me-1"></i>Nome do Endereço
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Apelido" 
+                                        id="Apelido" 
+                                        type="Apelido"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Casa/Trabalho"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Apelido" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-envelope me-1"></i>Logradouro
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Logradouro" 
+                                        id="Logradouro" 
+                                        type="Logradouro"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Rua José João da Silva"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Logradouro" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-envelope me-1"></i>Numero
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Numero" 
+                                        id="Numero" 
+                                        type="Numero"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Rua José João da Silva"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Numero" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-envelope me-1"></i>Complemento
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Complemento" 
+                                        id="Complemento" 
+                                        type="Complemento"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Em frente ao mercado"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Complemento" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-envelope me-1"></i>Bairro
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Bairro" 
+                                        id="Bairro" 
+                                        type="Bairro"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Em frente ao mercado"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Bairro" class="text-danger small"></span>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-lg w-100 text-white fw-semibold mb-3"
+                                    style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;"
+                                >
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+}

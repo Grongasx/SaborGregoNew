@@ -1,0 +1,54 @@
+@page
+@model SaborGregoNew.Pages.Usuario.ListaEnderecosModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{    ViewData["Title"] = "Meus Endereços";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">@ViewData["Title"]</h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text">Abaixo estão os seus endereços cadastrados. Você pode adicionar novos endereços a qualquer momento.</p>
+            <a asp-page="/Usuario/CadastroEndereco" class="btn btn-success mb-4">
+                <i class="fas fa-plus-circle"></i> Adicionar Novo Endereço
+            </a>
+
+            @if (Model.Enderecos != null && Model.Enderecos.Any())
+            {
+                <div class="row">
+                    @foreach (var endereco in Model.Enderecos)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm address-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">@endereco.Apelido</h5>
+                                    <p class="card-text">
+                                        @endereco.Logradouro, @endereco.Numero<br />
+                                        @endereco.Bairro
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <a asp-page="EditarEndereco" asp-route-id="@endereco.Id" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    <a asp-page="ExcluirEndereco" asp-route-id="@endereco.Id" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    Nenhum endereço cadastrado ainda. Que tal adicionar um agora?
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+}
