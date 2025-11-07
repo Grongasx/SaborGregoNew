@@ -2,66 +2,45 @@ using Microsoft.EntityFrameworkCore;
 using SaborGregoNew.Data;
 using SaborGregoNew.Models;
 
-namespace SaborGregoNew.Repository;
-
-public class EnderecoRepository
+namespace SaborGregoNew.Repository
 {
-    private readonly ApplicationDbContext _context;
-
-    public EnderecoRepository(ApplicationDbContext context)
+    public class EnderecoRepository
     {
-        _context = context;
-    }
-    public async Task Create(Endereco endereco)
-    {
-        await _context.Enderecos.AddAsync(endereco);
+        private readonly ApplicationDbContext _context;
 
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<List<Endereco>> FindAllById(int? Id)
-    {
-        return await _context.Enderecos.ToListAsync();
-    }
-
-    public async Task<Usuario?> GetByUserId(int? Id)
-    {
-        if (Id== null)
+        public EnderecoRepository(ApplicationDbContext context)
         {
-            Console.WriteLine("O Usuario não foi Encontrado");
-            return null;
+            _context = context;
         }
-        else
+
+        public async Task<List<Endereco>> GetEnderecosByUsuarioId(int usuarioId)
         {
-            return await _context.Usuarios.
-                FirstOrDefaultAsync(u => u.Id == Id);
+            return await _context.Enderecos
+                                 .Where(e => e.UsuarioId == usuarioId)
+                                 .ToListAsync();
         }
-    }
-    public List<Endereco> GetAllByUserId(int userId)
-    {
-        return _context.Enderecos.Where(e => e.UsuarioId == userId).ToList();
-    }
-    public Endereco GetById(int id)
-    {
-        return _context.Enderecos.FirstOrDefault(e => e.Id == id);
-    }
-    public async Task UpdateAsync(Endereco endereco)
-    {
-        await _context.SaveChangesAsync();
-    }
-    public async Task DeleteAsync(int id)
-    {
-        var endereco = GetById(id);
-        if (endereco != null)
+
+        public async Task AddEndereco(Endereco endereco)
+        {
+            await _context.Enderecos.AddAsync(endereco);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateEndereco(Endereco endereco)
+        {
+            _context.Enderecos.Update(endereco);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteEndereco(Endereco endereco)
         {
             _context.Enderecos.Remove(endereco);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Endereco?> GetEnderecoById(int id)
+        {
+            return await _context.Enderecos.FindAsync(id);
         }
     }
 }
-
-    
-
-        
-
-    

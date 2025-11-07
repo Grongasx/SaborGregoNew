@@ -24,4 +24,18 @@ namespace SaborGregoNew.Models
         public Usuario? Entregador { get; set; }
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
     }
-}
+
+    public class ItemPedido
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public int PedidoId { get; set; }
+        public Pedido? Pedido { get; set; } 
+        [Required]
+        public int ProdutoId { get; set; }
+        public Produto? Produto { get; set; }
+        [Required]
+        public int Quantidade { get; set; } = 0;
+    }
+} 

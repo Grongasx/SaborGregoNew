@@ -243,8 +243,14 @@
                     </li>
                     @if (User.Identity != null && User.Identity!.IsAuthenticated)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Usuario" asp-action="Profile">@User.Identity.Name</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="bi dropdown-item" href="/Usuario/Endereco/ListaEnderecos">Meus Endereços</a></li>
+                                <li><a class="bi dropdown-item" href="/Perfil">Meu Perfil</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <form method="post" action="/Logout">
@@ -298,6 +304,14 @@
         
         // Update cart count on page load
         document.addEventListener('DOMContentLoaded', updateCartCount);
+
+        // Initialize Bootstrap dropdowns
+        document.addEventListener('DOMContentLoaded', function () {
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl)
+            })
+        });
     </script>
     
     @RenderSection("Scripts", required: false)

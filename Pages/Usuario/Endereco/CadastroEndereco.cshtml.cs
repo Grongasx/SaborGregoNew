@@ -2,17 +2,16 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.DTOs.Usuario;
-using SaborGregoNew.Models;
 using SaborGregoNew.Services;
 
 namespace SaborGregoNew.Pages.Usuario
 {
     public class CadastroEnderecoModel : PageModel
     {
-        private readonly EnderecoService _EnderecoService;
+        private readonly EnderecoService _enderecoService;
         public CadastroEnderecoModel(EnderecoService enderecoService)
         {
-            _EnderecoService = enderecoService;
+            _enderecoService = enderecoService;
         }
 
         [BindProperty]
@@ -25,6 +24,8 @@ namespace SaborGregoNew.Pages.Usuario
 
         public async Task<IActionResult> OnPostAsync()
         {
+            
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -38,11 +39,13 @@ namespace SaborGregoNew.Pages.Usuario
 
             var UserId = int.Parse(UserIdString);
 
-            if (enderecoDTO != null)
+            
+            if (enderecoDTO == null)
             {
                 enderecoDTO.UsuarioId = UserId;
-                await _EnderecoService.CadastrarEndereco(enderecoDTO);
+                await _enderecoService.AddEndereco(enderecoDTO, UserId);
             }
+
 
             return RedirectToPage("/Index");
         }

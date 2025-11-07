@@ -12,7 +12,6 @@ public class CadastroEnderecoDTO
     public string Logradouro { get; set; } = string.Empty;
     [Required]
     public string Numero { get; set; } = string.Empty;
-    [Required]
     public string Complemento { get; set; } = string.Empty;
     [Required]
     public string Bairro { get; set; } = string.Empty;

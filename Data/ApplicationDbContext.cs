@@ -14,6 +14,10 @@ namespace SaborGregoNew.Data
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Endereco> Enderecos { get; set; }
+        public DbSet<ItemPedido> ItensPedidos { get; set; }
+        public DbSet<CarrinhoItem> CarrinhoItens { get; set; }
+        public DbSet<Carrinho> Carrinhos { get; set; }
+        
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -19,7 +19,7 @@ namespace SaborGregoNew.Pages.Usuario
         [BindProperty]
         public Endereco Endereco { get; set; }
 
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGet(int id)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -27,7 +27,7 @@ namespace SaborGregoNew.Pages.Usuario
                 return RedirectToPage("/Usuario/Login");
             }
 
-            Endereco = _enderecoService.GetById(id);
+            Endereco = await _enderecoService.GetById(id);
 
             if (Endereco == null || Endereco.UsuarioId != userId)
             {
@@ -45,7 +45,7 @@ namespace SaborGregoNew.Pages.Usuario
                 return RedirectToPage("/Usuario/Login");
             }
 
-            var enderecoFromDb = _enderecoService.GetById(id);
+            var enderecoFromDb = await _enderecoService.GetById(id);
             if (enderecoFromDb == null || enderecoFromDb.UsuarioId != userId)
             {
                 return Forbid();

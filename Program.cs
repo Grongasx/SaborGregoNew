@@ -13,11 +13,17 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 // Configuração do DbContext com SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SaborGregoConnection")));
+    options.UseSqlite("Data Source=SaborGrego.db"));
+    
 
 // Registro dos Serviços e Repositórios
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ProdutoRepository>();
+builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<EnderecoRepository>();
+builder.Services.AddScoped<EnderecoService>();
+
 
 // Configuração de Autenticação via Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

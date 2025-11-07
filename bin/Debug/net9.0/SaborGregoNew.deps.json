@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v9.0": {
       "SaborGregoNew/1.0.0": {
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Cookies": "2.3.0",
           "Microsoft.Data.SqlClient": "6.1.2",
           "Microsoft.Data.Sqlite": "9.0.10",
           "Microsoft.Data.Sqlite.Core": "9.0.10",
@@ -20,8 +21,7 @@
           "Microsoft.Extensions.Caching.Memory": "9.0.10",
           "SQLite": "3.13.0",
           "Swashbuckle.AspNetCore": "9.0.6",
-          "System.Memory.Data": "9.0.10",
-          "Microsoft.AspNetCore.Authentication.Cookies": "2.3.0"
+          "System.Memory.Data": "9.0.10"
         },
         "runtime": {
           "SaborGregoNew.dll": {}
