@@ -4,9 +4,6 @@ using SaborGregoNew.DTOs.Usuario;
 
 namespace SaborGregoNew.Services
 {
-    // This service handles business logic for Endereco (Address) entities.
-
-{
     public class EnderecoService
     {
         private readonly EnderecoRepository _enderecoRepository;
