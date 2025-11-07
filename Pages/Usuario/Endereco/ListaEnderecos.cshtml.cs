@@ -25,7 +25,7 @@ namespace SaborGregoNew.Pages.Usuario
                 return RedirectToPage("/Usuario/Login");
             }
 
-            List<Endereco> Enderecos = await _enderecoService.GetAllByUserId(userId);
+            Enderecos = await _enderecoService.GetAllByUserId(userId);
 
             return Page();
         }

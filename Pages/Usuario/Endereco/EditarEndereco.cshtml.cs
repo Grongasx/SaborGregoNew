@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.Models;
 using SaborGregoNew.Services;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace SaborGregoNew.Pages.Usuario
 {
@@ -67,7 +66,7 @@ namespace SaborGregoNew.Pages.Usuario
 
             await _enderecoService.UpdateAsync(Endereco.Id, dto);
 
-            return RedirectToPage("/Usuario/ListaEnderecos");
+            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }
 }

@@ -1,0 +1,88 @@
+@page
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model SaborGregoNew.Pages.CheckoutModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="container mt-5">
+    <h2>Finalizar Compra</h2>
+    <hr />
+
+    <form method="post" asp-page-handler="OnPostAsync">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Resumo do Pedido</h3>
+                <ul class="list-group mb-3">
+                    @foreach (var item in Model.Carrinho)
+                    {
+                        <li class="list-group-item d-flex justify-content-between lh-sm">
+                            <div>
+                                <h6 class="my-0">@item.Nome</h6>
+                                <small class="text-muted">(@item.Quantidade x @item.Preco.ToString("C"))</small>
+                            </div>
+                            <span class="text-muted">@item.SubTotal.ToString("C")</span>
+                        </li>
+                    }
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total (BRL)</span>
+                        <strong>@Model.CarrinhoTotal.ToString("C")</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Detalhes de Entrega e Pagamento</h3>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <h4>Endereço de Entrega</h4>
+                <div class="mb-3">
+                    <label asp-for="CheckoutInfo.EnderecoId" class="form-label"></label>
+                    
+                    <select asp-for="CheckoutInfo.EnderecoId" class="form-select">
+                        <option value="">Selecione um Endereço Cadastrado</option>
+                        @foreach (var endereco in Model.Enderecos)
+                        {
+                            // Certifique-se de que a propriedade DescricaoCompleta existe no seu Endereco Model
+                            <option value="@endereco.Id">
+                                @endereco.Apelido
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="CheckoutInfo.EnderecoId" class="text-danger"></span>
+                    
+                    <div class="mt-2">
+                        <a asp-page="/Usuario/Endereco/Criar" class="btn btn-sm btn-outline-info">
+                            + Cadastrar Novo Endereço
+                        </a>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Método de Pagamento</h4>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Pix" class="form-check-input" required />
+                        <label class="form-check-label">Pix</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Cartão na Entrega" class="form-check-input" required />
+                        <label class="form-check-label">Cartão na Entrega</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Dinheiro na Entrega" class="form-check-input" required />
+                        <label class="form-check-label">Dinheiro na Entrega</label>
+                    </div>
+                    <span asp-validation-for="CheckoutInfo.MetodoPagamento" class="text-danger"></span>
+                </div>
+
+                <hr class="my-4">
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success">Finalizar Compra <i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

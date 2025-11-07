@@ -24,4 +24,9 @@ public class ProdutoRepository
     {
         return await _context.Produtos.ToListAsync();
     }
+
+    public Produto? GetById(int id)
+    {
+        return _context.Produtos.FirstOrDefault(e => e.Id == id);
+    }
 }

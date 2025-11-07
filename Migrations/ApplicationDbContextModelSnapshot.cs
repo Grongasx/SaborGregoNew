@@ -17,21 +17,6 @@ namespace SaborGregoNew.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
 
-            modelBuilder.Entity("PedidoProduto", b =>
-                {
-                    b.Property<int>("PedidosId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProdutosId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("PedidosId", "ProdutosId");
-
-                    b.HasIndex("ProdutosId");
-
-                    b.ToTable("PedidoProduto");
-                });
-
             modelBuilder.Entity("SaborGregoNew.Models.Carrinho", b =>
                 {
                     b.Property<int>("Id")
@@ -59,8 +44,16 @@ namespace SaborGregoNew.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CarrinhoId")
+                    b.Property<int?>("CarrinhoId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Imagem")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Preco")
                         .HasColumnType("TEXT");
@@ -78,6 +71,36 @@ namespace SaborGregoNew.Migrations
                     b.HasIndex("ProdutoId");
 
                     b.ToTable("CarrinhoItens");
+                });
+
+            modelBuilder.Entity("SaborGregoNew.Models.DetalhePedido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("NomeProduto")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("PrecoUnitario")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.ToTable("DetalhesPedido");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Endereco", b =>
@@ -116,30 +139,6 @@ namespace SaborGregoNew.Migrations
                     b.ToTable("Enderecos");
                 });
 
-            modelBuilder.Entity("SaborGregoNew.Models.ItemPedido", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PedidoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProdutoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PedidoId");
-
-                    b.HasIndex("ProdutoId");
-
-                    b.ToTable("ItensPedidos");
-                });
-
             modelBuilder.Entity("SaborGregoNew.Models.Pedido", b =>
                 {
                     b.Property<int>("Id")
@@ -152,27 +151,36 @@ namespace SaborGregoNew.Migrations
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("EnderecoEntrega")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("EntregadorId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("FuncionarioId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("MetodoPagamento")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("ValorTotal")
-                        .HasPrecision(10, 2)
+                    b.Property<int?>("ProdutoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalPedido")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClienteId");
-
-                    b.HasIndex("EntregadorId");
-
-                    b.HasIndex("FuncionarioId");
+                    b.HasIndex("ProdutoId");
 
                     b.ToTable("Pedidos");
                 });
@@ -190,9 +198,9 @@ namespace SaborGregoNew.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Imagem")
+                    b.Property<string>("Imagem")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -237,28 +245,11 @@ namespace SaborGregoNew.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("PedidoProduto", b =>
-                {
-                    b.HasOne("SaborGregoNew.Models.Pedido", null)
-                        .WithMany()
-                        .HasForeignKey("PedidosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SaborGregoNew.Models.Produto", null)
-                        .WithMany()
-                        .HasForeignKey("ProdutosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SaborGregoNew.Models.CarrinhoItem", b =>
                 {
-                    b.HasOne("SaborGregoNew.Models.Carrinho", "Carrinho")
+                    b.HasOne("SaborGregoNew.Models.Carrinho", null)
                         .WithMany("Produtos")
-                        .HasForeignKey("CarrinhoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CarrinhoId");
 
                     b.HasOne("SaborGregoNew.Models.Produto", "Produto")
                         .WithMany()
@@ -266,9 +257,18 @@ namespace SaborGregoNew.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Carrinho");
-
                     b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("SaborGregoNew.Models.DetalhePedido", b =>
+                {
+                    b.HasOne("SaborGregoNew.Models.Pedido", "Pedido")
+                        .WithMany("Itens")
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Endereco", b =>
@@ -282,51 +282,26 @@ namespace SaborGregoNew.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("SaborGregoNew.Models.ItemPedido", b =>
-                {
-                    b.HasOne("SaborGregoNew.Models.Pedido", "Pedido")
-                        .WithMany()
-                        .HasForeignKey("PedidoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SaborGregoNew.Models.Produto", "Produto")
-                        .WithMany()
-                        .HasForeignKey("ProdutoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pedido");
-
-                    b.Navigation("Produto");
-                });
-
             modelBuilder.Entity("SaborGregoNew.Models.Pedido", b =>
                 {
-                    b.HasOne("SaborGregoNew.Models.Usuario", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SaborGregoNew.Models.Usuario", "Entregador")
-                        .WithMany()
-                        .HasForeignKey("EntregadorId");
-
-                    b.HasOne("SaborGregoNew.Models.Usuario", "Funcionario")
-                        .WithMany()
-                        .HasForeignKey("FuncionarioId");
-
-                    b.Navigation("Cliente");
-
-                    b.Navigation("Entregador");
-
-                    b.Navigation("Funcionario");
+                    b.HasOne("SaborGregoNew.Models.Produto", null)
+                        .WithMany("Pedidos")
+                        .HasForeignKey("ProdutoId");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Carrinho", b =>
                 {
                     b.Navigation("Produtos");
+                });
+
+            modelBuilder.Entity("SaborGregoNew.Models.Pedido", b =>
+                {
+                    b.Navigation("Itens");
+                });
+
+            modelBuilder.Entity("SaborGregoNew.Models.Produto", b =>
+                {
+                    b.Navigation("Pedidos");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Usuario", b =>

@@ -28,7 +28,7 @@
     {
         <p>usuario é um Admin</p>
     }
-    else
+    @if (User.Identity == null || !User.Identity.IsAuthenticated)
     {
         <p>usuario não está autenticado</p>
     }

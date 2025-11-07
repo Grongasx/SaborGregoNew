@@ -21,8 +21,7 @@ namespace SaborGregoNew.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public int CarrinhoId { get; set; }
-        public Carrinho? Carrinho { get; set; }
+        public string Nome { get; set; }
         [Required]
         public int ProdutoId { get; set; }
         public Produto? Produto { get; set; }
@@ -30,5 +29,9 @@ namespace SaborGregoNew.Models
         public int Quantidade { get; set; } = 1;
         [Required]
         public decimal Preco { get; set; } = 0.0M;
+        public decimal SubTotal => Preco * Quantidade;
+        [Required]
+        public string Imagem { get; set; } = string.Empty;
+    
     }
 }

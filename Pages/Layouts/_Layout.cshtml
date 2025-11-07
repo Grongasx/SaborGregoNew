@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
@@ -225,7 +226,7 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Produto" asp-action="Cardapio">Cardápio</a>
+                        <a class="nav-link" asp-page="/Produto/Cardapio">Cardápio</a>
                     </li>
                     @if (User.IsInRole("Admin"))
                     {
@@ -235,11 +236,8 @@
                     }
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item position-relative">
-                        <a class="nav-link" asp-controller="Pedido" asp-action="Cart">
-                            <i class="bi bi-cart3"></i>
-                            <span class="cart-badge" id="cartCount">0</span>
-                        </a>
+                    <li class="nav-item">
+                            @await Component.InvokeAsync("Carrinho")
                     </li>
                     @if (User.Identity != null && User.Identity!.IsAuthenticated)
                     {
@@ -253,7 +251,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <form method="post" action="/Logout">
+                            <form method="post" action="/logout">
                                 <button type="submit" class="nav-link btn btn-link border-0">Sair</button>
                             </form>
                         </li>
@@ -261,10 +259,10 @@
                     else 
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="/Usuario/Cadastro">Registrar</a>
+                            <a class="nav-link" asp-page="/Usuario/Login/Cadastro">Registrar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Usuario/Login">Entrar</a>
+                            <a class="nav-link" asp-page="/Usuario/Login/Login">Entrar</a>
                         </li>
                     }
                 </ul>

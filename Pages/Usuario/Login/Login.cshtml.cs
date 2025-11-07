@@ -76,5 +76,11 @@ namespace SaborGregoNew.Pages.Usuario
                 return Page();
             }
         }
+
+        public async Task<IActionResult> OnPostLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToPage("/Index");
+        }
     }
 }

@@ -1,0 +1,85 @@
+@page
+@model SaborGregoNew.Pages.CarrinhoModel
+@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="container mt-5">
+    <h2><i class="bi bi-cart"></i> Seu Carrinho de Compras</h2>
+    <hr />
+
+    @if (Model.Carrinho == null || !Model.Carrinho.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            Seu carrinho está vazio. Adicione alguns produtos!
+        </div>
+        <p><a asp-page="/Produto/Cardapio" class="btn btn-secondary"><i class="bi bi-chevron-left"></i>Continuar Comprando</a></p>
+    }
+    else
+    {
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Produto</th>
+                    <th class="text-center">Preço</th>
+                    <th class="text-center" style="width: 150px;">Quantidade</th>
+                    <th class="text-end">Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Carrinho)
+                {
+                    <tr>
+                        <td style="width: 100px;">
+                            @* Exibe a imagem, lembrando que ImagemUrl é o caminho relativo *@
+                            <img src="@item.Imagem" class="img-thumbnail" style="max-height: 80px;" alt="@item.Nome">
+                        </td>
+                        <td>@item.Nome</td>
+                        <td class="text-center">@item.Preco.ToString("C")</td>
+                        
+                        <td class="text-center">
+                            @* Formulário para Atualizar Quantidade *@
+                            <form method="post" asp-page-handler="AtualizarQuantidade" class="d-flex align-items-center justify-content-center">
+                                @* Campo oculto para identificar qual produto atualizar *@
+                                <input type="hidden" name="produtoId" value="@item.ProdutoId" />
+                                
+                                <input type="number" 
+                                       name="novaQuantidade" 
+                                       value="@item.Quantidade" 
+                                       min="0" 
+                                       class="form-control text-center" 
+                                       style="width: 70px;" />
+                                
+                                <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Atualizar">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </form>
+                        </td>
+                        
+                        <td class="text-end">@item.SubTotal.ToString("C")</td>
+                        <td>
+                            @* Formulário para Remover Item *@
+                            <form method="post" asp-page-handler="RemoverItem" asp-route-produtoId="@item.ProdutoId">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Remover Item">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-dark">
+                    <td colspan="4" class="text-end"><strong>Total do Pedido:</strong></td>
+                    <td class="text-end"><strong>@Model.CarrinhoTotal.ToString("C")</strong></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-page="/Produto/Cardapio" class="btn btn-secondary"><i class="bi bi-chevron-left"></i> Continuar Comprando</a>
+            <a asp-page="/Pedido/Carrinho/Checkout" class="btn btn-success">Finalizar Compra <i class="bi bi-chevron-right"></i></a>
+        </div>
+    }
+</div>

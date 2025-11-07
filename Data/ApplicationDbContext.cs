@@ -1,6 +1,7 @@
 namespace SaborGregoNew.Data
 {
     using Microsoft.EntityFrameworkCore;
+    using SaborGregoNew.Enums;
     using SaborGregoNew.Models;
 
     public class ApplicationDbContext : DbContext
@@ -14,26 +15,25 @@ namespace SaborGregoNew.Data
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Endereco> Enderecos { get; set; }
-        public DbSet<ItemPedido> ItensPedidos { get; set; }
+        public DbSet<DetalhePedido> DetalhesPedido { get; set; }
         public DbSet<CarrinhoItem> CarrinhoItens { get; set; }
         public DbSet<Carrinho> Carrinhos { get; set; }
         
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Pedido>()
-                .Property(p => p.ValorTotal)
-                .HasPrecision(10, 2);
-
             modelBuilder.Entity<Produto>()
                 .Property(p => p.Preco)
                 // Define a precisão total como 18 e a escala como 2 (duas casas decimais)
                 .HasPrecision(10, 2); 
-                
-            // ...
+            
+            modelBuilder.Entity<Produto>()
+                .Property(p => p.Categoria)
+                .HasConversion<string>();
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Pedido>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
         }
     }
-    
 }

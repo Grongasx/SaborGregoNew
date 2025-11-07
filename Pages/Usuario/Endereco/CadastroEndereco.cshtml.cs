@@ -40,14 +40,13 @@ namespace SaborGregoNew.Pages.Usuario
             var UserId = int.Parse(UserIdString);
 
             
-            if (enderecoDTO == null)
+            if (enderecoDTO != null)
             {
                 enderecoDTO.UsuarioId = UserId;
                 await _enderecoService.AddEndereco(enderecoDTO, UserId);
             }
 
-
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }
 }

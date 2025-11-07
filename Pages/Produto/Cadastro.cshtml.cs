@@ -1,21 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.DTOs.Produtos;
-using SaborGregoNew.Models;
 using SaborGregoNew.Services;
+
 
 namespace SaborGregoNew.Pages.Produto
 {
     public class CadastroModel : PageModel
     {
         private readonly ProdutoService _produtoService;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         [BindProperty] 
         public CreateProdutoDTO ProdutoDto { get; set; }
 
-        public CadastroModel(ProdutoService produtoService)
+        public CadastroModel(ProdutoService produtoService, IWebHostEnvironment hostEnvironment)
         {
             _produtoService = produtoService;
+            _hostEnvironment = hostEnvironment;
         }
 
         public void OnGet()
@@ -29,6 +31,17 @@ namespace SaborGregoNew.Pages.Produto
                 Console.WriteLine("O modelo nao e valido");
                 return Page();
             }
+            string wwwRootPath = _hostEnvironment.WebRootPath;
+            string pathDaImagem = Path.Combine(wwwRootPath, "images");
+            string nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(ProdutoDto.ImagemUpload.FileName);
+            string filePath = Path.Combine(pathDaImagem, nomeArquivo);
+            Directory.CreateDirectory(pathDaImagem);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await ProdutoDto.ImagemUpload.CopyToAsync(fileStream);
+            }
+            ProdutoDto.Imagem = "/images/" + nomeArquivo;
 
             try
             {

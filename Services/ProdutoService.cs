@@ -19,7 +19,8 @@ public class ProdutoService
             Nome = dto.Nome,
             Descricao = dto.Descricao,
             Preco = dto.Preco,
-            Categoria = dto.Categoria
+            Categoria = dto.Categoria,
+            Imagem = dto.Imagem
         };
 
         await _produtoRepository.Create(produto);

@@ -36,4 +36,19 @@ public class UsuarioRepository
                 FirstOrDefaultAsync(u => u.Email == Email);
         }
     }
+    
+    public async Task<Usuario?> GetById(int? Id)
+    {         
+        if (Id == null)
+        {
+            Console.WriteLine("O Usuario não foi Encontrado");
+            return null;
+        }
+        else
+        {
+            return await _context.Usuarios.
+                FirstOrDefaultAsync(u => u.Id == Id);
+        }
+    }
+    
 }

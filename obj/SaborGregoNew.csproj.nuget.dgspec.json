@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj": {}
+    "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj": {
+    "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
+        "projectUniqueName": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
         "projectName": "SaborGregoNew",
-        "projectPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
+        "projectPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
         "packagesPath": "C:\\Users\\Latitude\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\obj\\",
+        "outputPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Latitude\\AppData\\Roaming\\NuGet\\NuGet.Config"

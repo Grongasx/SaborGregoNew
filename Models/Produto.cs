@@ -15,7 +15,7 @@ namespace SaborGregoNew.Models
         public string Categoria { get; set; } = string.Empty;
         [ForeignKey("Pedido")]
         public string? Descricao { get; set; }
-        public byte[] Imagem { get; set; } = new byte[0];
+        public string Imagem { get; set; } = string.Empty;
         public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
     }
 }

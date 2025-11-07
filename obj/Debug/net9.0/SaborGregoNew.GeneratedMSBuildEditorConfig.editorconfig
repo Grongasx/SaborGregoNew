@@ -28,28 +28,36 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Cardapio.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FyZGFwaW8uY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Pedido/Cadastro.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVkaWRvXENhZGFzdHJvLmNzaHRtbA==
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Pedido/Carrinho/Carrinho.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVkaWRvXENhcnJpbmhvXENhcnJpbmhvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Pedido/Checkout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVkaWRvXENoZWNrb3V0LmNzaHRtbA==
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Pedido/Carrinho/Checkout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVkaWRvXENhcnJpbmhvXENoZWNrb3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Pedido/ConfirmacaoPedido.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVkaWRvXENvbmZpcm1hY2FvUGVkaWRvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Produto/Cadastro.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHV0b1xDYWRhc3Ryby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Cadastro.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xDYWRhc3Ryby5jc2h0bWw=
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Produto/Cardapio.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHV0b1xDYXJkYXBpby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Shared/Components/Carrinho/Default.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcQ2FycmluaG9cRGVmYXVsdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Cozinheiro/Pedidos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xDb3ppbmhlaXJvXFBlZGlkb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Endereco/CadastroEndereco.cshtml]
@@ -68,12 +76,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbmRlcmVjb1xMaXN0YUVuZGVyZWNvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xMb2dpbi5jc2h0bWw=
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Entregador/Entregas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbnRyZWdhZG9yXEVudHJlZ2FzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Logout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xMb2dvdXQuY3NodG1s
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Login/Cadastro.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xMb2dpblxDYWRhc3Ryby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/Usuario/Login/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xMb2dpblxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [c:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Pages/_ViewStart.cshtml]

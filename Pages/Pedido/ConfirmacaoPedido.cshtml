@@ -1,0 +1,81 @@
+@page
+@model SaborGregoNew.Pages.ConfirmacaoPedidoModel
+@using SaborGregoNew.Enums
+
+<div class="container my-5">
+    @if (Model.Pedido == null)
+    {
+        <div class="alert alert-danger text-center">
+            <h3>Pedido não encontrado.</h3>
+            <p>Por favor, verifique o número do pedido ou acesse sua área de pedidos.</p>
+            <a asp-page="/Index" class="btn btn-primary mt-3">Voltar ao Início</a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white text-center">
+                <h1 class="mb-0">Pedido Confirmado com Sucesso!</h1>
+                <p class="lead mb-0">Obrigado por sua compra.</p>
+            </div>
+            <div class="card-body p-4">
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4>Detalhes da Transação</h4>
+                        <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.Pedido.Id</span></p>
+                        <p class="mb-1"><strong>Data do Pedido:</strong> @Model.Pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.Pedido.Status</span></p>
+                        <p class="mb-1"><strong>Pagamento:</strong> @Model.Pedido.MetodoPagamento</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Entrega</h4>
+                        <p class="mb-1"><strong>Total:</strong> <span class="fs-5 text-success">@Model.Pedido.TotalPedido.ToString("C")</span></p>
+                        <p class="mb-1"><strong>Endereço de Entrega:</strong></p>
+                        <p class="text-muted">@Model.Pedido.EnderecoEntrega</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h4>Resumo dos Itens</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-center">Qtd.</th>
+                            <th class="text-end">Preço Unit.</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Pedido.Itens)
+                        {
+                            <tr>
+                                <td>@item.NomeProduto</td>
+                                <td class="text-center">@item.Quantidade</td>
+                                <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                                <td class="text-end">@item.SubTotal.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total do Pedido:</strong></td>
+                            <td class="text-end"><strong class="fs-5 text-success">@Model.Pedido.TotalPedido.ToString("C")</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="text-muted">Você receberá um e-mail de confirmação com os detalhes da sua compra.</p>
+                    <a asp-page="/Index" class="btn btn-primary mt-3 me-2">Continuar Comprando</a>
+                    <a asp-page="/Usuario/Pedidos/Lista" class="btn btn-outline-secondary mt-3">Ver Meus Pedidos</a>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>

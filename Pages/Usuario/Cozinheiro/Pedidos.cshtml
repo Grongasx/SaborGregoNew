@@ -1,0 +1,115 @@
+@page
+@model SaborGregoNew.Pages.Funcionario.PedidosSolicitadosModel // ⬅️ Model ajustado
+@using SaborGregoNew.Enums
+@addTagHelper*,Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary"><i class="bi bi-person-workspace"></i> Painel de Funcionário: Fila de Preparo</h1>
+    <p class="lead">Exibindo pedidos com status: <span class="badge bg-danger">Solicitado</span></p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.PedidosSolicitados.Any())
+    {
+        <div class="row">
+            @foreach (var pedido in Model.PedidosSolicitados)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card shadow-sm h-100 border-warning border-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Pedido #@pedido.Id</h5>
+                            <small>Recebido em: @pedido.DataPedido.ToString("HH:mm - dd/MM")</small>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">Itens para Preparar:</h6>
+                            <ul class="list-group list-group-flush mb-3">
+                                @foreach (var item in pedido.Itens)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <strong>@item.Quantidade x</strong> @item.NomeProduto
+                                    </li>
+                                }
+                            </ul>
+
+                            <p class="card-text">
+                                **Endereço:** @pedido.EnderecoEntrega <br/>
+                                **Pagamento:** @pedido.MetodoPagamento <br/>
+                                **Total:** <span class="text-success fw-bold">@pedido.TotalPedido.ToString("C")</span>
+                            </p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <form method="post">]
+                            @Html.AntiForgeryToken()
+                                <button type="submit" 
+                                        asp-page-handler="IniciarPreparo" 
+                                        asp-route-id="@pedido.Id"
+                                        class="btn btn-primary w-100">
+                                    <i class="bi bi-play-fill"></i> Iniciar Preparo
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-5">
+            <h4 class="alert-heading">Fila Vazia</h4>
+            <p>Nenhum pedido com status "Solicitado" no momento.</p>
+        </div>
+    }
+    <div class="col-lg-6 mb-4">
+        <h2 class="text-warning border-bottom pb-2">2. Em Preparação <span class="badge bg-warning text-dark">@Model.PedidosEmPreparacao.Count</span></h2>
+        <p class="lead">Pedidos em andamento, prontos para serem concluídos.</p>
+
+        @if (Model.PedidosEmPreparacao.Any())
+        {
+            <div class="row">
+                @foreach (var pedido in Model.PedidosEmPreparacao)
+                {
+                    <div class="col-12 mb-3">
+                        <div class="card shadow-sm h-100 border-warning border-2">
+                            <div class="card-body">
+                                <h5 class="card-title">Pedido #@pedido.Id <span class="float-end badge bg-warning text-dark">Em Preparação</span></h5>
+                                <small>Iniciado em: @pedido.DataPedido.ToString("HH:mm")</small>
+                                
+                                <h6>Itens:</h6>
+                                <ul class="list-unstyled small">
+                                    @foreach (var item in pedido.Itens)
+                                    {
+                                        <li><strong>@item.Quantidade x</strong> @item.NomeProduto</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="card-footer text-center">
+                                <form method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" 
+                                            asp-page-handler="ConcluirPreparo" 
+                                            asp-route-id="@pedido.Id"
+                                            class="btn btn-sm btn-success w-100">
+                                        <i class="bi bi-check-circle-fill"></i> Concluir Preparo
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">Nenhum pedido em preparo.</div>
+        }
+    </div>
+</div>
