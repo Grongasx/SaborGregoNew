@@ -11,8 +11,8 @@
             <h4 class="mb-0">@ViewData["Title"]</h4>
         </div>
         <div class="card-body">
-            <p class="card-text">Abaixo estão os seus endereços cadastrados. Você pode adicionar novos endereços a qualquer momento.</p>
-            <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-success mb-4">
+                <p class="card-text" style="color: white">Abaixo estão os seus endereços cadastrados. Você pode adicionar novos endereços a qualquer momento.</p>
+                <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-success mb-4">
                 <i class="fas fa-plus-circle"></i> Adicionar Novo Endereço
             </a>
 
@@ -24,10 +24,10 @@
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 shadow-sm address-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">@endereco.Apelido</h5>
-                                    <p class="card-text">
-                                        @endereco.Logradouro, @endereco.Numero<br />
-                                        @endereco.Bairro
+                                    <h5 class="card-title" style="color: #e9e9e98c">@endereco.Apelido</h5>
+                                    <p class="card-text" style="color: #e9e9e98c">
+                                        @endereco.Logradouro, @endereco.Numero<br />    
+                                        @endereco.Bairro    
                                     </p>
                                 </div>
                                 <div class="card-footer bg-transparent border-top-0">

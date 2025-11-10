@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sabor Grego</title>
     
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     
     <style>
+    
         :root {
             --primary-orange: #ff6b35;
             --primary-gold: #f7931e;
@@ -111,11 +111,17 @@
         }
         
         .hero-section {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
-            border-radius: 20px;
-            padding: 3rem;
-            margin-bottom: 2rem;
+            /* Adicionado estilos de imagem para o banner */
+            background-size: cover; 
+            background-position: center; 
+            min-height: 500px;
+            display: flex; 
+            align-items: center;
+            /* Fundo de fallback, caso a imagem não carregue ou para sobreposição */
+            background-color: #2d1810; 
         }
+        
+        /* ... (restante do seu CSS) ... */
         
         .stat-card {
             background: linear-gradient(135deg, var(--card-bg), rgba(255, 107, 53, 0.1));
@@ -177,7 +183,7 @@
             position:fixed; 
             right:75px; 
             bottom:30px; 
-            transform: translate(-50%, -50%);  
+            transform: translate(-50%, -50%);  
             background-color:rgb(37, 211, 102); 
             width:60px; height:60px; 
             text-align:center; 
@@ -201,12 +207,12 @@
             top: -20px;
             animation: animate 1.5s linear infinite;
             opacity:0;
-            backface-visibility:hidden;    
+            backface-visibility:hidden;    
         }
         .pulsaDelay:after { animation-delay: .5s; }
         @@keyframes animate {
-        0%   { transform: scale(0.5); opacity:0; }
-        50%  { opacity:1; }
+        0%   { transform: scale(0.5); opacity:0; }
+        50%  { opacity:1; }
         100% { transform: scale(1.2); opacity:0; }
         }
     </style>
@@ -269,7 +275,30 @@
             </div>
         </div>
     </nav>
-
+    
+    @if (ViewContext.RouteData.Values["page"]?.ToString() == "/Index" || ViewContext.RouteData.Values["page"]?.ToString() == "/")
+    {
+        <div class="hero-section text-white text-center py-5" 
+             style="background-image: url('C:\Users\Noll\Downloads\SaborGregoNew-main\SaborGregoNew-main\wwwroot'); 
+                    background-size: cover; 
+                    background-position: center;">
+            
+            <div class="container bg-dark p-4 rounded-3" style="--bs-bg-opacity: .6;">
+                <h1 class="display-3 fw-bolder mb-3" style="color: #ff6b35;">
+                    Autêntico Sabor Grego em Sua Casa
+                </h1>
+                
+                <p class="lead mb-4">
+                    Peça agora os nossos Gyros, Souvlakis e pratos tradicionais frescos.
+                </p>
+                
+                <a asp-page="/Produto/Cardapio" class="btn btn-lg fw-bold" 
+                   style="background-color: #ff6b35; color: white; border: none;">
+                   VER CARDÁPIO COMPLETO <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    }
     <main class="flex-grow-1">
         @RenderBody()
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
@@ -285,7 +314,6 @@
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>

@@ -18,18 +18,47 @@ else
                 <div class="col-md-6 col-lg-5">
                     <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
                         <div class="card-body p-5">
+
+                            <style>
+                                /* Cor: #e9e9e98c */
+                                
+                                /* Padrão W3C */
+                                input::placeholder {
+                                    color: #e9e9e98c !important; 
+                                    opacity: 1;
+                                }
+
+                                /* Navegadores WebKit (Chrome, Safari, etc.) */
+                                ::-webkit-input-placeholder {
+                                    color: #e9e9e98c !important;
+                                    opacity: 1; 
+                                }
+
+                                /* Mozilla Firefox */
+                                :-moz-placeholder,
+                                ::-moz-placeholder {
+                                    color: #e9e9e98c !important;
+                                    opacity: 1; /* Para evitar transparência automática do Firefox */
+                                }
+
+                                /* Internet Explorer/Edge (se aplicável) */
+                                :-ms-input-placeholder {
+                                    color: #e9e9e98c !important;
+                                    opacity: 1;
+                                }
+                            </style>
                             <div class="text-center mb-4">
                                 <div class="mb-3">
                                     <i class="bi bi-box-arrow-in-right" style="font-size: 3rem; color: #ff6b35;"></i>
                                 </div>
-                                <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">Acessar Conta</h2>
-                                <p class="text-white-50">Bem-vindo(a) de volta!</p>
+                                <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">Cadastrar novo Endereço</h2>
+                                <p class="text-white-50">Cadastre seu endereço aqui</p>
                             </div>
                             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                             
-
                             <form method="post" id="CadastroEndereco">
-                                <div class="mb-3">
+                                
+                                <div class="mb-3" style="">
                                     <label for="email" class="form-label fw-semibold text-white">
                                         <i class="bi bi-envelope me-1"></i>Nome do Endereço
                                     </label>
@@ -68,7 +97,7 @@ else
                                         id="Numero" 
                                         type="Numero"
                                         class="form-control form-control-lg" 
-                                        placeholder="Rua José João da Silva"
+                                        placeholder="123"
                                         required
                                     />
                                     <span asp-validation-for="enderecoDTO.Numero" class="text-danger small"></span>
@@ -83,7 +112,7 @@ else
                                         id="Complemento" 
                                         type="Complemento"
                                         class="form-control form-control-lg" 
-                                        placeholder="Em frente ao mercado"
+                                        placeholder="Apartamento 01"
                                         required
                                     />
                                     <span asp-validation-for="enderecoDTO.Complemento" class="text-danger small"></span>
@@ -109,7 +138,7 @@ else
                                     class="btn btn-lg w-100 text-white fw-semibold mb-3"
                                     style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;"
                                 >
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Cadastrar
                                 </button>
                             </form>
                         </div>
@@ -118,7 +147,4 @@ else
             </div>
         </div>
     </div>
-
-
-
 }

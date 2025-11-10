@@ -1,9 +1,9 @@
 @model int // O modelo aqui é o total de itens (int)
 @addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<a asp-page="Pedido/Carrinho/Carrinho" class="btn btn-outline-dark position-relative">
+<a asp-page="/Pedido/Carrinho/Carrinho" class="btn btn-outline-light position-relative">
     
-    <i class="bi bi-cart"></i> Carrinho
+<i class="bi bi-cart text-white"></i> Carrinho
     
     @if (Model > 0)
     {
