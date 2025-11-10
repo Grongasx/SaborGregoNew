@@ -14,29 +14,72 @@
     }
 </style>
 
-<div class="text-center">
-    <h1 class="display-4">Nosso Cardápio</h1>
-    <p>Conheça as delícias que preparamos para você!</p>
+@{
+    var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
+}
+
+@foreach (var key in keys)
+{
+    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
+    {
+        string alertClass = key switch
+        {
+            "MensagemSucesso" => "alert-success",
+            "MensagemErro" => "alert-danger",
+            _ => "alert-info"
+        };
+        <div class="container mt-3">
+            <div class="alert @alertClass alert-dismissible fade show text-white">
+                @message
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+}
+
+
+<div class="text-center mt-4 mb-5">
+    <h1 class="display-4">Nosso Cardápio 🍽️</h1>
+    <p class="lead text-muted">Conheça as delícias que preparamos para você!</p>
 </div>
 
-<div class="row">
-    @foreach (var produto in Model.Produtos)
+<div class="container">
+    @if (Model.Produtos.Any())
     {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="@produto.Imagem" class="card-img-top" alt="@produto.Nome" asp-append-version="true">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">@produto.Nome</h5>
-                    <p class="card-text">@produto.Descricao</p>
-                    <p class="card-text"><strong>Preço:</strong> @produto.Preco.ToString("C")</p>
-                    <p class="card-text"><small class="text-muted">Categoria: @produto.Categoria</small></p>
-                    <form method="post" asp-page-handler="AdicionarAoCarrinho" asp-route-produtoId="@produto.Id">
-                        <button type="submit" class="btn btn-primary mt-auto">
-                            <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
-                        </button>
-                    </form>
+        <div class="row">
+            @foreach (var produto in Model.Produtos)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-light">
+                        
+                        @* asp-append-version é bom para imagens *@
+                        <img src="@produto.Imagem" class="card-img-top" alt="Imagem de @produto.Nome" asp-append-version="true">
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">@produto.Nome</h5>
+                            <p class="card-text text-muted small">@produto.Descricao</p>
+                            
+                            <h6 class="card-text text-success fw-bold mt-auto">
+                                Preço: @produto.Preco.ToString("C")
+                            </h6>
+                            
+                            <p class="card-text mt-1"><small class="text-muted">Categoria: @produto.Categoria</small></p>
+                            
+                            <form method="post" asp-route-produtoId="@produto.Id">
+                                <button type="submit" class="btn btn-primary mt-2 w-100">
+                                    <i class="bi bi-cart-plus me-1"></i> Adicionar ao Carrinho
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center mt-5" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i> Nenhum produto encontrado no cardápio.
         </div>
     }
 </div>

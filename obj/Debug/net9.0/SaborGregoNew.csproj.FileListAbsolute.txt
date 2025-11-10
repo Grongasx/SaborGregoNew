@@ -627,3 +627,4 @@ C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\st
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGre.E8E0F2D0.Up2Date
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\SaborGregoNew.genruntimeconfig.cache
 C:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\ref\SaborGregoNew.dll
+c:\Users\Latitude\OneDrive\Área de Trabalho\SaborGregoNewaa\obj\Debug\net9.0\compressed\292uqa9s3x-efduytf082.gz

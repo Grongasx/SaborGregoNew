@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using saborGregoNew.Repository;
 using SaborGregoNew.DTOs.Produtos;
-using SaborGregoNew.Services;
 
 
 namespace SaborGregoNew.Pages.Produto
 {
     public class CadastroModel : PageModel
     {
-        private readonly ProdutoService _produtoService;
+        private readonly IProdutoRepository _produtoService;
         private readonly IWebHostEnvironment _hostEnvironment;
 
         [BindProperty] 
-        public CreateProdutoDTO ProdutoDto { get; set; }
+        public ProdutoDTO ProdutoDto { get; set; }
 
-        public CadastroModel(ProdutoService produtoService, IWebHostEnvironment hostEnvironment)
+        public CadastroModel(IProdutoRepository produtoService, IWebHostEnvironment hostEnvironment)
         {
             _produtoService = produtoService;
             _hostEnvironment = hostEnvironment;

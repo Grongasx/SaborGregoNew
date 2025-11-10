@@ -8,7 +8,6 @@ namespace SaborGregoNew.Pages;
 
 public class IndexModel : PageModel
 {
-    public string Texto { get; set; } = "Page Index";
 
     public void OnGet()
     {
@@ -17,9 +16,7 @@ public class IndexModel : PageModel
     
     public async Task<IActionResult> OnPostLogoutAsync()
     {
-            Console.WriteLine("--- MÉTODO OnPostLogoutAsync FOI CHAMADO ---");
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            Console.WriteLine("--- USUÁRIO DESLOGADO, REDIRECIONANDO... ---");
             return RedirectToPage("/Index");
     }
 }

@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using saborGregoNew.Repository;
 using SaborGregoNew.Models;
-using SaborGregoNew.Services;
 
 namespace SaborGregoNew.Pages
 {
     public class CarrinhoModel : PageModel
     {
-        private readonly CarrinhoService _carrinhoService;
+        private readonly ICarrinhoRepository _carrinhoService;
 
-        public CarrinhoModel(CarrinhoService carrinhoService)
+        public CarrinhoModel(ICarrinhoRepository carrinhoService)
         {
             _carrinhoService = carrinhoService;
         }

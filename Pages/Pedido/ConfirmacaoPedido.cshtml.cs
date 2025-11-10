@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SaborGregoNew.Data;
 using SaborGregoNew.Models;
-using SaborGregoNew.Services;
 using System.Security.Claims;
+using saborGregoNew.Repository;
 
 
 namespace SaborGregoNew.Pages
@@ -14,21 +14,21 @@ namespace SaborGregoNew.Pages
     [Authorize] 
     public class ConfirmacaoPedidoModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly EnderecoService _enderecoService;
-
+        private readonly IEnderecoRepository _enderecoService;
+        private readonly IPedidoRepository _pedidoRepository;
 
         // Propriedade para vincular e exibir o pedido na View
-        public Pedido Pedido { get; set; }
+        public Pedido pedido { get; set; }
+        public Endereco endereco { get; set; }
 
-        public ConfirmacaoPedidoModel(ApplicationDbContext context, EnderecoService enderecoService)
+        public ConfirmacaoPedidoModel(IEnderecoRepository enderecoService, IPedidoRepository pedidoRepository)
         {
-            _context = context;
             _enderecoService = enderecoService;
+            _pedidoRepository = pedidoRepository;
         }
 
         // O método OnGet receberá o 'id' do Pedido via query string (URL)
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int pedidoid, int enderecoid)
         {
             // 1. Verificar Autenticação (redundante, mas seguro)
             var usuarioIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -38,16 +38,19 @@ namespace SaborGregoNew.Pages
             }
             var clienteId = int.Parse(usuarioIdString);
 
-            // 2. Buscar o Pedido e seus Itens
-            // Inclui: Carrega os DetalhesPedido (Itens) e verifica se pertence ao ClienteId
-            Pedido = await _context.Pedidos
-                                   .Include(p => p.Itens) // Carrega os detalhes do pedido
-                                   .FirstOrDefaultAsync(p => p.Id == id && p.ClienteId == clienteId);
 
-            if (Pedido == null)
+            pedido = await _pedidoRepository.SelectByIdAsync(pedidoid);
+            endereco = await _enderecoService.SelectByIdAsync(enderecoid);
+            if (pedido == null)
             {
-                // Se o pedido não existir ou não pertencer ao usuário logado
+                TempData["MensagemErro"] = "O Pedido não foi encontrado";
                 return RedirectToPage("/Index"); // Ou NotFound()
+            }
+                
+            if (endereco == null)
+            {
+                TempData["MensagemErro"] = "O Endereço não foi encontrado";
+                return RedirectToPage("/Index");
             }
 
             return Page();

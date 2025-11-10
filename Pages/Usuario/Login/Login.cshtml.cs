@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using saborGregoNew.Repository;
 using SaborGregoNew.DTOs.Usuario;
-using SaborGregoNew.Services;
 
 namespace SaborGregoNew.Pages.Usuario
 {
     public class LoginModel : PageModel
     {
-        private readonly UsuarioService _usuarioService;
+        private readonly IUsuarioRepository _usuarioService;
 
         [BindProperty]
-        public LoginUserDTO? LoginDto { get; set; } // Renomeado para seguir o padrão da View
+        public LoginDTO? LoginDto { get; set; } // Renomeado para seguir o padrão da View
 
-        public LoginModel(UsuarioService usuarioService)
+        public LoginModel(IUsuarioRepository usuarioService)
         {
             _usuarioService = usuarioService;
         }
@@ -30,7 +30,7 @@ namespace SaborGregoNew.Pages.Usuario
             }
 
             // 1. Chama o método de login
-            var usuarioLogado = await _usuarioService.Logar(LoginDto);
+            var usuarioLogado = await _usuarioService.Login(LoginDto);
 
             if (usuarioLogado != null)
             {
@@ -57,7 +57,7 @@ namespace SaborGregoNew.Pages.Usuario
                 var authProperties = new AuthenticationProperties
                 {
                     IsPersistent = true, // Manter o usuário logado entre sessões (Remember Me)
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Expiração
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 };
 
                 // 5. Efetua o Login (Assina o usuário e cria o Cookie de Autenticação)

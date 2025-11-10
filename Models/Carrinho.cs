@@ -12,16 +12,13 @@ namespace SaborGregoNew.Models
         public ICollection<CarrinhoItem> Produtos { get; set; } = new List<CarrinhoItem>();
         [Required]
         public decimal Total { get; set; } = 0.0M;
-        
-        [Required]
-        public FormaPagamento? FormaPagamento { get; set; }
     }
     public class CarrinhoItem
     {
         [Key]
         public int Id { get; set; }
         [Required]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = string.Empty;
         [Required]
         public int ProdutoId { get; set; }
         public Produto? Produto { get; set; }

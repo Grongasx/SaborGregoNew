@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.Data;
 using SaborGregoNew.Models;
-using SaborGregoNew.Services;
 using SaborGregoNew.DTOs;
-using Microsoft.EntityFrameworkCore;
+using saborGregoNew.Repository;
+using SaborGregoNew.DTOs.Pedido;
 
 
 namespace SaborGregoNew.Pages
 {
     public class CheckoutModel : PageModel
     {
-        private readonly CarrinhoService _carrinhoService;
-        private readonly ApplicationDbContext _context;
-        private readonly EnderecoService _enderecoService;
+        private readonly ICarrinhoRepository _carrinhoService;
+        private readonly IEnderecoRepository _enderecoService;
+        private readonly IPedidoRepository _pedidoService;
 
         // O ViewModel para coletar as informações de entrega/pagamento
         [BindProperty]
@@ -25,11 +25,11 @@ namespace SaborGregoNew.Pages
         public List<Endereco> Enderecos { get; set; }
         public decimal CarrinhoTotal { get; set; }
 
-        public CheckoutModel(CarrinhoService carrinhoService, ApplicationDbContext context, EnderecoService enderecoService)
+        public CheckoutModel(ICarrinhoRepository carrinhoService, IEnderecoRepository enderecoService, IPedidoRepository pedidoRepository)
         {
             _carrinhoService = carrinhoService;
-            _context = context;
             _enderecoService = enderecoService;
+            _pedidoService = pedidoRepository;
         }
 
         public async Task<IActionResult> OnGet()
@@ -51,7 +51,7 @@ namespace SaborGregoNew.Pages
 
             
             
-            this.Enderecos = await _enderecoService.GetAllByUserId(ClienteId);
+            this.Enderecos = await _enderecoService.SelectAllByUserIdAsync(ClienteId);
 
             if (Enderecos == null)
             {
@@ -69,11 +69,6 @@ namespace SaborGregoNew.Pages
             Carrinho = _carrinhoService.GetCarrinho();
             CarrinhoTotal = _carrinhoService.CalcularTotal();
 
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             // 1. OBTENÇÃO DO ID DO USUÁRIO LOGADO (Lógica solicitada)
             var usuarioIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -86,17 +81,11 @@ namespace SaborGregoNew.Pages
             }
             var usuarioId = int.Parse(usuarioIdString);
 
-            if (!ModelState.IsValid)
-            {
-                // Se o modelo não for válido, recarrega a página com os erros
-                // e os dados do carrinho para que o usuário possa corrigir.
-                return Page();
-            }
+            var enderecoSelecionado = await _enderecoService.GetByIdAndUserIdAsync(
+                CheckoutInfo.EnderecoId, 
+                usuarioId
+            );
 
-            var enderecoSelecionado = await _context.Enderecos // Use o seu DbSet<Endereco> aqui
-                .AsNoTracking() // Não precisamos rastrear a entidade Endereco
-                .FirstOrDefaultAsync(e => e.Id == CheckoutInfo.EnderecoId && e.UsuarioId == usuarioId);
-            
             if (enderecoSelecionado == null)
             {
                 ModelState.AddModelError("CheckoutInfo.EnderecoId", "Endereço de entrega não encontrado ou inválido.");
@@ -104,31 +93,36 @@ namespace SaborGregoNew.Pages
             }
 
             // 2. Criação do Pedido (Order Header)
-
-            var pedido = new Models.Pedido
+            if (!ModelState.IsValid)
+            {
+                TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+                return Page();
+            }
+            
+            var pedido = new PedidoDTO
             {
                 ClienteId = usuarioId, // ⬅️ AGORA USAMOS ClienteId
                 FuncionarioId = null,  // Inicializa como nulo
                 EntregadorId = null,   // Inicializa como nulo
                 DataPedido = DateTime.Now,
-                TotalPedido = CarrinhoTotal,
+                ValorTotal = CarrinhoTotal,
                 Status = 0, // Status inicial do pedido
                 
 
                 // Mapeia os dados do DTO
-                EnderecoEntrega = $"{CheckoutInfo.EnderecoId}",
+                EnderecoId = CheckoutInfo.EnderecoId,
                 MetodoPagamento = CheckoutInfo.MetodoPagamento,
                 // ...
             };
 
             // INÍCIO DA TRANSAÇÃO NO BANCO DE DADOS
-            _context.Pedidos.Add(pedido);
-            await _context.SaveChangesAsync();
+            _pedidoService.Create(pedido);
 
+            var detalhesParaSalvar = new List<DetalhePedido>();
             // 3. Criação dos Detalhes do Pedido (Order Details)
             foreach (var item in Carrinho)
             {
-                var detalhe = new DetalhePedido
+                var detalheModelo = new DetalhePedido
                 {
                     PedidoId = pedido.Id,
                     ProdutoId = item.ProdutoId,
@@ -136,17 +130,17 @@ namespace SaborGregoNew.Pages
                     PrecoUnitario = item.Preco,
                     Quantidade = item.Quantidade
                 };
-                _context.DetalhesPedido.Add(detalhe);
+                detalhesParaSalvar.Add(detalheModelo);
             }
-
-            await _context.SaveChangesAsync();
+            _pedidoService.AddDetalhesAsync(detalhesParaSalvar);
 
             // 4. Limpar o carrinho da sessão
             _carrinhoService.ClearCarrinho();
+            
+            ViewData["MensagemSucesso"] = "Pedido realizado com sucesso!";
 
             // Redireciona para a página de confirmação
-            return RedirectToPage("/Pedido/ConfirmacaoPedido", new { id = pedido.Id });
+            return RedirectToPage("/Pedido/ConfirmacaoPedido", new { pedidoid = pedido.Id, enderecoid = CheckoutInfo.EnderecoId });
         }
-
     }
 }

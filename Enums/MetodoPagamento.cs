@@ -2,7 +2,7 @@ using Microsoft.OpenApi.Attributes;
 
 namespace SaborGregoNew.Enums;
 
-public enum FormaPagamento
+public enum MetodoPagamento
 {
     [Display(name: "Cartão de Crédito")]
     CartaoCredito,

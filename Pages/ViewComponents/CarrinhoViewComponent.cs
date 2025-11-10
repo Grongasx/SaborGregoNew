@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using SaborGregoNew.Services; // Assumindo seu CarrinhoService
+using saborGregoNew.Repository;
 
 namespace SaborGregoNew.ViewComponents
 {
     // O nome da classe deve terminar com "ViewComponent"
     public class CarrinhoViewComponent : ViewComponent
     {
-        private readonly CarrinhoService _carrinhoService;
+        private readonly ICarrinhoRepository _carrinhoService;
 
         // Injeta o Serviço do Carrinho
-        public CarrinhoViewComponent(CarrinhoService carrinhoService)
+        public CarrinhoViewComponent(ICarrinhoRepository carrinhoService)
         {
             _carrinhoService = carrinhoService;
         }

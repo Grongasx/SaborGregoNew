@@ -3,7 +3,7 @@ using SaborGregoNew.Enums;
 
 namespace SaborGregoNew.DTOs.Usuario;
 
-public class RegisterUserDto
+public class RegisterDto
 {
     [Required]
     [StringLength(20, MinimumLength = 3, ErrorMessage = "Tamanho do nome inválido")]

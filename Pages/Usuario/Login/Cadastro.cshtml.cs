@@ -1,22 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using saborGregoNew.Repository;
 using SaborGregoNew.DTOs.Usuario;
 using SaborGregoNew.Enums;
-using SaborGregoNew.Services;
 
 namespace SaborGregoNew.Pages.Usuario;
 
 public class CadastroModel : PageModel
 {
-    private readonly UsuarioService _usuarioService;
+    private readonly IUsuarioRepository _usuarioService;
     
-    public CadastroModel(UsuarioService usuarioService)
+    public CadastroModel(IUsuarioRepository usuarioService)
     {
         _usuarioService =  usuarioService;
     }
 
     [BindProperty]
-    public RegisterUserDto? Usuario  { get; set; }
+    public RegisterDto? Usuario  { get; set; }
     
     public IActionResult OnGet()
     {
@@ -34,7 +34,7 @@ public class CadastroModel : PageModel
         {
             Usuario.Role = UserRole.Cliente;
             
-            await _usuarioService.Register(Usuario);
+            await _usuarioService.Create(Usuario);
         }
             
         return RedirectToPage("/Index");

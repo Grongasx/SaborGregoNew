@@ -1,21 +1,22 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using saborGregoNew.Repository;
 using SaborGregoNew.DTOs.Usuario;
-using SaborGregoNew.Services;
 
 namespace SaborGregoNew.Pages.Usuario
 {
     public class CadastroEnderecoModel : PageModel
     {
-        private readonly EnderecoService _enderecoService;
-        public CadastroEnderecoModel(EnderecoService enderecoService)
+        private readonly IEnderecoRepository _enderecoService;
+
+        public CadastroEnderecoModel(IEnderecoRepository enderecoService)
         {
             _enderecoService = enderecoService;
         }
 
         [BindProperty]
-        public CadastroEnderecoDTO? enderecoDTO { get; set; }
+        public EnderecoDTO endereco { get; set; } = new EnderecoDTO();
 
         public IActionResult OnGet()
         {
@@ -24,28 +25,27 @@ namespace SaborGregoNew.Pages.Usuario
 
         public async Task<IActionResult> OnPostAsync()
         {
-            
+
 
             if (!ModelState.IsValid)
             {
+                TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
                 return Page();
             }
+            
             var UserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(UserIdString))
+            if (UserIdString == null)
             {
-                Console.WriteLine("O Usuario não está logado");
+                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
                 return Unauthorized();
             }
 
             var UserId = int.Parse(UserIdString);
-
             
-            if (enderecoDTO != null)
-            {
-                enderecoDTO.UsuarioId = UserId;
-                await _enderecoService.AddEndereco(enderecoDTO, UserId);
-            }
+            await _enderecoService.Create(endereco, UserId);
 
+
+            TempData["MensagemSucesso"] = "Endereço cadastrado com sucesso!";
             return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }

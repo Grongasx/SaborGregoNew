@@ -1,0 +1,9 @@
+
+.text-muted {
+    color: #ffffff !important; /* Branco puro */
+}
+
+/* Opcional: Se você usa o text-secondary e ele também está muito escuro */
+.text-secondary {
+    color: #cccccc !important; /* Cinza claro, melhor que o cinza escuro padrão */
+}

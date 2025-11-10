@@ -3,10 +3,10 @@
 @using SaborGregoNew.Enums
 
 <div class="container my-5">
-    @if (Model.Pedido == null)
+    @if (Model.pedido == null)
     {
         <div class="alert alert-danger text-center">
-            <h3>Pedido não encontrado.</h3>
+            <h3>pedido não encontrado.</h3>
             <p>Por favor, verifique o número do pedido ou acesse sua área de pedidos.</p>
             <a asp-page="/Index" class="btn btn-primary mt-3">Voltar ao Início</a>
         </div>
@@ -15,7 +15,7 @@
     {
         <div class="card shadow-lg">
             <div class="card-header bg-success text-white text-center">
-                <h1 class="mb-0">Pedido Confirmado com Sucesso!</h1>
+                <h1 class="mb-0">pedido Confirmado com Sucesso!</h1>
                 <p class="lead mb-0">Obrigado por sua compra.</p>
             </div>
             <div class="card-body p-4">
@@ -23,16 +23,17 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <h4>Detalhes da Transação</h4>
-                        <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.Pedido.Id</span></p>
-                        <p class="mb-1"><strong>Data do Pedido:</strong> @Model.Pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</p>
-                        <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.Pedido.Status</span></p>
-                        <p class="mb-1"><strong>Pagamento:</strong> @Model.Pedido.MetodoPagamento</p>
+                        <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.pedido.Id</span></p>
+                        <p class="mb-1"><strong>Data do Pedido:</strong> @Model.pedido.DataPedido.ToString("dd/MM/yyyy")</p>
+                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")>
+                        <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.pedido.Status</span></p>
+                        <p class="mb-1"><strong>Metodo de Pagamento:</strong> @Model.pedido.MetodoPagamento</p>
                     </div>
                     <div class="col-md-6">
                         <h4>Entrega</h4>
-                        <p class="mb-1"><strong>Total:</strong> <span class="fs-5 text-success">@Model.Pedido.TotalPedido.ToString("C")</span></p>
+                        <p class="mb-1"><strong>Total:</strong> <span class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</span></p>
                         <p class="mb-1"><strong>Endereço de Entrega:</strong></p>
-                        <p class="text-muted">@Model.Pedido.EnderecoEntrega</p>
+                        <p class="text-muted">@Model.endereco.Logradouro, @Model.endereco.Numero</p>
                     </div>
                 </div>
 
@@ -49,9 +50,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.Pedido.Itens)
+                        @foreach (var item in Model.pedido.Itens)
                         {
                             <tr>
+                                <img class="" source="@item.Imagem">
                                 <td>@item.NomeProduto</td>
                                 <td class="text-center">@item.Quantidade</td>
                                 <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
@@ -61,8 +63,8 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="3" class="text-end"><strong>Total do Pedido:</strong></td>
-                            <td class="text-end"><strong class="fs-5 text-success">@Model.Pedido.TotalPedido.ToString("C")</strong></td>
+                            <td colspan="3" class="text-end"><strong>Total do pedido:</strong></td>
+                            <td class="text-end"><strong class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</strong></td>
                         </tr>
                     </tfoot>
                 </table>

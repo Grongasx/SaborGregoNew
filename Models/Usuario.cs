@@ -5,22 +5,6 @@ namespace SaborGregoNew.Models
 {
     public class Usuario
     {
-        public Usuario()
-        {
-
-        }
-
-        public Usuario(int id, string nome, string telefone, string email, string senha, UserRole role, Endereco? endereco)
-        {
-            Id = id;
-            Nome = nome;
-            Telefone = telefone;
-            Email = email;
-            Senha = senha;
-            Role = role;
-            Endereco = new List<Endereco>();
-        }
-
         [Key]
         public int Id { get; set; }
         [Required]

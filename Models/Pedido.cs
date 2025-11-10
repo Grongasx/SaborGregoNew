@@ -10,23 +10,13 @@ namespace SaborGregoNew.Models
         [Key]
         public int Id { get; set; }
 
-        // 1. CHAVE OBRIGATÓRIA: ID do Cliente
-        /// <summary>
-        /// ID do usuário que fez o pedido (o Cliente). Obrigatório.
-        /// </summary>
+        
         public int ClienteId { get; set; } // Renomeado de UsuarioId para ClienteId
 
-        // 2. CHAVE OPCIONAL: ID do Funcionário
-        /// <summary>
-        /// ID do funcionário que está gerenciando o pedido. Opcional (será associado depois).
-        /// </summary>
-        ///  
+        
         public int? FuncionarioId { get; set; } // O ponto de interrogação indica que é anulável (opcional)
 
-        // 3. CHAVE OPCIONAL: ID do Entregador
-        /// <summary>
-        /// ID do entregador associado ao pedido. Opcional (será associado depois).
-        /// </summary> 
+         
         public int? EntregadorId { get; set; } // O ponto de interrogação indica que é anulável (opcional)
         
         // Dados do Pedido
@@ -40,11 +30,11 @@ namespace SaborGregoNew.Models
         public StatusPedido Status { get; set; } 
         
         // Dados de Entrega e Pagamento
-        [StringLength(255)]
-        public string EnderecoEntrega { get; set; }
+        [Required]
+        public int EnderecoId { get; set; }
         
-        [StringLength(50)]
-        public string MetodoPagamento { get; set; }
+        [Required]
+        public MetodoPagamento MetodoPagamento { get; set; }
         
         // Propriedade de Navegação para os Itens do Pedido (relação 1-para-muitos)
         public ICollection<DetalhePedido> Itens { get; set; } = new List<DetalhePedido>();
@@ -52,32 +42,29 @@ namespace SaborGregoNew.Models
 
     public class DetalhePedido
     {
-        // Chave Primária
-        [Key]
-        public int Id { get; set; }
-
         // Chave Estrangeira para a tabela Pedido
         [Required]
+        [Key]
+        [ForeignKey("PedidoId")]
         public int PedidoId { get; set; }
 
         // Chave Estrangeira para a tabela Produto
         [Required]
+        [Key]
+        [ForeignKey("ProdutoId")]
         public int ProdutoId { get; set; }
 
         // Snapshot dos dados do Produto no momento da compra
         [Required]
         [StringLength(100)]
-        public string NomeProduto { get; set; }
+        public string NomeProduto { get; set; } = string.Empty;
+        public string? Imagem { get; set; }
 
         [Required]
         public int Quantidade { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PrecoUnitario { get; set; }
-
-        // Propriedade de Navegação
-        [ForeignKey("PedidoId")]
-        public Pedido Pedido { get; set; }
 
         // Propriedade calculada (opcional, mas útil)
         [NotMapped]

@@ -1,19 +1,21 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 
-public static class SessionExtensions
+namespace SaborGregoNew.Extensions
 {
-    // Método para salvar um objeto complexo na sessão
-    public static void Set<T>(this ISession session, string key, T value)
+    public static class SessionExtensions
     {
-        session.SetString(key, JsonSerializer.Serialize(value));
-    }
+        // Método para salvar um objeto complexo na sessão
+        public static void SetObjectJson<T>(this ISession session, string key, T value)
+        {
+            session.SetString(key, JsonSerializer.Serialize(value));
+        }
 
-    // Método para obter um objeto complexo da sessão
-    public static T Get<T>(this ISession session, string key)
-    {
-        var value = session.GetString(key);
-        // Se a chave não existir, retorna o valor padrão (null para objetos)
-        return value == null ? default : JsonSerializer.Deserialize<T>(value);
+        // Método para obter um objeto complexo da sessão
+        public static T? GetObjectFromJson<T>(this ISession session, string key)
+        {
+            var value = session.GetString(key);
+            // Se a chave não existir, retorna o valor padrão (null para objetos)
+            return value == null ? default : JsonSerializer.Deserialize<T>(value);
+        }
     }
 }

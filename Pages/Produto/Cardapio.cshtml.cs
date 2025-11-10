@@ -1,56 +1,57 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SaborGregoNew.Services;
+using saborGregoNew.Repository;
+using SaborGregoNew.Models; // Adicionar using para Models.Produto
 
 namespace SaborGregoNew.Pages
 {
     public class CardapioModel : PageModel
     {
-        private readonly ProdutoService _produtoService;
-        private readonly CarrinhoService _carrinhoService;
+        private readonly IProdutoRepository _produtoService;
+        private readonly ICarrinhoRepository _carrinhoService;
 
-
-        public CardapioModel(ProdutoService produtoService, CarrinhoService carrinhoService)
+        public CardapioModel(IProdutoRepository produtoService, ICarrinhoRepository carrinhoService)
         {
             _produtoService = produtoService;
             _carrinhoService = carrinhoService;
         }
 
-        public List<Models.Produto> Produtos { get; set; }
+        // Inicializado para evitar CS8618 e NRE na View
+        public List<Models.Produto> Produtos { get; set; } = new List<Models.Produto>(); 
 
         public async Task OnGetAsync()
         {
-            Produtos = await _produtoService.GetAllAsync();
+            Produtos = await _produtoService.SelectAllAsync();
         }
 
-        public IActionResult OnPostAdicionarAoCarrinho(int produtoId)
+        // ⭐️ CORREÇÃO: Método assíncrono para usar 'await'
+        public async Task<IActionResult> OnPost(int produtoId)
         {
             if (produtoId <= 0)
             {
-                // Tratamento de erro básico
-                return RedirectToPage(); 
+                ModelState.AddModelError(string.Empty, "ID de produto inválido.");
+                // Recarrega os produtos para a View ter os dados necessários
+                await OnGetAsync(); 
+                return Page(); 
             }
 
             try
             {
-                // 1. Chama o Serviço para adicionar. 
-                // O Serviço irá buscar o produto no banco e salvar na Sessão.
-                _carrinhoService.AdicionarAoCarrinho(produtoId);
+                // ⭐️ Chama o serviço de forma assíncrona (await)
+                await _carrinhoService.AdicionarAoCarrinhoAsync(produtoId);
 
-                // 2. Redireciona o usuário para a página do carrinho para ver o item
-                return RedirectToPage("/Pedido/Carrinho/Carrinho"); 
+                // ⭐️ Padrão PRG: Redireciona para evitar re-submissão
+                TempData["MensagemSucesso"] = "Produto adicionado ao carrinho com sucesso!";
+                return RedirectToPage("Pedidod/Carrinho/Carrinho"); 
             }
             catch (Exception ex)
             {
-                // Lidar com exceções (ex: produtoId não encontrado)
                 ModelState.AddModelError(string.Empty, "Erro ao adicionar produto ao carrinho: " + ex.Message);
                 
-                // Recarrega os produtos para a tela atual
-                // Produtos = _produtoService.GetAllProdutos(); 
+                // Em caso de erro, recarrega os dados antes de retornar a Page()
+                await OnGetAsync(); 
                 return Page(); 
             }
         }
-
     }
 }
