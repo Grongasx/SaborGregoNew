@@ -1,4 +1,3 @@
-using System.Data;
 using SaborGregoNew.DTOs.Produtos;
 using Microsoft.Data.Sqlite;
 using SaborGregoNew.Models;

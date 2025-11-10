@@ -5,7 +5,7 @@ namespace SaborGregoNew.Extensions
     public static class SessionExtensions
     {
         // Método para salvar um objeto complexo na sessão
-        public static void SetObjectJson<T>(this ISession session, string key, T value)
+        public static void SetObjectFromJson<T>(this ISession session, string key, T value)
         {
             session.SetString(key, JsonSerializer.Serialize(value));
         }

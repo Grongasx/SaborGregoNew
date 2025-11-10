@@ -32,5 +32,28 @@ namespace saborGregoNew.Repository
         public const string UsuarioById = "SELECT Id, Nome, Telefone, Email, Senha, Role FROM Usuarios WHERE Id = @Id";
         public const string UsuarioUpdateById = "UPDATE Usuarios SET Nome = @Nome, Telefone = @Telefone, Email = @Email, Senha = @Senha, Role = @Role WHERE Id = @Id";
         public const string UsuarioDeleteById = "DELETE FROM Usuarios WHERE Id = @Id";
+
+
+
+
+
+
+
+        //=================================================//
+        //===========Coloca As Queries aqui Caue===========//
+        //=================================================//
+        //Dashboard
+        public const string PedidosMensais = "";
+        public const string PedidosDiarios = "";
+        public const string ProdutosMensais = "";
+        public const string ProdutosDiarios = "";
+        public const string FuncionariosMensais = "";
+        public const string FuncionariosDiarios = "";
+
+
+        public const string GetVendasQuantidadePorCategoria = @" SELECT P.Categoria, SUM(DP.Quantidade) AS QuantidadeTotal FROM DetalhesPedidos AS DP JOIN Produtos AS P ON P.Id = DP.ProdutoId GROUP BY P.Categoria;";
+        public const string GetVendasReceitaPorCategoria = @" SELECT P.Categoria, SUM(DP.PrecoUnitario) AS ReceitaTotal FROM DetalhesPedidos AS DP JOIN Produtos AS P ON P.Id = DP.ProdutoId GROUP BY P.Categoria;";
+        public const string GetProdutoMaisRentavel = @" SELECT DP.NomeProduto, SUM(DP.PrecoUnitario) AS ReceitaTotal FROM DetalhesPedidos AS DP GROUP BY DP.NomeProduto ORDER BY ReceitaTotal DESC";
+        public const string GetReceitaPorProdutoId = @"SELECT DP.ProdutoId, SUM(DP.PrecoUnitario * DP.Quantidade) AS ValorVendidoTotal, SUM(DP.Quantidade) AS QuantidadeTotalVendida FROM DetalhesPedidos AS DP GROUP BY  DP.ProdutoId ORDER BY QuantidadeTotalVendida DESC;";
     }
 }

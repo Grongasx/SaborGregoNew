@@ -31,8 +31,7 @@ namespace SaborGregoNew.Repositories
         public void SaveCarrinho(List<CarrinhoItem> carrinho)
         {
             var session = _httpContextAccessor.HttpContext?.Session;
-            // ⭐️ Correção: SetObjectAsJson é o nome correto do método de extensão
-            session?.SetObjectJson("Carrinho", carrinho); 
+            session?.SetObjectFromJson("Carrinho", carrinho); 
         }
 
         public void ClearCarrinho()
@@ -63,12 +62,11 @@ namespace SaborGregoNew.Repositories
                 // Mapeamento
                 carrinho.Add(new CarrinhoItem
                 {
-                    ProdutoId = produto.Id,
                     Nome = produto.Nome,
+                    ProdutoId = produto.Id,
+                    Quantidade = quantidade,
                     Preco = produto.Preco,
-                    // Garanta que o Model Produto tenha a propriedade Imagem
-                    Imagem = produto.Imagem, 
-                    Quantidade = quantidade
+                    Imagem = produto.Imagem,
                 });
             }
 
