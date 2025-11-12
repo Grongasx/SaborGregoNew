@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using saborGregoNew.Repository;
-using SaborGregoNew.Models; // Adicionar using para Models.Produto
 
 namespace SaborGregoNew.Pages
 {
