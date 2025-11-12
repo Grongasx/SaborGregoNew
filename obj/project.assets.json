@@ -5814,11 +5814,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
+      "projectUniqueName": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
       "projectName": "SaborGregoNew",
-      "projectPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\SaborGregoNew.csproj",
+      "projectPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
       "packagesPath": "C:\\Users\\Latitude\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\obj\\",
+      "outputPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Latitude\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -5834,11 +5834,6 @@
           "targetAlias": "net9.0",
           "projectReferences": {}
         }
-      },
-      "warningProperties": {
-        "warnAsError": [
-          "NU1605"
-        ]
       },
       "restoreAuditProperties": {
         "enableAudit": "true",

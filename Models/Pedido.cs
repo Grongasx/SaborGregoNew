@@ -10,7 +10,7 @@ namespace SaborGregoNew.Models
         [Key]
         public int Id { get; set; }
 
-        
+        [Required]
         public int ClienteId { get; set; } // Renomeado de UsuarioId para ClienteId
 
         
@@ -20,13 +20,13 @@ namespace SaborGregoNew.Models
         public int? EntregadorId { get; set; } // O ponto de interrogação indica que é anulável (opcional)
         
         // Dados do Pedido
+        [Required]
         public DateTime DataPedido { get; set; }
         
-        [Column(TypeName = "decimal(18, 2)")]
+        [Required]
         public decimal TotalPedido { get; set; }
         
         [Required]
-        [StringLength(50)]
         public StatusPedido Status { get; set; } 
         
         // Dados de Entrega e Pagamento
@@ -47,12 +47,13 @@ namespace SaborGregoNew.Models
         [Key]
         [ForeignKey("PedidoId")]
         public int PedidoId { get; set; }
+        public Pedido Pedido { get; set; }
 
         // Chave Estrangeira para a tabela Produto
         [Required]
-        [Key]
         [ForeignKey("ProdutoId")]
         public int ProdutoId { get; set; }
+        public Produto Produto { get; set; }
 
         // Snapshot dos dados do Produto no momento da compra
         [Required]

@@ -1,7 +1,27 @@
 @page
 @model SaborGregoNew.Pages.CarrinhoModel
 @addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
-
+@{
+    var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
+}
+@foreach (var key in keys)
+{
+    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
+    {
+        string alertClass = key switch
+        {
+            "MensagemSucesso" => "alert-success",
+            "MensagemErro" => "alert-danger",
+            _ => "alert-info"
+        };
+        <div class="container mt-3">
+            <div class="alert @alertClass alert-dismissible fade show text-white">
+                @message
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+}
 <div class="container mt-5">
     <h2><i class="bi bi-cart"></i> Seu Carrinho de Compras</h2>
     <hr />

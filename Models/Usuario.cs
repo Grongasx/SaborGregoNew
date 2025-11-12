@@ -18,5 +18,7 @@ namespace SaborGregoNew.Models
         [Required]
         public UserRole Role { get; set; }
         public ICollection<Endereco>? Endereco { get; set; }
+        public ICollection<Pedido>? Pedidos { get; set; }
+        public bool Ativo { get; set; } = true;
     }
 }

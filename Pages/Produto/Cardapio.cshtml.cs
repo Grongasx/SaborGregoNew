@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using saborGregoNew.Repository;
 
+
 namespace SaborGregoNew.Pages
 {
     public class CardapioModel : PageModel
@@ -24,32 +25,34 @@ namespace SaborGregoNew.Pages
         }
 
         // ⭐️ CORREÇÃO: Método assíncrono para usar 'await'
-        public async Task<IActionResult> OnPost(int produtoId)
+        public async Task<IActionResult> OnPostAsync(int produtoId)
         {
             if (produtoId <= 0)
             {
                 TempData["MensagemErro"] = "ID de produto inválido.";
-                ModelState.AddModelError(string.Empty, "ID de produto inválido.");
-                // Recarrega os produtos para a View ter os dados necessários
-                await OnGetAsync(); 
-                return Page(); 
+                return RedirectToPage();
             }
 
+            // 2. Busque o produto completo no banco de dados
+            var produto = await _produtoService.SelectByIdAsync(produtoId); 
+
+            if (produto == null)
+            {
+                TempData["MensagemErro"] = "Produto não encontrado.";
+                return RedirectToPage();
+            }
+            
             try
             {
-                // ⭐️ Chama o serviço de forma assíncrona (await)
-                await _carrinhoService.AdicionarAoCarrinhoAsync(produtoId);
+                // 3. Adicione o produto completo ao carrinho
+                await _carrinhoService.AdicionarAoCarrinhoAsync(produto);
 
-                // ⭐️ Padrão PRG: Redireciona para evitar re-submissão
                 TempData["MensagemSucesso"] = "Produto adicionado ao carrinho com sucesso!";
-                return RedirectToPage("Pedido/Carrinho/Carrinho"); 
+                return RedirectToPage("/Pedido/Carrinho/Carrinho");
             }
             catch (Exception ex)
             {
                 TempData["MensagemErro"] = "Erro ao adicionar produto ao carrinho: " + ex.Message;
-                ModelState.AddModelError(string.Empty, "Erro ao adicionar produto ao carrinho: " + ex.Message);
-                
-                // Em caso de erro, recarrega os dados antes de retornar a Page()
                 await OnGetAsync(); 
                 return RedirectToPage("Cardapio"); 
             }

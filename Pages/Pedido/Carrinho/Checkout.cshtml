@@ -7,7 +7,7 @@
     <h2>Finalizar Compra</h2>
     <hr />
 
-    <form method="post" asp-page-handler="OnPostAsync">
+    <form method="post" asp-page-handler="FinalizarCompra">
         <div class="row">
             <div class="col-md-6">
                 <h3>Resumo do Pedido</h3>
@@ -42,9 +42,8 @@
                         <option value="">Selecione um Endereço Cadastrado</option>
                         @foreach (var endereco in Model.Enderecos)
                         {
-                            // Certifique-se de que a propriedade DescricaoCompleta existe no seu Endereco Model
                             <option value="@endereco.Id">
-                                @endereco.Apelido
+                                @endereco.Apelido - @endereco.Logradouro
                             </option>
                         }
                     </select>
@@ -64,11 +63,11 @@
                         <label class="form-check-label">Pix</label>
                     </div>
                     <div class="form-check">
-                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Cartão na Entrega" class="form-check-input" required />
+                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="CartãoNaEntrega" class="form-check-input" required />
                         <label class="form-check-label">Cartão na Entrega</label>
                     </div>
                     <div class="form-check">
-                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Dinheiro na Entrega" class="form-check-input" required />
+                        <input asp-for="CheckoutInfo.MetodoPagamento" type="radio" value="Dinheiro" class="form-check-input" required />
                         <label class="form-check-label">Dinheiro na Entrega</label>
                     </div>
                     <span asp-validation-for="CheckoutInfo.MetodoPagamento" class="text-danger"></span>
@@ -86,3 +85,40 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+<script>
+function atualizarCarrinho(inputElement)
+{
+    const produtoId = inputElement.getAttribute('data-produto-id');
+    const novaQuantidade = parseInt(inputElement.value);
+
+    fetch('?handler=AtualizarQuantidade&produtoId=${produtoId}&novaQuantidade=${novaQuantidade}', {
+        method: 'POST',
+        header: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Falha ao atualizar o servidor.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.removido) {
+            const row = document.getElementById('carrinho-item-${produtoId}');
+            if (row) {
+                row.remove();
+            }
+        } else {
+            const subtotalDiv = document.getElementById('subtotal-${produtoId}');
+            if (subtotalDiv) {
+                subtotalDiv.textContent = data.novoSubTotal;
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Erro ao atualizar o carrinho", error);
+        alert('Erro ao atualizar. Tente novamente');
+    });
+}
+</script>

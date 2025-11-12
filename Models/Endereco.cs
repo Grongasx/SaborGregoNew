@@ -25,5 +25,6 @@ namespace SaborGregoNew.Models
         public Usuario? Usuario { get; set; }
         [Required]
         public int UsuarioId { get; set; }
+        public bool Ativo { get; set; } = true;
     }
 }

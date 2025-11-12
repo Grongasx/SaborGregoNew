@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using saborGregoNew.Repository.Interfaces;
 using saborGregoNew.Repository;
 using SaborGregoNew.Data;
-using SaborGregoNew.Repositories;
 using SaborGregoNew.Repository;
+using AspNetCoreGeneratedDocument;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +15,8 @@ builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "SaborGrego.Session";
     options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.HttpOnly = true;
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -22,12 +24,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
-builder.Services.AddSingleton<ICarrinhoRepository, CarrinhoSessionRepository>();
-builder.Services.AddSingleton<IUsuarioRepository, UsuarioSqliteRepository>();
-builder.Services.AddSingleton<IProdutoRepository, ProdutoSqliteRepository>();
-builder.Services.AddSingleton<IPedidoRepository, PedidoSqliteRepository>();
-builder.Services.AddSingleton<IEnderecoRepository, EnderecoSqliteRepository>();
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();//uma unica conexão para toda a navegação
+
+builder.Services.AddScoped<ICarrinhoRepository, CarrinhoSessionRepository>();
+builder.Services.AddScoped<IEnderecoRepository, EnderecoSqliteRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioSqliteRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoSqliteRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoSqliteRepository>();
 
 // Configuração de Autenticação via Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

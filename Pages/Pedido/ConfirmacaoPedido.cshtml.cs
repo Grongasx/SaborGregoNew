@@ -1,58 +1,49 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using SaborGregoNew.Data;
 using SaborGregoNew.Models;
-using System.Security.Claims;
-using saborGregoNew.Repository;
-
+using SaborGregoNew.Extensions;
+using SaborGregoNew.DTOs.Pedido;
 
 namespace SaborGregoNew.Pages
 {
     // Apenas usuários logados podem ver a confirmação de um pedido
-    [Authorize] 
     public class ConfirmacaoPedidoModel : PageModel
     {
-        private readonly IEnderecoRepository _enderecoService;
-        private readonly IPedidoRepository _pedidoRepository;
 
-        // Propriedade para vincular e exibir o pedido na View
-        public Pedido pedido { get; set; }
-        public Endereco endereco { get; set; }
+        //modelos para receber as viewbags
+        public Pedido? pedido { get; set; }
+        public Endereco? endereco { get; set; }
+        public List<DetalhePedido>? detalhesPedido { get; set; }
 
-        public ConfirmacaoPedidoModel(IEnderecoRepository enderecoService, IPedidoRepository pedidoRepository)
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            _enderecoService = enderecoService;
-            _pedidoRepository = pedidoRepository;
-        }
 
-        // O método OnGet receberá o 'id' do Pedido via query string (URL)
-        public async Task<IActionResult> OnGetAsync(int pedidoid, int enderecoid)
-        {
-            // 1. Verificar Autenticação (redundante, mas seguro)
-            var usuarioIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(usuarioIdString))
-            {
-                return RedirectToPage("/Usuario/Login/Login");
-            }
-            var clienteId = int.Parse(usuarioIdString);
+           var session = HttpContext.Session;
 
+            var pedidotemp = session.GetObjectFromJson<Pedido>("PedidoConfirmacao");
+            var enderecotemp = session.GetObjectFromJson<Endereco>("EnderecoConfirmacao");
+            var detalhesPedidotemp = session.GetObjectFromJson<List<DetalhePedido>>("DetalhesConfirmacao");
 
-            pedido = await _pedidoRepository.SelectByIdAsync(pedidoid);
-            endereco = await _enderecoService.SelectByIdAsync(enderecoid);
-            if (pedido == null)
+            // ⭐️ Remover os dados da SESSÃO IMEDIATAMENTE após a leitura ⭐️
+            session.Remove("PedidoConfirmacao");
+            session.Remove("EnderecoConfirmacao");
+            session.Remove("DetalhesConfirmacao");
+
+            // ⚠️ Nota: PedidoDTO deve ser o tipo correto que você está salvando (ou Pedido)
+            if (pedidotemp == null || enderecotemp == null || detalhesPedidotemp == null || detalhesPedidotemp.Count == 0)
             {
-                TempData["MensagemErro"] = "O Pedido não foi encontrado";
-                return RedirectToPage("/Index"); // Ou NotFound()
-            }
-                
-            if (endereco == null)
-            {
-                TempData["MensagemErro"] = "O Endereço não foi encontrado";
-                return RedirectToPage("/Index");
+                // Se falhar, redireciona para o carrinho (Sem usar TempData, limpa a mensagem aqui)
+                // session.Remove() já foi feito, então o Redirect é seguro.
+                return RedirectToPage("/Pedido/Carrinho/Carrinho");
             }
 
+            // Atribui os modelos para exibição na página
+            pedido = (Pedido)pedidotemp; // Ajuste o casting se PedidoDTO não for Pedido
+            endereco = enderecotemp;
+            detalhesPedido = detalhesPedidotemp;
+            
             return Page();
         }
     }

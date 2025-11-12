@@ -2,103 +2,119 @@ using SaborGregoNew.Models;
 using SaborGregoNew.Extensions;
 using saborGregoNew.Repository;
 
-namespace SaborGregoNew.Repositories
+namespace SaborGregoNew.Repository
 {
-    // ⭐️ RENOMEADO para refletir o uso da Session e implementar a interface
-    public class CarrinhoSessionRepository : ICarrinhoRepository 
+    public class CarrinhoSessionRepository : ICarrinhoRepository
     {
-        private readonly IProdutoRepository _produtoRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProdutoRepository _produtoRepository; //conexão com o repositorio de pedidos
 
-        public CarrinhoSessionRepository(IProdutoRepository produtoRepository, IHttpContextAccessor httpContextAccessor)
+        //conexão com a sessão
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CarrinhoSessionRepository(IHttpContextAccessor httpContextAccessor, IProdutoRepository produtoRepository)
         {
-            _produtoRepository = produtoRepository;
             _httpContextAccessor = httpContextAccessor;
+            _produtoRepository = produtoRepository;
         }
 
+        //listagem de todos os itens do carrinho
         public List<CarrinhoItem> GetCarrinho()
         {
-            var session = _httpContextAccessor.HttpContext?.Session;
-            if (session == null)
-            {
-                return new List<CarrinhoItem>();
-            }
-            // Usa o método de extensão GetObjectFromJson
-            var carrinho = session.GetObjectFromJson<List<CarrinhoItem>>("Carrinho");
-            return carrinho ?? new List<CarrinhoItem>();
+            var carrinho = _httpContextAccessor.HttpContext?//cria uma variavel
+                .Session?//procura pela sessão
+                .GetObjectFromJson<List<CarrinhoItem>>("Carrinho");//Lê o arquivo json da sessão chamado carrinho
+            return carrinho ?? new List<CarrinhoItem>();//retorna a lista, senão, cria uma nova
         }
 
-        public void SaveCarrinho(List<CarrinhoItem> carrinho)
+        //salva o carrinho atualizado no arquivo json
+        public void SaveCarrinho(List<CarrinhoItem> carrinho) //recebe uma lista de itens e retorna "deu certo"
         {
-            var session = _httpContextAccessor.HttpContext?.Session;
-            session?.SetObjectFromJson("Carrinho", carrinho); 
+            try
+            {
+                var session = _httpContextAccessor.HttpContext?.Session;//procura a sessão
+                if (session == null) throw new Exception("a sessão não existe");
+                session.SetObjectFromJson("Carrinho", carrinho);//atualiza o carrinho
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("erro ao salvar os itens no carrinho", ex);//caso de merda ele acusa
+            }
         }
 
+        //limpa o carrinho (usado quando o pedido é realizado)
         public void ClearCarrinho()
         {
-            _httpContextAccessor.HttpContext?.Session.Remove("Carrinho");
+            try
+            {
+                _httpContextAccessor.HttpContext?.Session.Remove("Carrinho");//limpa o objeto carrinho do arquivo json
+            }
+            catch
+            {
+                throw new Exception("Problema ao limpar o carrinho");
+            }
         }
 
-        public async Task AdicionarAoCarrinhoAsync(int produtoId, int quantidade = 1)
+        //Adiciona produtos ao carrinho
+        public async Task AdicionarAoCarrinhoAsync(Produto produto)//recebe um objeto produto retorna um "ok"
         {
-            // 1. ✅ CORREÇÃO: Usar 'await' para desempacotar o Produto do Task
-            var produto = await _produtoRepository.SelectByIdAsync(produtoId); 
-            
-            if (produto == null)
+            try
             {
-                throw new Exception($"Produto não encontrado.");
-            }
+                if (produto == null)//caso o produto não exista
+                {
+                    throw new Exception($"Produto não encontrado.");
+                }
+                var carrinho = GetCarrinho();//buscar o carrinho na sessão
 
-            // 2. ✅ CORREÇÃO: Usar o próprio GetCarrinho() da classe (que lê a Session)
-            var carrinho = GetCarrinho(); 
-            var itemExistente = carrinho.FirstOrDefault(i => i.ProdutoId == produtoId);
-
-            if (itemExistente != null)
-            {
-                itemExistente.Quantidade += quantidade;
-            }
-            else
-            {
-                // Mapeamento
+                //copia o produto para inserir no carrinho como um item
                 carrinho.Add(new CarrinhoItem
                 {
                     Nome = produto.Nome,
                     ProdutoId = produto.Id,
-                    Quantidade = quantidade,
+                    Quantidade = 1, //seta a quantidade automaticamente para 1
                     Preco = produto.Preco,
                     Imagem = produto.Imagem,
                 });
-            }
 
-            // 3. Salva a lista atualizada de volta na Sessão usando o próprio método da classe
-            SaveCarrinho(carrinho); 
-        }
-        
-        public void RemoverItem(int produtoId)
-        {
-            // ✅ CORREÇÃO: Usar o próprio GetCarrinho()
-            var carrinho = GetCarrinho(); 
-            var itemParaRemover = carrinho.FirstOrDefault(i => i.ProdutoId == produtoId);
-            
-            if (itemParaRemover != null)
+                SaveCarrinho(carrinho);//salva o carrinho no arquivo json
+            }
+            catch(Exception ex)
             {
-                carrinho.Remove(itemParaRemover);
-                // ✅ CORREÇÃO: Usar o próprio SaveCarrinho()
-                SaveCarrinho(carrinho); 
+                throw new Exception("Ocorreu um problema ao Inserir o produto no carrinho", ex);
+            }
+        }
+
+        //remove um item do carrinho
+        public void RemoverItem(int produtoId)//recebe o id do produto
+        {
+            try
+            {
+                var carrinho = GetCarrinho(); //busca o carrinho
+                var itemParaRemover = carrinho.FirstOrDefault(i => i.ProdutoId == produtoId);//procura o item no carrinho pelo id do produto
+
+                if (itemParaRemover != null)
+                {
+                    carrinho.Remove(itemParaRemover);
+                    SaveCarrinho(carrinho);
+                }
+                else throw new Exception("O produto é nulo");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um problema ao deletar o item do carrinho", ex);
             }
         }
         
+        //soma o valor dos itens no carrinho (usado para quando for salvar no pedido)
         public decimal CalcularTotal()
         {
-            // ✅ OK: Usa o próprio GetCarrinho()
-            return GetCarrinho().Sum(i => i.SubTotal);
+            return GetCarrinho().Sum(i => i.SubTotal);//soma todos os valores dos itens e retorna um decimal
         }
 
-        public void AtualizarQuantidade(int produtoId, int novaQuantidade)
+        //Atualiza a quantidade de itens em um unico item do carrinho
+        public void AtualizarQuantidade(int produtoId, int novaQuantidade)//recebe o id do produto e a quantidade nova
         {
-            var carrinho = GetCarrinho();
+            var carrinho = GetCarrinho();//busca o carrinho
 
-            var item = carrinho.FirstOrDefault(i => i.ProdutoId == produtoId);
+            var item = carrinho.FirstOrDefault(i => i.ProdutoId == produtoId);//busca o item no carrinho
 
             if (item != null)
             {
@@ -111,7 +127,7 @@ namespace SaborGregoNew.Repositories
                     item.Quantidade = novaQuantidade;
                 }
                 // ✅ CORREÇÃO: Usar o próprio SaveCarrinho()
-                SaveCarrinho(carrinho); 
+                SaveCarrinho(carrinho);
             }
         }
     }

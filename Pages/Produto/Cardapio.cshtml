@@ -65,7 +65,8 @@
                             
                             <p class="card-text mt-1"><small class="text-muted">Categoria: @produto.Categoria</small></p>
                             
-                            <form method="post" asp-route-produtoId="@produto.Id">
+                            <form method="post">
+                                <input type="hidden" name="produtoId" value="@produto.Id" />
                                 <button type="submit" class="btn btn-primary mt-2 w-100">
                                     <i class="bi bi-cart-plus me-1"></i> Adicionar ao Carrinho
                                 </button>

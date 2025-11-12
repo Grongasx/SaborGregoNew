@@ -94,6 +94,8 @@ namespace SaborGregoNew.Migrations
 
                     b.HasKey("PedidoId", "ProdutoId");
 
+                    b.HasIndex("ProdutoId");
+
                     b.ToTable("DetalhesPedido");
                 });
 
@@ -163,11 +165,10 @@ namespace SaborGregoNew.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalPedido")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -254,11 +255,21 @@ namespace SaborGregoNew.Migrations
 
             modelBuilder.Entity("SaborGregoNew.Models.DetalhePedido", b =>
                 {
-                    b.HasOne("SaborGregoNew.Models.Pedido", null)
+                    b.HasOne("SaborGregoNew.Models.Pedido", "Pedido")
                         .WithMany("Itens")
                         .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SaborGregoNew.Models.Produto", "Produto")
+                        .WithMany()
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
+
+                    b.Navigation("Produto");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Endereco", b =>

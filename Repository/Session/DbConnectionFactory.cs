@@ -1,7 +1,6 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
-using System.Data.Common;
 
 namespace saborGregoNew.Repository
 {

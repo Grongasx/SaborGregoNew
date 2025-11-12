@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using saborGregoNew.Repository;
+using SaborGregoNew.Extensions;
 using SaborGregoNew.Models;
 using System.Security.Claims;
 
@@ -8,41 +9,45 @@ namespace SaborGregoNew.Pages.Usuario
 {
     public class ListaEnderecosModel : PageModel
     {
-        private readonly IEnderecoRepository _enderecoService;
+        private readonly IEnderecoRepository _enderecoRepository;
 
-        public ListaEnderecosModel(IEnderecoRepository enderecoService) 
+        public ListaEnderecosModel(IEnderecoRepository enderecoRepository) 
         {
-            _enderecoService = enderecoService;
+            _enderecoRepository = enderecoRepository;
         }
 
         public List<Endereco> enderecos { get; set; } = new List<Endereco>();
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdString == null)
+            var userId = 0;
+            try
             {
-                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
-                return RedirectToPage("/Usuario/Login/Login");
+                userId = User.GetUserId();
             }
-
-            var userId = int.Parse(userIdString);
-
-            enderecos = await _enderecoService.SelectAllByUserIdAsync(userId);
-            if (enderecos.Count == 0)
+            catch
             {
-                TempData["MensagemErro"] = "Nenhum endereço encontrado.";
-                return Page();
+                TempData["MensagemErro"] = "Usuário não autenticado, Porfavor faça Login para continuar!";
+                RedirectToPage("/Usuario/Login/Login");
             }
-
+            enderecos = await _enderecoRepository.SelectAllByUserIdAsync(userId);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int Id)
         {
-            await _enderecoService.DeleteById(Id);
 
-            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
+            try
+            {
+                await _enderecoRepository.DesativarAsync(Id);
+                TempData["MensagemSucesso"] = "Endereço desativado com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = "Erro ao desativar endereço: " + ex.Message;
+                return Page();
+            }
+            return RedirectToPage();
         }
     }
 }
