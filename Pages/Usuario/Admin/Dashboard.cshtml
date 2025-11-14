@@ -1,0 +1,177 @@
+@page "/admin/dashboard"
+@model SaborGregoNew.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard do Administrador";
+}
+
+<style>
+    /* Estilos simples para os cards do dashboard */
+    .dashboard-card {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        border: none;
+    }
+
+    .dashboard-card-header {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .dashboard-card-body {
+        padding: 1.25rem;
+    }
+    
+    .dashboard-metric {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #007bff;
+    }
+    
+    .dashboard-label {
+         font-size: 1.1rem;
+         font-weight: 500;
+         color: #6c757d;
+    }
+</style>
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Vendas de Hoje
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.VendasHoje.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Vendas do Mês
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.VendasMes.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Pedidos de Hoje
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.PedidosHoje</h5>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Pedidos do Mês
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.PedidosMes</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Produto Mais Vendido (Hoje)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <p class="dashboard-label">@Model.DashboardData.ProdutoMaisVendidoHoje</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Produto Mais Vendido (Mês)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <p class="dashboard-label">@Model.DashboardData.ProdutoMaisVendidoMes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Vendas Diárias (Mês Atual)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <canvas id="vendasDiariasChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Vendas por Categoria (Mês)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <canvas id="vendasCategoriaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        (function() {
+            // --- Gráfico 1: Vendas Diárias (Linha) ---
+            var vendasDiariasData = @Html.Raw(Model.VendasDiariasJson);
+            
+            // Pega o elemento <canvas>
+            const ctxDiario = document.getElementById('vendasDiariasChart');
+            
+            // Cria o gráfico
+            new Chart(ctxDiario, {
+                type: 'line', // Tipo de gráfico
+                data: vendasDiariasData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // --- Gráfico 2: Vendas por Categoria (Pizza) ---
+            
+            var vendasCategoriaData = @Html.Raw(Model.VendasCategoriaJson);
+            const ctxCategoria = document.getElementById('vendasCategoriaChart');
+            
+            new Chart(ctxCategoria, {
+                type: 'pie', // Tipo de gráfico
+                data: vendasCategoriaData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        })();
+    </script>
+}
