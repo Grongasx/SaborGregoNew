@@ -111,7 +111,7 @@ namespace SaborGregoNew.Repository
             // 1. Verifica se a lista é nula ou vazia.
             if (itens == null || !itens.Any())
             {
-                return 3.00m; // Retorna 0.00 se o carrinho estiver vazio.
+                return 0.00m; // Retorna 0.00 se o carrinho estiver vazio.
             }
 
             // 2. Tenta somar os SubTotais

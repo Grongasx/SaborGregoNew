@@ -45,7 +45,7 @@ namespace SaborGregoNew.Pages
                 return RedirectToPage("/Usuario/Login/Login");
             }
             var ClienteId = int.Parse(clienteIdString);
-
+            CarrinhoTotal =_carrinhoService.CalcularTotal();
 
 
             this.Enderecos = await _enderecoService.SelectAllByUserIdAsync(ClienteId);
@@ -155,6 +155,7 @@ namespace SaborGregoNew.Pages
                 HttpContext.Session.SetObjectFromJson("PedidoConfirmacao", pedido);
                 HttpContext.Session.SetObjectFromJson("EnderecoConfirmacao", enderecoSelecionado);
                 HttpContext.Session.SetObjectFromJson("DetalhesConfirmacao", detalhesParaSalvar);
+                HttpContext.Session.SetObjectFromJson("CarrinhoTotal", CarrinhoTotal);
 
                 return RedirectToPage("/Pedido/ConfirmacaoPedido");// Redireciona para a página de confirmação do pedido
             }

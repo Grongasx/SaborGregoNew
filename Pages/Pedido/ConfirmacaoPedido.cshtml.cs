@@ -15,6 +15,7 @@ namespace SaborGregoNew.Pages
         public Pedido? pedido { get; set; }
         public Endereco? endereco { get; set; }
         public List<DetalhePedido>? detalhesPedido { get; set; }
+        public decimal CarrinhoTotal { get; set; }
 
 
         public async Task<IActionResult> OnGetAsync()
@@ -25,6 +26,7 @@ namespace SaborGregoNew.Pages
             var pedidotemp = session.GetObjectFromJson<Pedido>("PedidoConfirmacao");
             var enderecotemp = session.GetObjectFromJson<Endereco>("EnderecoConfirmacao");
             var detalhesPedidotemp = session.GetObjectFromJson<List<DetalhePedido>>("DetalhesConfirmacao");
+            CarrinhoTotal = session.GetObjectFromJson<decimal>("CarrinhoTotal");
 
             // ⭐️ Remover os dados da SESSÃO IMEDIATAMENTE após a leitura ⭐️
             session.Remove("PedidoConfirmacao");
