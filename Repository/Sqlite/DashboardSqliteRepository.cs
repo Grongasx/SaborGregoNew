@@ -1,234 +1,206 @@
-// using System.Data.Common;
-// using saborGregoNew.Repository;
-// using SaborGregoNew.Models;
-// using Microsoft.Data.Sqlite;
-// using System.Data.Common;
+using saborGregoNew.DTOs;
+using saborGregoNew.Repository;
+using System.Data.Common;
+using System.Threading.Tasks;
+using System;
+using System.Data;
+using System.Collections.Generic;
+
+namespace SaborGregoNew.Repository
+{
+    public class DashboardSqliteRepository : IDashboardRepository
+    {
+        private readonly IDbConnectionFactory _connectionFactory;
+
+        public DashboardSqliteRepository(IDbConnectionFactory connectionFactory)
+        {
+            _connectionFactory = connectionFactory;
+        }
+
+        public async Task<DashboardAdminDTO> GetDashboardAdminDataAsync()
+        {
+            var dto = new DashboardAdminDTO();
+            const string queryHoje = @"
+                SELECT 
+                    COALESCE(SUM(TotalPedido), 0) AS VendasHoje,
+                    COUNT(Id) AS PedidosHoje
+                FROM Pedidos
+                WHERE DATE(DataPedido) = DATE('now', 'localtime');";
+            
+            const string queryMes = @"
+                SELECT 
+                    COALESCE(SUM(TotalPedido), 0) AS VendasMes,
+                    COUNT(Id) AS PedidosMes
+                FROM Pedidos
+                WHERE STRFTIME('%Y-%m', DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime');";
+
+            const string queryProdutoHoje = @"
+                SELECT 
+                    p.Nome, 
+                    SUM(dp.Quantidade) AS QtdTotal
+                FROM DetalhesPedido AS dp
+                JOIN Produtos AS p ON dp.ProdutoId = p.Id
+                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
+                WHERE DATE(pe.DataPedido) = DATE('now', 'localtime')
+                GROUP BY p.Nome
+                ORDER BY QtdTotal DESC
+                LIMIT 1;";
+            
+            const string queryProdutoMes = @"
+                SELECT 
+                    p.Nome, 
+                    SUM(dp.Quantidade) AS QtdTotal
+                FROM DetalhesPedido AS dp
+                JOIN Produtos AS p ON dp.ProdutoId = p.Id
+                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
+                WHERE STRFTIME('%Y-%m', pe.DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
+                GROUP BY p.Nome
+                ORDER BY QtdTotal DESC
+                LIMIT 1;";
 
 
-// namespace SaborGregoNew.Repository
-// {
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão SQLite");
 
-//     public class DashboardSqliteRepository : IDashboardRepository
-//     {
-//         private readonly IDbConnectionFactory _connectionFactory;
+            using (conn)
+            {
+                await conn.OpenAsync();
+                // 1. Buscar Vendas/Pedidos de HOJE
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = queryHoje;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            dto.VendasHoje = reader.GetDecimal(reader.GetOrdinal("VendasHoje"));
+                            dto.PedidosHoje = reader.GetInt32(reader.GetOrdinal("PedidosHoje"));
+                        }
+                    }
+                }
 
-//         public DashboardSqliteRepository(IDbConnectionFactory connectionFactory)
-//         {
-//             _connectionFactory = connectionFactory;
-//         }
+                // 2. Buscar Vendas/Pedidos do MÊS
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = queryMes;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            dto.VendasMes = reader.GetDecimal(reader.GetOrdinal("VendasMes"));
+                            dto.PedidosMes = reader.GetInt32(reader.GetOrdinal("PedidosMes"));
+                        }
+                    }
+                }
+                
+                // 3. Buscar Produto mais vendido HOJE
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = queryProdutoHoje;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            dto.ProdutoMaisVendidoHoje = reader.GetString(reader.GetOrdinal("Nome"));
+                        }
+                    }
+                }
+                
+                // 4. Buscar Produto mais vendido MÊS
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = queryProdutoMes;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            dto.ProdutoMaisVendidoMes = reader.GetString(reader.GetOrdinal("Nome"));
+                        }
+                    }
+                }
+            }
+            return dto;
+        }
+        
+        public async Task<List<VendasPorDiaDTO>> GetVendasDiariasMesAsync()
+        {
+            var resultado = new List<VendasPorDiaDTO>();
+            
+            // Agrupa as vendas por dia para o mês atual
+            const string query = @"
+                SELECT 
+                    STRFTIME('%d/%m', DataPedido) AS Dia, 
+                    SUM(TotalPedido) AS Total
+                FROM Pedidos
+                WHERE STRFTIME('%Y-%m', DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
+                GROUP BY DATE(DataPedido)
+                ORDER BY DATE(DataPedido);";
 
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão SQLite");
 
-//         //Lembrete:
-//         //criar os models para tratar a vinda de dados da tabela
+            using (conn)
+            {
+                await conn.OpenAsync();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = query;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            resultado.Add(new VendasPorDiaDTO
+                            {
+                                Dia = reader.GetString(reader.GetOrdinal("Dia")),
+                                Total = reader.GetDecimal(reader.GetOrdinal("Total"))
+                            });
+                        }
+                    }
+                }
+            }
+            return resultado;
+        }
 
+        public async Task<List<VendasPorCategoriaDTO>> GetVendasPorCategoriaMesAsync()
+        {
+            var resultado = new List<VendasPorCategoriaDTO>();
 
-//         //================//
-//         //=====Pedidos====//
-//         //================//
-//         public async Task<List<Pedido>> PedidosMensaisAsync()
-//         {
-//             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
+            // Junta Pedidos, DetalhesPedido e Produtos para
+            // agrupar o total vendido por categoria no mês atual.
+            const string query = @"
+                SELECT 
+                    p.Categoria, 
+                    SUM(dp.PrecoUnitario * dp.Quantidade) AS Total
+                FROM DetalhesPedido AS dp
+                JOIN Produtos AS p ON dp.ProdutoId = p.Id
+                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
+                WHERE STRFTIME('%Y-%m', pe.DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
+                GROUP BY p.Categoria
+                ORDER BY Total DESC;";
 
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosMensais;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var pedidos = new List<Pedido>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     pedidos.Add(new Pedido
-//                     {
-//                         //arrumar oque vem da tabela aqui
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão SQLite");
 
-//                     }
-//                 );
-//                 }
-//                 return pedidos;
-//             }
-//         }
-
-//         public async Task<List<Pedido>> PedidosDiariosAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var pedidos = new List<Pedido>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     pedidos.Add(new Produto
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return pedidos;
-//             }
-//         }
-
-
-//         //================//
-//         //====Produtos====//
-//         //================//
-
-//         public async Task<List<Produto>> ProdutosMensaisAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var produtos = new List<Produto>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     produtos.Add(new Produto
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return produtos;
-//             }
-//         }
-
-//         public async Task<List<Produto>> ProdutosDiariosAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var produtos = new List<Produto>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     produtos.Add(new Produto
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return produtos;
-//             }
-//         }
-
-
-//         //==================//
-//         //===Funcionarios===//
-//         //==================//
-
-//         public async Task<List<Usuario>> QtdFuncionariosMensaisAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var funcionario = new List<Usuario>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     funcionario.Add(new Usuario
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return funcionario;
-//             }
-//         }
-
-//         public async Task<List<Usuario>> qtdFuncionariosDiariosAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var funcionarios = new List<Usuario>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     funcionarios.Add(new Usuario
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return funcionarios;
-//             }
-//         }
-
-
-//         //================//
-//         //===Entregador===//
-//         //================//
-
-//         public async Task<List<Usuario>> EntregadorMensaisAsync()
-//         {            if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var entregadores = new List<Usuario>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     entregadores.Add(new Usuario
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return entregadores;
-//             }
-//         }
-//         public async Task<List<Usuario>> EntregadorDiariosAsync()
-//         {
-//             if (_connectionFactory.CreateConnection() is not DbConnection conn)
-//                 throw new InvalidOperationException("Falha ao obter conexão");
-//             using (conn)
-//             {
-//                 await conn.OpenAsync();
-//                 using var cmd = conn.CreateCommand();
-//                 cmd.CommandText = Queries.QtdPedidosDiarios;
-//                 using var reader = await cmd.ExecuteReaderAsync();
-//                 var entregadores = new List<Usuario>();
-//                 while (await reader.ReadAsync())
-//                 {
-//                     entregadores.Add(new Usuario
-//                     {
-//                         //arrumar oque vem da tabela aqui
-
-//                     }
-//                 );
-//                 }
-//                 return entregadores;
-//             }
-//         }
-//     } 
-// }
+            using (conn)
+            {
+                await conn.OpenAsync();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = query;
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            resultado.Add(new VendasPorCategoriaDTO
+                            {
+                                Categoria = reader.GetString(reader.GetOrdinal("Categoria")),
+                                Total = reader.GetDecimal(reader.GetOrdinal("Total"))
+                            });
+                        }
+                    }
+                }
+            }
+            return resultado;
+        }
+    }
+}

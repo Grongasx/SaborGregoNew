@@ -5,7 +5,6 @@ using saborGregoNew.Repository.Interfaces;
 using saborGregoNew.Repository;
 using SaborGregoNew.Data;
 using SaborGregoNew.Repository;
-using AspNetCoreGeneratedDocument;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +30,7 @@ builder.Services.AddScoped<IEnderecoRepository, EnderecoSqliteRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioSqliteRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoSqliteRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoSqliteRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardSqliteRepository>();
 
 // Configuração de Autenticação via Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -41,7 +41,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Tempo de vida do cookie
     });
 
-// Configuração do Razor Pages
 builder.Services.AddRazorPages()
     .WithRazorPagesRoot("/Pages"); // Usar a pasta Pages como root (se não for a pasta padrão)
 

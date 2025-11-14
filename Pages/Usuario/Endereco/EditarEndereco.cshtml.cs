@@ -12,6 +12,8 @@ namespace SaborGregoNew.Pages.Usuario
         private readonly IEnderecoRepository _enderecoService;
 
         [BindProperty]
+        public EnderecoDTO endereco { get; set; } = new EnderecoDTO();
+        [BindProperty]
         public Endereco enderecoatualizado { get; set; } = new Endereco();
         public Endereco enderecoConfirmacao { get; set; } = new Endereco();
 
