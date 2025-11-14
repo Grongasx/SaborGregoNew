@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj": {}
+    "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj": {
+    "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
+        "projectUniqueName": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
         "projectName": "SaborGregoNew",
-        "projectPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
+        "projectPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
         "packagesPath": "C:\\Users\\Latitude\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\obj\\",
+        "outputPath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Latitude\\AppData\\Roaming\\NuGet\\NuGet.Config"

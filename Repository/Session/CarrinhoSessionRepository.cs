@@ -106,9 +106,17 @@ namespace SaborGregoNew.Repository
         //soma o valor dos itens no carrinho (usado para quando for salvar no pedido)
         public decimal CalcularTotal()
         {
-            return GetCarrinho().Sum(i => i.SubTotal);//soma todos os valores dos itens e retorna um decimal
-        }
+            var itens = GetCarrinho();
 
+            // 1. Verifica se a lista é nula ou vazia.
+            if (itens == null || !itens.Any())
+            {
+                return 3.00m; // Retorna 0.00 se o carrinho estiver vazio.
+            }
+
+            // 2. Tenta somar os SubTotais
+            return itens.Sum(i => i.SubTotal);
+        }
         //Atualiza a quantidade de itens em um unico item do carrinho
         public void AtualizarQuantidade(int produtoId, int novaQuantidade)//recebe o id do produto e a quantidade nova
         {

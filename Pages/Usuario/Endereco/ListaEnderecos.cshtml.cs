@@ -45,7 +45,7 @@ namespace SaborGregoNew.Pages.Usuario
             catch (Exception ex)
             {
                 TempData["MensagemErro"] = "Erro ao desativar endereço: " + ex.Message;
-                return Page();
+                return RedirectToPage();
             }
             return RedirectToPage();
         }

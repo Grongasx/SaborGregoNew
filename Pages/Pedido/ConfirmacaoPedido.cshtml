@@ -2,100 +2,137 @@
 @model SaborGregoNew.Pages.ConfirmacaoPedidoModel
 @using SaborGregoNew.Enums
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
-    var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
+    ViewData["Title"] = "Confirmação de Pedido";
 }
-@foreach (var key in keys)
+
+@* --- 1. Exibição de Mensagens (TempData) --- *@
+@if (TempData["MensagemSucesso"] is string successMessage)
 {
-    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
-    {
-        string alertClass = key switch
-        {
-            "MensagemSucesso" => "alert-success",
-            "MensagemErro" => "alert-danger",
-            _ => "alert-info"
-        };
-        <div class="container mt-3">
-            <div class="alert @alertClass alert-dismissible fade show text-white">
-                @message
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show text-white" role="alert">
+            @successMessage
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Fechar"></button>
         </div>
-    }
+    </div>
 }
+
+@if (TempData["MensagemErro"] is string errorMessage)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show text-white" role="alert">
+            @errorMessage
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    </div>
+}
+
+
 <div class="container my-5">
+    @* --- 2. Pedido Não Encontrado --- *@
     @if (Model.pedido == null)
     {
-        <div class="alert alert-danger text-center">
-            <h3>pedido não encontrado.</h3>
+        <div class="alert alert-danger text-center shadow-sm" role="alert">
+            <h3 class="alert-heading">Pedido não encontrado.</h3>
             <p>Por favor, verifique o número do pedido ou acesse sua área de pedidos.</p>
             <a asp-page="/Index" class="btn btn-primary mt-3">Voltar ao Início</a>
         </div>
     }
+    @* --- 3. Confirmação do Pedido --- *@
     else
     {
-        <div class="card shadow-lg">
-            <div class="card-header bg-success text-white text-center">
-                <h1 class="mb-0">pedido Confirmado com Sucesso!</h1>
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-success text-white text-center py-4">
+                <h1 class="mb-1 fw-bold">Pedido Confirmado com Sucesso!</h1>
                 <p class="lead mb-0">Obrigado por sua compra.</p>
             </div>
-            <div class="card-body p-4">
+            
+            <div class="card-body p-4 p-md-5">
                 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h4>Detalhes da Transação</h4>
-                        <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.pedido.Id</span></p>
-                        <p class="mb-1"><strong>Data do Pedido:</strong> @Model.pedido.DataPedido.ToString("dd/MM/yyyy")</p>
-                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")>
-                        <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.pedido.Status</span></p>
-                        <p class="mb-1"><strong>Metodo de Pagamento:</strong> @Model.pedido.MetodoPagamento</p>
+                <div class="row mb-5">
+                    
+                    @* Detalhes da Transação *@
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <h4 class="border-bottom pb-2 mb-3 text-success">Detalhes do Pedido</h4>
+                        <p class="mb-1 text-nowrap"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.pedido.Id</span></p>
+                        <p class="mb-1"><strong>Data:</strong> @Model.pedido.DataPedido.ToString("dd/MM/yyyy")</p>
+                        <p class="mb-1"><strong>Hora:</strong> @Model.pedido.DataPedido.ToString("HH:mm")</p>
+                        @* Uso do Nome do ENUM ou método de display para o Status *@
+                        <p class="mb-1"><strong>Status:</strong> <span class="badge bg-info text-dark">@Model.pedido.Status</span></p> 
+                        <p class="mb-1"><strong>Pagamento:</strong> @Model.pedido.MetodoPagamento</p>
                     </div>
+
+                    @* Detalhes da Entrega *@
                     <div class="col-md-6">
-                        <h4>Entrega</h4>
-                        <p class="mb-1"><strong>Total:</strong> <span class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</span></p>
-                        <p class="mb-1"><strong>Endereço de Entrega:</strong></p>
-                        <p class="text-muted">@Model.endereco.Logradouro, @Model.endereco.Numero</p>
+                        <h4 class="border-bottom pb-2 mb-3 text-success">Entrega e Valores</h4>
+                        <p class="mb-3"><strong>Total Pago:</strong> <span class="fs-4 text-success fw-bold">@Model.pedido.TotalPedido.ToString("C")</span></p>
+                        
+                        <h5 class="mb-1">Endereço de Entrega:</h5>
+                        <address class="text-muted">
+                            @Model.endereco.Logradouro, @Model.endereco.Numero
+                            @if (!string.IsNullOrEmpty(Model.endereco.Complemento))
+                            {
+                                <text> (@Model.endereco.Complemento)</text>
+                            }
+                            <br />
+                            @Model.endereco.Bairro
+                            <br />
+                            @Model.endereco.Apelido (Referência)
+                        </address>
                     </div>
+                </div>
+
+                <h4 class="border-bottom pb-2 mb-3 text-success">Itens do Pedido</h4>
+                
+                @* --- 4. Resumo dos Itens (Tabela) --- *@
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 55%;">Produto</th>
+                                <th class="text-center" style="width: 15%;">Qtd.</th>
+                                <th class="text-end" style="width: 15%;">Preço Unit.</th>
+                                <th class="text-end" style="width: 15%;">Subtotal</th>
+                                @* ✅ Removido o 's' extra na linha acima que quebrava o HTML *@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.pedido.Itens)
+                            {
+                                <tr>
+                                    <td>
+                                        @* ✅ Corrigido o uso da tag de imagem *@
+                                        <img src="@item.Imagem" alt="@item.NomeProduto" class="img-thumbnail me-2" style="max-width: 50px;">
+                                        @item.NomeProduto
+                                    </td>
+                                    <td class="text-center text-nowrap">@item.Quantidade</td>
+                                    <td class="text-end text-nowrap">@item.PrecoUnitario.ToString("C")</td>
+                                    @* Assumindo que o DTO tem a propriedade SubTotal. Se não, use: @((item.PrecoUnitario * item.Quantidade).ToString("C")) *@
+                                    <td class="text-end text-nowrap">@item.SubTotal.ToString("C")</td> 
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end pt-3"><strong>Total do Pedido:</strong></td>
+                                <td class="text-end pt-3"><strong class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
 
                 <hr class="my-4">
 
-                <h4>Resumo dos Itens</h4>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th class="text-center">Qtd.</th>
-                            <th class="text-end">Preço Unit.</th>
-                            <th class="text-end">Subtotal</th>s
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.pedido.Itens)
-                        {
-                            <tr>
-                                <img class="" source="@item.Imagem">
-                                <td>@item.NomeProduto</td>
-                                <td class="text-center">@item.Quantidade</td>
-                                <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
-                                <td class="text-end">@item.SubTotal.ToString("C")</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" class="text-end"><strong>Total do pedido:</strong></td>
-                            <td class="text-end"><strong class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <hr class="my-4">
-
-                <div class="text-center">
-                    <p class="text-muted">Você receberá um e-mail de confirmação com os detalhes da sua compra.</p>
-                    <a asp-page="/Index" class="btn btn-primary mt-3 me-2">Continuar Comprando</a>
-                    <a asp-page="/Usuario/Pedidos/Lista" class="btn btn-outline-secondary mt-3">Ver Meus Pedidos</a>
+                @* --- 5. Ações Finais --- *@
+                <div class="text-center pt-3">
+                    <p class="text-muted mb-3">Você receberá um e-mail de confirmação em breve.</p>
+                    <a asp-page="/Index" class="btn btn-primary btn-lg mt-2 me-3" role="button">
+                        <i class="bi bi-shop"></i> Continuar Comprando
+                    </a>
+                    <a asp-page="/Usuario/Pedidos/Lista" class="btn btn-outline-secondary btn-lg mt-2" role="button">
+                        <i class="bi bi-list-ul"></i> Ver Meus Pedidos
+                    </a>
                 </div>
 
             </div>

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OtPEW2gMx/E=",
+  "dgSpecHash": "2qUzeHW9wT8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
+  "projectFilePath": "c:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Latitude\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\Latitude\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

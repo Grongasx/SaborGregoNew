@@ -6,7 +6,7 @@ namespace saborGregoNew.Repository
     {
         // Endereço
         public const string EnderecoInsert = "INSERT INTO Enderecos (Apelido, Logradouro, Numero, Complemento, Bairro, UsuarioId) VALUES (@Apelido, @Logradouro, @Numero, @Complemento, @Bairro, @UsuarioId)";
-        public const string EnderecoUpdate = "UPDATE Enderecos SET Id = @Id, Apelido = @Apelido, Logradouro = @Logradouro, Numero = @Numero, Complemento = @Complemento, Bairro = @Bairro, UsuarioId = @UsuarioId WHERE Id = @Id";
+        public const string EnderecoUpdate = "UPDATE Enderecos SET Apelido = @Apelido, Logradouro = @Logradouro, Numero = @Numero, Complemento = @Complemento, Bairro = @Bairro, UsuarioId = @UsuarioId WHERE Id = @Id";
         public const string EnderecoSelectByUserId = "SELECT * FROM Enderecos WHERE UsuarioId = @UsuarioId";
         public const string EnderecoSelectById = "SELECT * FROM Enderecos WHERE Id = @Id";
         public const string EnderecoDeleteById = "DELETE FROM Enderecos WHERE Id = @Id";
@@ -26,7 +26,7 @@ namespace saborGregoNew.Repository
 
 
         //Produto
-        public const string ProdutoInsert = "INSERT INTO Produtos (Id, Categoria, Descricao, Imagem, Nome, Preco) VALUES (@Id, @Categoria, @Descricao, @Imagem, @Nome, @Preco)";
+        public const string ProdutoInsert = "INSERT INTO Produtos (Categoria, Descricao, Imagem, Nome, Preco) VALUES (@Categoria, @Descricao, @Imagem, @Nome, @Preco)";
         public const string ProdutoSelectAll = "SELECT Id, Categoria, Descricao, Imagem, Nome, Preco FROM Produtos";
         public const string ProdutoSelectById = "SELECT Id, Categoria, Descricao, Imagem, Nome, Preco FROM Produtos WHERE Id = @Id";
         public const string ProdutoUpdate = "UPDATE Produtos SET Nome = @Nome, Descricao = @Descricao, Preco = @Preco, Categoria = @Categoria, Imagem = @Imagem WHERE Id = @Id";

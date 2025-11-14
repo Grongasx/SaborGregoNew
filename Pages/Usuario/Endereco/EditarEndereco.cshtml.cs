@@ -12,8 +12,7 @@ namespace SaborGregoNew.Pages.Usuario
         private readonly IEnderecoRepository _enderecoService;
 
         [BindProperty]
-        public Endereco enderecoatualizado { get; set; } = new Endereco();
-        public Endereco enderecoConfirmacao { get; set; } = new Endereco();
+        public Endereco endereco { get; set; } = new Endereco();
 
         public EditarEnderecoModel(IEnderecoRepository enderecoRepository)
         {
@@ -30,14 +29,14 @@ namespace SaborGregoNew.Pages.Usuario
             }
             var UserId = int.Parse(userIdString);
 
-            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
+            endereco = await _enderecoService.SelectByIdAsync(Id);
 
-            if (enderecoConfirmacao == null)
+            if (endereco == null)
             {
                 TempData["MensagemErro"] = "Endereço não encontrado.";
                 return Page();
             }
-            if (enderecoConfirmacao.UsuarioId != UserId)
+            if (endereco.UsuarioId != UserId)
             {
                 TempData["MensagemErro"] = "Este endereço não pertence ao usuário logado.";
                 return Forbid();
@@ -54,6 +53,7 @@ namespace SaborGregoNew.Pages.Usuario
                 return Page();
             }
 
+            // 2. Segurança: Obter o ID do usuário logado
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -62,47 +62,33 @@ namespace SaborGregoNew.Pages.Usuario
             }
             var UserId = int.Parse(userIdClaim);
 
-            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
-            if (enderecoConfirmacao == null)
+            // 3. Carregar o Endereço ORIGINAL do banco para SEGURANÇA E PROPRIEDADE
+            var enderecoOriginal = await _enderecoService.SelectByIdAsync(Id);
+            
+            if (enderecoOriginal == null || enderecoOriginal.UsuarioId != UserId)
             {
-                TempData["MensagemErro"] = "Endereço não encontrado.";
-                return Page();
+                TempData["MensagemErro"] = "Endereço não encontrado ou não pertence ao usuário logado.";
+                return Forbid(); // Retorna 403 (Proibido) se não for o dono
             }
-            if (enderecoConfirmacao.UsuarioId != UserId)
-            {
-                TempData["MensagemErro"] = "O endereço não pertence ao usuário logado.";
-                return Forbid();
-            }
-            var dto = new EnderecoDTO();
-            try
-            {
-                dto = new EnderecoDTO
-                {
-                    Apelido = enderecoatualizado.Apelido,
-                    Logradouro = enderecoatualizado.Logradouro,
-                    Numero = enderecoatualizado.Numero,
-                    Bairro = enderecoatualizado.Bairro,
-                    Complemento = enderecoatualizado.Complemento ?? "",
-                    UsuarioId = enderecoatualizado.UsuarioId
-                };
-                if (enderecoatualizado != enderecoConfirmacao)
-                {
-                    await _enderecoService.UpdateById(enderecoatualizado.Id, dto);
 
-                    TempData["MensagemSucesso"] = "Endereço atualizado com sucesso!";
-                    return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
-                }
-                else
-                {
-                    TempData["MensagemErro"] = "Os dados não foram alterados.";
-                    return Page();
-                }
-            }
-            catch (Exception ex)
+            // 4. Mapear os dados EDITADOS (contidos em this.endereco) para o DTO
+            // Os dados do formulário (this.endereco) são usados, mas o ID do usuário é obtido do original.
+            var enderecodto = new EnderecoDTO
             {
-                TempData["MensagemErro"] = "Erro na associação dos dados: " + ex.Message;
-                return Page();
-            }
+                Apelido = endereco.Apelido,
+                Logradouro = endereco.Logradouro,
+                Numero = endereco.Numero,
+                Bairro = endereco.Bairro,
+                Complemento = endereco.Complemento ?? "",
+                // ⭐️ IMPORTANTÍSSIMO: Usar o ID ORIGINAL DO BANCO para garantir a integridade
+                UsuarioId = enderecoOriginal.UsuarioId 
+            };
+
+            // 5. Atualizar no Banco de Dados
+            await _enderecoService.UpdateById(Id, enderecodto);
+
+            TempData["MensagemSucesso"] = "Endereço atualizado com sucesso!";
+            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }
 }

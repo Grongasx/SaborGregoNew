@@ -21,4 +21,5 @@ public class EnderecoDTO
     public string Bairro { get; set; } = string.Empty;
     [ForeignKey("UsuarioId")]
     public int? UsuarioId { get; set; }
+    public bool Ativo { get; set; } = true;
 }

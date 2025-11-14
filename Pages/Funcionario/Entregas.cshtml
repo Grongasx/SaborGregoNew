@@ -1,0 +1,114 @@
+@page "/Funcionario/Entregas"
+@model SaborGregoNew.Pages.Funcionario.EntregasModel
+@using SaborGregoNew.Enums
+@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-success"><i class="bi bi-truck"></i> Painel do Entregador</h1>
+    <p class="lead">Gerenciamento de Entregas.</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <h2 class="text-success border-bottom pb-2">1. Prontos para Coleta <span class="badge bg-success">@Model.PedidosProntos.Count</span></h2>
+    <p class="lead">Pedidos finalizados pelo cozinheiro e aguardando serem coletados.</p>
+
+    @if (Model.PedidosProntos.Any())
+    {
+        <div class="row">
+            @foreach (var pedido in Model.PedidosProntos)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card shadow-sm h-100 border-success border-3">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Pedido #@pedido.Id</h5>
+                            <small>Pronto em: @pedido.DataPedido.ToString("HH:mm - dd/MM")</small>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">Destino:</h6>
+                            <p class="card-text mb-2">
+                                **Endereço:** @pedido.EnderecoId <br/>
+                                **Pagamento:** @pedido.MetodoPagamento <br/>
+                                **Total:** <span class="text-success fw-bold">@pedido.TotalPedido.ToString("C")</span>
+                            </p>
+
+                            <ul class="list-group list-group-flush small">
+                                @foreach (var item in pedido.Itens)
+                                {
+                                    <li class="list-group-item">@item.Quantidade x @item.NomeProduto</li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="card-footer text-center">
+                            <form method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" 
+                                        asp-page-handler="Aceitar" 
+                                        asp-route-pedidoId="@pedido.Id"
+                                        class="btn btn-success w-100">
+                                    <i class="bi bi-box-arrow-in-right"></i> Aceitar Entrega
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-5">
+            <h4 class="alert-heading">Sem Pedidos para Coletar</h4>
+            <p>Nenhum pedido pronto para retirada no momento.</p>
+        </div>
+    }
+
+    <hr class="my-5"/>
+
+    <h2 class="text-info border-bottom pb-2">2. Em Rota de Entrega <span class="badge bg-info text-dark">@Model.PedidosEmRota.Count</span></h2>
+    <p class="lead">Pedidos que você está entregando no momento.</p>
+
+    @if (Model.PedidosEmRota.Any())
+    {
+        <div class="row">
+            @foreach (var pedido in Model.PedidosEmRota)
+            {
+                <div class="col-lg-6 mb-3">
+                    <div class="card shadow-sm h-100 border-info border-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Pedido #@pedido.Id <span class="float-end badge bg-info text-dark">Em Rota</span></h5>
+                            <small>Iniciado em: @pedido.DataPedido.ToString("HH:mm")</small>
+                            
+                            <p class="card-text mt-2">
+                                **Endereço:** @pedido.EnderecoId <br/>
+                                **Pagamento:** @pedido.MetodoPagamento
+                            </p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <form method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" 
+                                        asp-page-handler="Entregar" 
+                                        asp-route-pedidoId="@pedido.Id"
+                                        class="btn btn-sm btn-success w-100">
+                                    <i class="bi bi-check-circle-fill"></i> Concluir Entrega (Entregue)
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">Nenhum pedido em rota de entrega.</div>
+    }
+</div>

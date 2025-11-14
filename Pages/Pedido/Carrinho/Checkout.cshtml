@@ -24,7 +24,7 @@
                     }
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total (BRL)</span>
-                        <strong>@Model.CarrinhoTotal.ToString("C")</strong>
+                        <strong>(@Model.CarrinhoTotal.ToString("C"))</strong>
                     </li>
                 </ul>
             </div>
@@ -50,7 +50,7 @@
                     <span asp-validation-for="CheckoutInfo.EnderecoId" class="text-danger"></span>
                     
                     <div class="mt-2">
-                        <a asp-page="/Usuario/Endereco/Criar" class="btn btn-sm btn-outline-info">
+                        <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-sm btn-outline-info">
                             + Cadastrar Novo Endereço
                         </a>
                     </div>

@@ -101,64 +101,206 @@ namespace saborGregoNew.Repository
         //==Fluxos de Pedido==//
         //====================//
 
-        //atualizar status conforme o fluxo de trabalho
-        public async Task UpdateStatusByIdAsync(int id, StatusPedido status)
+        //pegar pedidos por status
+        private Pedido MapPedidoFromReader(DbDataReader reader)
         {
+            // Nota: A função Enum.Parse é case-sensitive. Garanta que o status no DB seja exato.
+            return new Pedido
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                DataPedido = reader.GetDateTime(reader.GetOrdinal("DataPedido")),
+                EnderecoId = reader.GetInt32(reader.GetOrdinal("EnderecoId")),
+
+                EntregadorId = reader.IsDBNull(reader.GetOrdinal("EntregadorId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("EntregadorId")),
+                FuncionarioId = reader.IsDBNull(reader.GetOrdinal("FuncionarioId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("FuncionarioId")),
+
+                MetodoPagamento = (MetodoPagamento)Enum.Parse(typeof(MetodoPagamento), reader.GetString(reader.GetOrdinal("MetodoPagamento"))),
+                Status = (StatusPedido)Enum.Parse(typeof(StatusPedido), reader.GetString(reader.GetOrdinal("Status"))),
+                TotalPedido = reader.GetDecimal(reader.GetOrdinal("TotalPedido"))
+            };
+        }
+
+        // ----------------------------------------------------------------------
+
+        public async Task<List<Pedido>> GetPedidosPublicosPorStatusAsync(StatusPedido status)
+        {
+            if (status != StatusPedido.Solicitado && status != StatusPedido.ProntoParaRetirada)
+            {
+                throw new ArgumentException("Status inválido para acesso público.");
+            }
+
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
-                throw new InvalidOperationException("Falha ao obter conexão");
+                throw new InvalidOperationException("Falha ao obter conexão com o banco de dados.");
+
             using (conn)
             {
                 await conn.OpenAsync();
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = PedidoQuery.PedidoUpdateStatus;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                cmd.Parameters.Add(new SqliteParameter("@Status", status));
-                await cmd.ExecuteNonQueryAsync();
+                var cmd = conn.CreateCommand();
+
+                cmd.CommandText = PedidoQuery.GetPedidosStatus;
+                
+                // Padronizado para STRING, alinhado com o mapeamento
+                cmd.Parameters.Add(new SqliteParameter("@Status", status.ToString())); 
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                var listaPedidos = new List<Pedido>();
+                while (await reader.ReadAsync())
+                {
+                    listaPedidos.Add(MapPedidoFromReader(reader));
+                }
+                return listaPedidos;
             }
         }
 
-        //Pegar Pedidos para o fluxo
-        public async Task<List<Pedido>> GetPedidosFluxoTrabalhoAsync(StatusPedido status, int usuarioId)
+        // ----------------------------------------------------------------------
+
+        public async Task<List<Pedido>> GetPedidosFuncionarioPorStatusAsync(StatusPedido status, int usuarioId)
         {
+            if (status != StatusPedido.EmPreparacao && status != StatusPedido.EmRotaDeEntrega)
+            {
+                throw new ArgumentException("Status inválido para acesso de funcionário.");
+            }
 
-            //Verifica a conexão com o banco de dados
-            if (_connectionFactory.CreateConnection() is not DbConnection conn)
-                throw new InvalidOperationException("Falha ao obter conexão");
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão com o banco de dados.");
 
-            //abre a conexão com o banco de dados, Configura a query e executa
             using (conn)
             {
                 await conn.OpenAsync();
-
                 var cmd = conn.CreateCommand();
 
-                //verificação de Status e Usuario
-                if (status == StatusPedido.Solicitado || status == StatusPedido.ProntoParaRetirada) //Estados onde todos podem ver
+                // 1. Define a Query com base no status/tipo de funcionário
+                if (status == StatusPedido.EmPreparacao)
                 {
-                    cmd.CommandText = PedidoQuery.GetPedidosStatus;
+                    cmd.CommandText = PedidoQuery.GetPedidoFuncionario;
                 }
-                else if (status == StatusPedido.EmPreparacao || status == StatusPedido.EmRotaDeEntrega) //estado onde só quem pegou o pedido pode ver
+                else if (status == StatusPedido.EmRotaDeEntrega)
                 {
-                    if (status == StatusPedido.EmPreparacao) //apenas para cozinheiro
-                    {
-                        cmd.CommandText = PedidoQuery.GetPedidoFuncionario;
-                    }
-                    else if (status == StatusPedido.EmRotaDeEntrega) //apenas para entregador
-                    {
-                        cmd.CommandText = PedidoQuery.GetPedidosEntregador;
-                    }
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId)); //seta o tipo de usuario
-                }
-                else
-                {
-                    return new List<Pedido>(); //caso algo esteja errado, retorna uma lista vazia
+                    cmd.CommandText = PedidoQuery.GetPedidosEntregador;
                 }
 
-                cmd.Parameters.Add(new SqliteParameter("@Status", (int)status)); //seta o status para pesquisa
+                // 2. Seta os parâmetros
+                // CORRIGIDO: Padronizado para STRING, alinhado com o mapeamento e o outro método
+                cmd.Parameters.Add(new SqliteParameter("@Status", status.ToString())); 
+                
+                cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
 
-                await cmd.ExecuteNonQueryAsync(); //executa a query
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                var listaPedidos = new List<Pedido>();
+                while (await reader.ReadAsync())
+                {
+                    listaPedidos.Add(MapPedidoFromReader(reader));
+                }
+
+                return listaPedidos;
             }
-            throw new InvalidCastException("a conexão não conseguiu realizar a operação");
+        }
+
+        //atualizar status do pedido
+        public async Task UpdateStatusByIdAsync(int id, int funcionarioId, StatusPedido status)
+        {
+            // 1. Cria a conexão UMA ÚNICA vez no método principal
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão com o banco de dados.");
+            
+            // Gerencia a conexão em todo o método principal
+            using (conn)
+            {
+                await conn.OpenAsync(); // Abre a conexão uma vez
+                
+                // NOVO: Verifica se o status exige atribuição de funcionário (Cozinheiro ou Entregador)
+                if (status == StatusPedido.EmPreparacao || status == StatusPedido.EmRotaDeEntrega)
+                {
+                    if (funcionarioId <= 0)
+                    {
+                        // Mensagem de erro unificada, pois o ID é obrigatório para ambas as atribuições
+                        throw new ArgumentException($"O ID do funcionário (cozinheiro ou entregador) deve ser fornecido para a transição para o status {status}.");
+                    }
+
+                    // Chama o método auxiliar, que decide qual coluna (FuncionarioId ou EntregadorId)
+                    // atualizar com base no 'status' fornecido.
+                    await UpdateAssignmentAsync(id, funcionarioId, conn, status);
+                    return; // Sai da função, a conexão será fechada pelo 'using' acima
+                }
+                else // Lógica Padrão para Outros Status (ProntoParaRetirada, Entregue, Cancelado, etc.)
+                {
+                    // Nota: Esta seção lida com mudanças de status que não exigem a atribuição de um ID
+                    // de funcionário ou entregador (pois já foram atribuídos ou não se aplicam).
+                    var cmd = conn.CreateCommand();
+
+                    cmd.CommandText = PedidoQuery.PedidoUpdateStatus;
+                    
+                    // Usando status.ToString(), assumindo que o campo Status no banco é TEXT.
+                    cmd.Parameters.Add(new SqliteParameter("@Status", status.ToString())); 
+                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected == 0)
+                    {
+                        throw new InvalidOperationException($"Nenhum pedido encontrado com o ID {id} para atualizar o status.");
+                    }
+                }
+            }
+        }
+
+        // ----------------------------------------------------------------------------------
+
+        // Método Auxiliar Refatorado para trabalhar com uma conexão existente
+        private async Task UpdateAssignmentAsync(int id, int userId, DbConnection conn, StatusPedido status)
+        {
+            // A coluna a ser atualizada e o status final dependem do que está sendo feito
+            string columnToUpdate = "";
+            string statusString = status.ToString();
+            
+            // Define qual coluna será atualizada com base no status
+            if (status == StatusPedido.EmPreparacao)
+            {
+                // Se estiver em preparação, o userId é o ID do Cozinheiro
+                columnToUpdate = "FuncionarioId";
+            }
+            else if (status == StatusPedido.EmRotaDeEntrega)
+            {
+                // Se estiver em rota de entrega, o userId é o ID do Entregador
+                columnToUpdate = "EntregadorId";
+            }
+            else
+            {
+                // Este método só deve ser chamado para atribuições diretas de ID
+                throw new ArgumentException($"O Status '{statusString}' não exige atribuição de funcionário (FuncionarioId/EntregadorId).");
+            }
+            
+            // O método principal (UpdateStatusByIdAsync) é responsável por garantir que conn está aberto.
+            var cmd = conn.CreateCommand();
+
+            // 1. Define a Query SQL com o nome da coluna variável
+            // Nota: É necessário usar interpolação de strings (ou métodos mais avançados) 
+            // para o NOME da coluna, pois ele não pode ser um parâmetro SQL (@...).
+            // Isso é seguro neste contexto, pois 'columnToUpdate' é validada.
+            cmd.CommandText = $@"
+                UPDATE Pedidos
+                SET 
+                    {columnToUpdate} = @UserId,
+                    Status = @Status
+                WHERE 
+                    Id = @Id;
+            ";
+
+            // 2. Adiciona os parâmetros com segurança
+            cmd.Parameters.Add(new SqliteParameter("@UserId", userId));
+            cmd.Parameters.Add(new SqliteParameter("@Status", statusString)); 
+            cmd.Parameters.Add(new SqliteParameter("@Id", id));
+
+            // 3. Executa o comando
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+            if (rowsAffected == 0)
+            {
+                throw new InvalidOperationException($"Nenhum pedido encontrado com o ID {id} para atribuição de funcionário.");
+            }
         }
 
         //==========================//
@@ -167,7 +309,7 @@ namespace saborGregoNew.Repository
         //Pegar pedidos pendentes do usuario
         public async Task<List<Pedido>> GetPedidosPendentesAsync(int usuarioId)
         {
-            if (_connectionFactory.CreateConnection() is not DbConnection conn)
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new Exception("Falha ao obter conexão");
 
             try

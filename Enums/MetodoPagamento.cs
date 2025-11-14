@@ -5,9 +5,9 @@ namespace SaborGregoNew.Enums;
 public enum MetodoPagamento
 {
     [Display(name: "CartãoNaEntrega")]
-    CartãoNaEntrega,
+    CartãoNaEntrega = 0,
     [Display(name: "Dinheiro")]
-    Dinheiro,
+    Dinheiro = 1,
     [Display(name: "Pix")]
-    Pix
+    Pix = 2
 }
