@@ -22,9 +22,23 @@ namespace SaborGregoNew.Repository
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão com o banco de dados.");
-            
+
             await conn.OpenAsync();
             return conn;
+        }
+        private Endereco MapEnderecoFromReader(DbDataReader reader)
+        {
+            return new Endereco
+            {
+                Id = reader.GetInt32(0),
+                Apelido = reader.GetString(1),
+                Logradouro = reader.GetString(2), // Índice 2
+                Numero = reader.GetString(3),     // Índice 3
+                Complemento = reader.GetString(4),// Índice 4
+                Bairro = reader.GetString(5),     // Índice 5
+                UsuarioId = reader.GetInt32(6),
+                Ativo = reader.GetBoolean(7)
+            };
         }
 
         // Cria um novo endereço
@@ -183,7 +197,6 @@ namespace SaborGregoNew.Repository
         }
 
         // Realmente deleta o endereço pelo id
-        // Mantido o aviso de produção
         public async Task DeleteById(int id)
         {
              //===============================================================//
@@ -207,20 +220,6 @@ namespace SaborGregoNew.Repository
         }
         
         // Mapeador Privado para evitar repetição e garantir a ordem correta das colunas
-        private Endereco MapEnderecoFromReader(DbDataReader reader)
-        {
-            return new Endereco
-            {
-                Id = reader.GetInt32(0),
-                Apelido = reader.GetString(1),
-                // ✅ Mapeamento corrigido conforme o Model:
-                Logradouro = reader.GetString(2), // Índice 2
-                Numero = reader.GetString(3),     // Índice 3
-                Complemento = reader.GetString(4),// Índice 4
-                Bairro = reader.GetString(5),     // Índice 5
-                UsuarioId = reader.GetInt32(6),
-                Ativo = reader.GetBoolean(7)      // ✅ NOVO: Mapeia o campo Ativo (Índice 7)
-            };
-        }
+        
     }
 }

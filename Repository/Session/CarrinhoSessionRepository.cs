@@ -7,6 +7,7 @@ namespace SaborGregoNew.Repository
     public class CarrinhoSessionRepository : ICarrinhoRepository
     {
         private readonly IProdutoRepository _produtoRepository; //conexão com o repositorio de pedidos
+        private const string CarrinhoKey = "Carrinho";
 
         //conexão com a sessão
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -137,6 +138,19 @@ namespace SaborGregoNew.Repository
                 // ✅ CORREÇÃO: Usar o próprio SaveCarrinho()
                 SaveCarrinho(carrinho);
             }
+        }
+        public void AtualizarCarrinhoCompleto(List<CarrinhoItem> novosItensCarrinho)
+        {
+            var session = _httpContextAccessor.HttpContext.Session;
+
+            // 1. Opcional: Filtra itens com Quantidade <= 0
+            var carrinhoFinal = novosItensCarrinho
+                .Where(item => item.Quantidade > 0)
+                .ToList();
+
+            // 2. Sobrescreve o carrinho completo na sessão
+            // (Você precisará de um método SetObjectFromJson, geralmente em SessionExtensions)
+            session.SetObjectFromJson(CarrinhoKey, carrinhoFinal);
         }
     }
 }
