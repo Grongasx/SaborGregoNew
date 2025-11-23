@@ -73,9 +73,7 @@ namespace SaborGregoNew.Migrations
             modelBuilder.Entity("SaborGregoNew.Models.DetalhePedido", b =>
                 {
                     b.Property<int>("PedidoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProdutoId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Imagem")
@@ -86,17 +84,25 @@ namespace SaborGregoNew.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PedidoId1")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("PrecoUnitario")
                         .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantidade")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("PedidoId", "ProdutoId");
+                    b.HasKey("PedidoId");
+
+                    b.HasIndex("PedidoId1");
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("DetalhesPedido");
+                    b.ToTable("DetalhePedido");
                 });
 
             modelBuilder.Entity("SaborGregoNew.Models.Endereco", b =>
@@ -135,6 +141,22 @@ namespace SaborGregoNew.Migrations
                     b.ToTable("Enderecos");
                 });
 
+            modelBuilder.Entity("SaborGregoNew.Models.ItensPedido", b =>
+                {
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PedidoId", "ProdutoId");
+
+                    b.ToTable("ItensPedidos");
+                });
+
             modelBuilder.Entity("SaborGregoNew.Models.Pedido", b =>
                 {
                     b.Property<int>("Id")
@@ -156,18 +178,17 @@ namespace SaborGregoNew.Migrations
                     b.Property<int?>("FuncionarioId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("MetodoPagamento")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("MetodoPagamento")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("ProdutoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("TotalPedido")
+                        .HasPrecision(10, 2)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -183,6 +204,9 @@ namespace SaborGregoNew.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Categoria")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -190,9 +214,9 @@ namespace SaborGregoNew.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Imagem")
+                    b.Property<byte[]>("Imagem")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -221,9 +245,8 @@ namespace SaborGregoNew.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Senha")
                         .IsRequired()
@@ -257,7 +280,7 @@ namespace SaborGregoNew.Migrations
                 {
                     b.HasOne("SaborGregoNew.Models.Pedido", "Pedido")
                         .WithMany("Itens")
-                        .HasForeignKey("PedidoId")
+                        .HasForeignKey("PedidoId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -1,5 +1,4 @@
-using saborGregoNew.Interfaces;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 using SaborGregoNew.Models;
 
 namespace SaborGregoNew.Services;

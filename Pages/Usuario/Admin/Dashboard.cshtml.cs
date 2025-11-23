@@ -1,13 +1,13 @@
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.DTOs;
-using saborGregoNew.Repository;
-using System.Threading.Tasks;
-using System.Linq; // Adicionar este using
-using System.Text.Json; // Adicionar este using
+using SaborGregoNew.DTOs;
+using SaborGregoNew.Repository;
 
-namespace SaborGregoNew.Pages.Admin
+namespace SaborGregoNew.Pages.Usuario.Admin
 {
     [Authorize(Roles = "Admin")]
     public class DashboardModel : PageModel
@@ -18,7 +18,7 @@ namespace SaborGregoNew.Pages.Admin
         
         // Armazena os dados do gráfico como JSON serializado
         public string VendasDiariasJson { get; private set; } = "{}";
-        public string VendasCategoriaJson { get; private set; } = "{}";
+        public string VendasProdutosJson { get; private set; } = "{}";
 
         public DashboardModel(IDashboardRepository dashboardRepo)
         {
@@ -33,7 +33,7 @@ namespace SaborGregoNew.Pages.Admin
 
             // 1. Buscar os dados para os gráficos
             var vendasDiarias = await _dashboardRepo.GetVendasDiariasMesAsync();
-            var vendasCategoria = await _dashboardRepo.GetVendasPorCategoriaMesAsync();
+            var vendasProdutos = await _dashboardRepo.GetVendasPorProdutoMesAsync();
             // Gráfico de Linha (Vendas Diárias)
             var vendasDiariasChart = new
             {
@@ -52,16 +52,16 @@ namespace SaborGregoNew.Pages.Admin
                 }
             };
 
-            // Gráfico de Pizza (Vendas por Categoria)
-            var vendasCategoriaChart = new
+            // Gráfico de Pizza (Vendas por Produto)
+            var vendasProdutosChart = new
             {
-                labels = vendasCategoria.Select(v => v.Categoria),
+                labels = vendasProdutos.Select(v => v.Produto),
                 datasets = new[]
                 {
                     new
                     {
                         label = "Vendas por Categoria (R$)",
-                        data = vendasCategoria.Select(v => v.Total),
+                        data = vendasProdutos.Select(v => v.Total),
                         backgroundColor = new[] // Cores para cada fatia
                         {
                             "rgba(255, 99, 132, 0.7)",
@@ -69,7 +69,11 @@ namespace SaborGregoNew.Pages.Admin
                             "rgba(255, 206, 86, 0.7)",
                             "rgba(75, 192, 192, 0.7)",
                             "rgba(153, 102, 255, 0.7)",
-                            "rgba(255, 159, 64, 0.7)"
+                            "rgba(255, 159, 64, 0.7)",
+                            "rgba(199, 199, 199, 0.7)",
+                            "rgba(83, 102, 255, 0.7)",
+                            "rgba(40, 159, 64, 0.7)",
+                            "rgba(210, 99, 132, 0.7)"
                         }
                     }
                 }
@@ -77,7 +81,7 @@ namespace SaborGregoNew.Pages.Admin
 
             // 3. Serializar os dados como JSON
             VendasDiariasJson = JsonSerializer.Serialize(vendasDiariasChart);
-            VendasCategoriaJson = JsonSerializer.Serialize(vendasCategoriaChart);
+            VendasProdutosJson = JsonSerializer.Serialize(vendasProdutosChart);
 
             return Page();
         }

@@ -1,96 +1,112 @@
-@page
+@page "{id:int?}"
 @model SaborGregoNew.Pages.Produto.CadastroModel
 @addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
-
-
 @using SaborGregoNew.Enums
 @{
-    ViewData["Title"] = "Cadastro de Produto";
+    ViewData["Title"] = Model.ProdutoDto.Id > 0 ? "Editar Produto" : "Cadastro de Produto";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-5">
+<div class="row justify-content-center">
+<div class="col-md-8 col-lg-6">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white">
+    <h4 class="mb-0">@ViewData["Title"]</h4>
+</div>
+<div class="card-body">
+<form method="post" enctype="multipart/form-data">
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+@if (Model.ProdutoDto.Id > 0)
+{
+    <input type="hidden" asp-for="ProdutoDto.Id" />
+    @* Keep existing image if not changed *@
+    <input type="hidden" asp-for="ProdutoDto.Imagem" />
+}
+
+@* --- Nome --- *@
+<div class="form-group mb-3">
+    <label asp-for="ProdutoDto.Nome" class="form-label fw-bold"></label>
+    <input asp-for="ProdutoDto.Nome" class="form-control" placeholder="Ex: Salada Grega" />
+    <span asp-validation-for="ProdutoDto.Nome" class="text-danger"></span>
+</div>
+                        
+@* --- Descrição --- *@
+<div class="form-group mb-3">
+    <label asp-for="ProdutoDto.Descricao" class="form-label fw-bold"></label>
+    <textarea asp-for="ProdutoDto.Descricao" class="form-control" rows="3" placeholder="Descreva o produto..."></textarea>
+    <span asp-validation-for="ProdutoDto.Descricao" class="text-danger"></span>
+</div>
 
 <div class="row">
-    <div class="col-md-4">
-        <form method="post" enctype="multipart/form-data">
-            <h4>Criar um novo produto.</h4>
-            <hr />
-            
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            @* --- Nome --- *@
-            <div class="form-group mb-3">
-                <label asp-for="ProdutoDto.Nome"></label>
-                <input asp-for="ProdutoDto.Nome" class="form-control" />
-                <span asp-validation-for="ProdutoDto.Nome" class="text-danger"></span>
-            </div>
-            
-            @* --- Descrição --- *@
-            <div class="form-group mb-3">
-                <label asp-for="ProdutoDto.Descricao"></label>
-                <textarea asp-for="ProdutoDto.Descricao" class="form-control"></textarea>
-                <span asp-validation-for="ProdutoDto.Descricao" class="text-danger"></span>
-            </div>
-
-            @* --- Categoria (Enum Dropdown) --- *@
-            <div class="form-group mb-3">
-                <label asp-for="ProdutoDto.Categoria"></label>
-                <select asp-for="ProdutoDto.Categoria" class="form-control" 
-                        asp-items="Html.GetEnumSelectList<Categoria>()">
-                    <option value="">Selecione uma Categoria</option>
-                </select>
-                <span asp-validation-for="ProdutoDto.Categoria" class="text-danger"></span>
-            </div>
-            
-            @* --- Preço --- *@
-            <div class="form-group mb-3">
-                <label asp-for="ProdutoDto.Preco"></label>
-                <input asp-for="ProdutoDto.Preco" class="form-control" type="number" step="0.01" />
-                <span asp-validation-for="ProdutoDto.Preco" class="text-danger"></span>
-            </div>
-
-            @* --- Imagem (Upload Estilizado) --- *@
-            <div class="form-group mb-3">
-                <label asp-for="ProdutoDto.ImagemUpload" class="form-label">Imagem do Produto</label>
-                
-                @* Input de arquivo escondido com filtro 'image/*' *@
-                <input type="file" 
-                    asp-for="ProdutoDto.ImagemUpload" 
-                    id="uploadImagem" 
-                    class="d-none" 
-                    accept="image/*">
-                
-                <div class="input-group">
-                    @* Campo para mostrar o nome do arquivo selecionado *@
-                    <input type="text" 
-                        id="nomeArquivo" 
-                        class="form-control" 
-                        placeholder="Nenhum arquivo selecionado" 
-                        readonly>
-                    
-                    @* Botão que aciona o input de arquivo *@
-                    <label class="btn btn-outline-secondary" for="uploadImagem">
-                        <i class="bi bi-upload me-2"></i> Escolher Imagem
-                    </label>
-                </div>
-                
-                <span asp-validation-for="ProdutoDto.ImagemUpload" class="text-danger"></span>
-            </div> @* Fechamento do form-group da Imagem *@
-
-            <br />
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-
-        </form>
+    @* --- Categoria (Enum Dropdown) --- *@
+    <div class="col-md-6 form-group mb-3">
+        <label asp-for="ProdutoDto.Categoria" class="form-label fw-bold"></label>
+        <select asp-for="ProdutoDto.Categoria" class="form-select" 
+                asp-items="Html.GetEnumSelectList<Categoria>()">
+            <option value="">Selecione uma Categoria</option>
+        </select>
+        <span asp-validation-for="ProdutoDto.Categoria" class="text-danger"></span>
+    </div>
+                            
+    @* --- Preço --- *@
+    <div class="col-md-6 form-group mb-3">
+        <label asp-for="ProdutoDto.Preco" class="form-label fw-bold"></label>
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input asp-for="ProdutoDto.Preco" class="form-control" type="number" step="0.01" />
+        </div>
+        <span asp-validation-for="ProdutoDto.Preco" class="text-danger"></span>
     </div>
 </div>
 
+@* --- Imagem (Upload Estilizado) --- *@
+<div class="form-group mb-4">
+    <label asp-for="ProdutoDto.ImagemUpload" class="form-label fw-bold">Imagem do Produto</label>
+                            
+    @* Input de arquivo escondido com filtro 'image/*' *@
+    <input type="file" 
+           asp-for="ProdutoDto.ImagemUpload" 
+           id="uploadImagem" 
+           class="d-none" 
+           accept="image/*">
+                            
+    <div class="input-group">
+        @* Campo para mostrar o nome do arquivo selecionado *@
+        <input type="text" 
+               id="nomeArquivo" 
+               class="form-control" 
+               placeholder="@(string.IsNullOrEmpty(Model.ProdutoDto.Imagem) ? "Nenhum arquivo selecionado" : "Imagem atual mantida")" 
+               readonly>
+                                
+        @* Botão que aciona o input de arquivo *@
+        <label class="btn btn-outline-secondary" for="uploadImagem">
+            <i class="bi bi-upload me-2"></i> Escolher
+        </label>
+    </div>
+                            
+    <span asp-validation-for="ProdutoDto.ImagemUpload" class="text-danger"></span>
+</div>
+
+<div class="d-grid gap-2">
+    <button type="submit" class="btn btn-primary btn-lg">
+        @(Model.ProdutoDto.Id > 0 ? "Salvar Alterações" : "Cadastrar Produto")
+    </button>
+    <a asp-page="/Index" class="btn btn-outline-secondary">Cancelar</a>
+</div>
+
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
 <script>
     document.getElementById('uploadImagem').addEventListener('change', function() {
         var fileName = this.files[0] ? this.files[0].name : 'Nenhum arquivo selecionado';
         document.getElementById('nomeArquivo').value = fileName;
     });
 </script>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

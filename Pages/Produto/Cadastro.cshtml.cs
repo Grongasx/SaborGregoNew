@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 using SaborGregoNew.DTOs.Produtos;
-
 
 namespace SaborGregoNew.Pages.Produto
 {
@@ -20,8 +19,32 @@ namespace SaborGregoNew.Pages.Produto
             _hostEnvironment = hostEnvironment;
         }
 
-        public void OnGet()
+        public async Task OnGet(int? id)
         {
+            if (id.HasValue && id.Value > 0)
+            {
+                var produto = await _produtoService.SelectByIdAsync(id.Value);
+                if (produto != null)
+                {
+                    ProdutoDto = new ProdutoDTO
+                    {
+                        Id = produto.Id,
+                        Nome = produto.Nome,
+                        Descricao = produto.Descricao ?? string.Empty,
+                        Preco = produto.Preco,
+                        Categoria = produto.Categoria,
+                        Imagem = string.Empty 
+                    };
+                }
+                else
+                {
+                    ProdutoDto = new ProdutoDTO();
+                }
+            }
+            else
+            {
+                ProdutoDto = new ProdutoDTO();
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -31,27 +54,38 @@ namespace SaborGregoNew.Pages.Produto
                 Console.WriteLine("O modelo nao e valido");
                 return Page();
             }
-            string wwwRootPath = _hostEnvironment.WebRootPath;
-            string pathDaImagem = Path.Combine(wwwRootPath, "images");
-            string nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(ProdutoDto.ImagemUpload.FileName);
-            string filePath = Path.Combine(pathDaImagem, nomeArquivo);
-            Directory.CreateDirectory(pathDaImagem);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            if (ProdutoDto.ImagemUpload != null)
             {
-                await ProdutoDto.ImagemUpload.CopyToAsync(fileStream);
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string pathDaImagem = Path.Combine(wwwRootPath, "images");
+                string nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(ProdutoDto.ImagemUpload.FileName);
+                string filePath = Path.Combine(pathDaImagem, nomeArquivo);
+                Directory.CreateDirectory(pathDaImagem);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ProdutoDto.ImagemUpload.CopyToAsync(fileStream);
+                }
+                ProdutoDto.Imagem = "/images/" + nomeArquivo;
             }
-            ProdutoDto.Imagem = "/images/" + nomeArquivo;
 
             try
             {
                 Console.WriteLine("Cadastro de produto");
-                await _produtoService.Create(ProdutoDto);
+                if (ProdutoDto.Id > 0)
+                {
+                     await _produtoService.UpdateById(ProdutoDto.Id, ProdutoDto);
+                }
+                else
+                {
+                    await _produtoService.Create(ProdutoDto);
+                }
                 return RedirectToPage("/Index");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Cadastro de produto nao foi");
+                Console.WriteLine("Cadastro de produto nao foi: " + ex.ToString());
                 ModelState.AddModelError(string.Empty, "Ocorreu um erro ao salvar o produto.");
                 return Page();
             }

@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.Models;
 using SaborGregoNew.DTOs;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 using SaborGregoNew.DTOs.Pedido;
-using saborGregoNew.Repository.Interfaces;
 using SaborGregoNew.Extensions;
 
 namespace SaborGregoNew.Pages
@@ -16,8 +15,6 @@ namespace SaborGregoNew.Pages
         private readonly ICarrinhoRepository _carrinhoService;
         private readonly IEnderecoRepository _enderecoService;
         private readonly IPedidoRepository _pedidoService;
-
-    
 
         // O ViewModel para coletar as informações de entrega/pagamento
         [BindProperty]
@@ -38,15 +35,14 @@ namespace SaborGregoNew.Pages
         public async Task<IActionResult> OnGet()
         {
             Carrinho = _carrinhoService.GetCarrinho(); //busca para ver se o carrinho existe
+            CarrinhoTotal = _carrinhoService.CalcularTotal(); //calcula o valor total do pedido
 
             var clienteIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(clienteIdString))
             {
-                return RedirectToPage("/Usuario/Login/Login");
+                return RedirectToPage("/Usuario/Login");
             }
             var ClienteId = int.Parse(clienteIdString);
-
-
 
             this.Enderecos = await _enderecoService.SelectAllByUserIdAsync(ClienteId);
 
@@ -79,63 +75,59 @@ namespace SaborGregoNew.Pages
 
         public async Task<IActionResult> OnPostFinalizarCompraAsync()
         {
+            // 1. Pegamos o ID do usuário logo no início para usar no tratamento de erro
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             try
             {
-                Carrinho = _carrinhoService.GetCarrinho();//tenta pegar o carrinho
-                //verifica se ele está vazio
+                Carrinho = _carrinhoService.GetCarrinho();
                 if (Carrinho == null || !Carrinho.Any())
                 {
                     return RedirectToPage("/Pedido/Carrinho/Carrinho");
                 }
 
+                CarrinhoTotal = _carrinhoService.CalcularTotal();
 
-                CarrinhoTotal = _carrinhoService.CalcularTotal();//calcula o valor total do pedido
-
-
-                if (CheckoutInfo.EnderecoId <= 0)//verifica se o endereço foi selecionado
+                // Validação: Endereço não selecionado
+                if (CheckoutInfo.EnderecoId <= 0)
                 {
-                    await LoadEnderecosAsync(User.GetUserId());//recarega os endereços da pagina
+                    ModelState.AddModelError("", "Selecione um endereço de entrega.");
+                    await LoadEnderecosAsync(userId); // <--- RECARREGA A LISTA
                     return Page();
                 }
 
-
+                var enderecoSelecionado = await _enderecoService.SelectByIdAsync(CheckoutInfo.EnderecoId);
                 
-                int userId = User.GetUserId();//tenta pegar o id do usuario logado
-
-
-                var enderecoSelecionado = await _enderecoService.SelectByIdAsync(CheckoutInfo.EnderecoId); //pega as informações com base no id do endereço selecionado
-                
-                if (enderecoSelecionado == null)//verifica se o endereço selecionado existe
+                // Validação: Endereço não existe
+                if (enderecoSelecionado == null)
                 {
-                    await LoadEnderecosAsync(User.GetUserId());//recarrega os endereços na pagina
+                    ModelState.AddModelError("", "Endereço não encontrado.");
+                    await LoadEnderecosAsync(userId); // <--- RECARREGA A LISTA
                     return Page();
                 }
 
-                if (!ModelState.IsValid)//verifica os modelo dos objetos da pagina
+                // Validação: Modelo inválido (ex: falta pagamento)
+                if (!ModelState.IsValid)
                 {
+                    await LoadEnderecosAsync(userId); // <--- RECARREGA A LISTA
                     return Page();
                 }
 
-                //cria o novo pedido
+                // Criação do DTO
                 var pedido = new PedidoDTO
                 {
                     ClienteId = userId,
-                    FuncionarioId = null,
-                    EntregadorId = null,
                     DataPedido = DateTime.Now,
                     ValorTotal = CarrinhoTotal,
-                    Status = 0,
-
+                    Status = 0, // Solicitado
                     EnderecoId = CheckoutInfo.EnderecoId,
                     MetodoPagamento = CheckoutInfo.MetodoPagamento,
                 };
 
-
-                //far um loop para inserir os itens do carrinho em uma lista de detalhes pedido
-                var detalhesParaSalvar = new List<DetalhePedido>();//variavel de armazenamento
+                var detalhesParaSalvar = new List<DetalhePedido>();
                 foreach (var item in Carrinho)
                 {
-                    var detalheModelo = new DetalhePedido //variavel para cada item
+                    detalhesParaSalvar.Add(new DetalhePedido
                     {
                         PedidoId = pedido.Id,
                         ProdutoId = item.ProdutoId,
@@ -143,24 +135,27 @@ namespace SaborGregoNew.Pages
                         NomeProduto = item.Nome,
                         PrecoUnitario = item.Preco,
                         Quantidade = item.Quantidade
-                    };
-                    detalhesParaSalvar.Add(detalheModelo);//salva na variavel de armazenamento
+                    });
                 }
-                await _pedidoService.CriarPedidoCompletoAsync(pedido, detalhesParaSalvar);//Cria o pedido com os itens no DB
 
-                _carrinhoService.ClearCarrinho();//limpa o carrinho da sessão
+                // Tenta salvar no banco
+                await _pedidoService.CriarPedidoCompletoAsync(pedido, detalhesParaSalvar);
 
+                _carrinhoService.ClearCarrinho();
 
-                //cria tempDatas para mostrar na tela de cofirmação
                 HttpContext.Session.SetObjectFromJson("PedidoConfirmacao", pedido);
                 HttpContext.Session.SetObjectFromJson("EnderecoConfirmacao", enderecoSelecionado);
                 HttpContext.Session.SetObjectFromJson("DetalhesConfirmacao", detalhesParaSalvar);
 
-                return RedirectToPage("/Pedido/ConfirmacaoPedido");// Redireciona para a página de confirmação do pedido
+                return RedirectToPage("/Pedido/ConfirmacaoPedido");
             }
             catch (Exception ex)
             {
-                TempData["MensagemErro"] = "Erro interno ao finalizar a compra. Tente novamente.";
+                // RECARREGA A LISTA PARA A TELA NÃO QUEBRAR
+                await LoadEnderecosAsync(userId);
+                
+                // Mostra o erro real para sabermos o que corrigir (ex: table not found)
+                TempData["MensagemErro"] = $"Erro ao finalizar: {ex.Message}";
                 return Page();
             }
         }

@@ -1,10 +1,8 @@
-using saborGregoNew.DTOs;
-using saborGregoNew.Repository;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
-using System;
-using System.Data;
-using System.Collections.Generic;
+using SaborGregoNew.DTOs;
 
 namespace SaborGregoNew.Repository
 {
@@ -20,44 +18,6 @@ namespace SaborGregoNew.Repository
         public async Task<DashboardAdminDTO> GetDashboardAdminDataAsync()
         {
             var dto = new DashboardAdminDTO();
-            const string queryHoje = @"
-                SELECT 
-                    COALESCE(SUM(TotalPedido), 0) AS VendasHoje,
-                    COUNT(Id) AS PedidosHoje
-                FROM Pedidos
-                WHERE DATE(DataPedido) = DATE('now', 'localtime');";
-            
-            const string queryMes = @"
-                SELECT 
-                    COALESCE(SUM(TotalPedido), 0) AS VendasMes,
-                    COUNT(Id) AS PedidosMes
-                FROM Pedidos
-                WHERE STRFTIME('%Y-%m', DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime');";
-
-            const string queryProdutoHoje = @"
-                SELECT 
-                    p.Nome, 
-                    SUM(dp.Quantidade) AS QtdTotal
-                FROM DetalhesPedido AS dp
-                JOIN Produtos AS p ON dp.ProdutoId = p.Id
-                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
-                WHERE DATE(pe.DataPedido) = DATE('now', 'localtime')
-                GROUP BY p.Nome
-                ORDER BY QtdTotal DESC
-                LIMIT 1;";
-            
-            const string queryProdutoMes = @"
-                SELECT 
-                    p.Nome, 
-                    SUM(dp.Quantidade) AS QtdTotal
-                FROM DetalhesPedido AS dp
-                JOIN Produtos AS p ON dp.ProdutoId = p.Id
-                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
-                WHERE STRFTIME('%Y-%m', pe.DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
-                GROUP BY p.Nome
-                ORDER BY QtdTotal DESC
-                LIMIT 1;";
-
 
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão SQLite");
@@ -65,10 +25,11 @@ namespace SaborGregoNew.Repository
             using (conn)
             {
                 await conn.OpenAsync();
-                // 1. Buscar Vendas/Pedidos de HOJE
+
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = queryHoje;
+                    // 1. Vendas Hoje (Usando a Query Centralizada)
+                    cmd.CommandText = Queries.DashboardVendasHoje;
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -77,12 +38,9 @@ namespace SaborGregoNew.Repository
                             dto.PedidosHoje = reader.GetInt32(reader.GetOrdinal("PedidosHoje"));
                         }
                     }
-                }
 
-                // 2. Buscar Vendas/Pedidos do MÊS
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = queryMes;
+                    // 2. Vendas Mês
+                    cmd.CommandText = Queries.DashboardVendasMes;
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -91,12 +49,9 @@ namespace SaborGregoNew.Repository
                             dto.PedidosMes = reader.GetInt32(reader.GetOrdinal("PedidosMes"));
                         }
                     }
-                }
                 
-                // 3. Buscar Produto mais vendido HOJE
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = queryProdutoHoje;
+                    // 3. Produto Hoje
+                    cmd.CommandText = Queries.DashboardProdutoMaisVendidoHoje;
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -104,12 +59,9 @@ namespace SaborGregoNew.Repository
                             dto.ProdutoMaisVendidoHoje = reader.GetString(reader.GetOrdinal("Nome"));
                         }
                     }
-                }
                 
-                // 4. Buscar Produto mais vendido MÊS
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = queryProdutoMes;
+                    // 4. Produto Mês
+                    cmd.CommandText = Queries.DashboardProdutoMaisVendidoMes;
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -125,16 +77,6 @@ namespace SaborGregoNew.Repository
         public async Task<List<VendasPorDiaDTO>> GetVendasDiariasMesAsync()
         {
             var resultado = new List<VendasPorDiaDTO>();
-            
-            // Agrupa as vendas por dia para o mês atual
-            const string query = @"
-                SELECT 
-                    STRFTIME('%d/%m', DataPedido) AS Dia, 
-                    SUM(TotalPedido) AS Total
-                FROM Pedidos
-                WHERE STRFTIME('%Y-%m', DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
-                GROUP BY DATE(DataPedido)
-                ORDER BY DATE(DataPedido);";
 
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão SQLite");
@@ -144,7 +86,9 @@ namespace SaborGregoNew.Repository
                 await conn.OpenAsync();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = query;
+                    // Usando a Query Centralizada
+                    cmd.CommandText = Queries.DashboardVendasDiarias;
+                    
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -161,22 +105,9 @@ namespace SaborGregoNew.Repository
             return resultado;
         }
 
-        public async Task<List<VendasPorCategoriaDTO>> GetVendasPorCategoriaMesAsync()
+        public async Task<List<VendasPorProdutoDTO>> GetVendasPorProdutoMesAsync()
         {
-            var resultado = new List<VendasPorCategoriaDTO>();
-
-            // Junta Pedidos, DetalhesPedido e Produtos para
-            // agrupar o total vendido por categoria no mês atual.
-            const string query = @"
-                SELECT 
-                    p.Categoria, 
-                    SUM(dp.PrecoUnitario * dp.Quantidade) AS Total
-                FROM DetalhesPedido AS dp
-                JOIN Produtos AS p ON dp.ProdutoId = p.Id
-                JOIN Pedidos AS pe ON dp.PedidoId = pe.Id
-                WHERE STRFTIME('%Y-%m', pe.DataPedido) = STRFTIME('%Y-%m', 'now', 'localtime')
-                GROUP BY p.Categoria
-                ORDER BY Total DESC;";
+            var resultado = new List<VendasPorProdutoDTO>();
 
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão SQLite");
@@ -186,14 +117,16 @@ namespace SaborGregoNew.Repository
                 await conn.OpenAsync();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = query;
+                    // Usando a Query Centralizada
+                    cmd.CommandText = Queries.DashboardVendasPorProduto;
+
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            resultado.Add(new VendasPorCategoriaDTO
+                            resultado.Add(new VendasPorProdutoDTO
                             {
-                                Categoria = reader.GetString(reader.GetOrdinal("Categoria")),
+                                Produto = reader.GetString(reader.GetOrdinal("NomeProduto")),
                                 Total = reader.GetDecimal(reader.GetOrdinal("Total"))
                             });
                         }

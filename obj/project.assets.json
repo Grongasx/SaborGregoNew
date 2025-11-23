@@ -5809,19 +5809,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Latitude\\.nuget\\packages\\": {}
+    "C:\\Users\\T-GAMER\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
+      "projectUniqueName": "C:\\Users\\T-GAMER\\RiderProjects\\SaborGregoNew\\SaborGregoNew.csproj",
       "projectName": "SaborGregoNew",
-      "projectPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\SaborGregoNew.csproj",
-      "packagesPath": "C:\\Users\\Latitude\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Latitude\\OneDrive\\Área de Trabalho\\SaborGregoNewaa\\Edu\\obj\\",
+      "projectPath": "C:\\Users\\T-GAMER\\RiderProjects\\SaborGregoNew\\SaborGregoNew.csproj",
+      "packagesPath": "C:\\Users\\T-GAMER\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\T-GAMER\\RiderProjects\\SaborGregoNew\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Latitude\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\T-GAMER\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -5834,6 +5834,11 @@
           "targetAlias": "net9.0",
           "projectReferences": {}
         }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
       },
       "restoreAuditProperties": {
         "enableAudit": "true",
@@ -5926,7 +5931,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -2,9 +2,12 @@ using SaborGregoNew.DTOs.Usuario;
 using Microsoft.Data.Sqlite;
 using SaborGregoNew.Models;
 using System.Data.Common;
-using SaborGregoNew.Repository.Query;
+using SaborGregoNew.Repository.Query; // Se UsuarioQuery estiver aqui
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace saborGregoNew.Repository
+namespace SaborGregoNew.Repository
 {
     public class UsuarioSqliteRepository : IUsuarioRepository
     {
@@ -21,7 +24,7 @@ namespace saborGregoNew.Repository
         //==============================================//
 
         //Cria um Cliente no banco de dados 
-        public async Task Create(RegisterDto ModeloUsuario) //recebe um objeto de registro e retorna um check
+        public async Task Create(RegisterUserDto ModeloUsuario) //recebe um objeto de registro e retorna um check
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria conexão c banco
                 throw new InvalidOperationException("Falha ao obter conexão.");
@@ -51,28 +54,27 @@ namespace saborGregoNew.Repository
         }
 
         //realiza o login de qualquer usuario
-        public async Task<Usuario?> Login(LoginDTO ModeloUsuario)//recebe um objeto de login e retorna Usuario completo
+        public async Task<Usuario?> Login(LoginDTO ModeloUsuario)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria conexão com o banco
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão.");
 
             try
             {
                 using (conn)
                 {
-                    await conn.OpenAsync();//abre conexão com o banco de dados
+                    await conn.OpenAsync();
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = UsuarioQuery.UsuarioLogin;//query para realizar o login
-
-                    cmd.Parameters.Add(new SqliteParameter("@Email", ModeloUsuario.Email));//parametro do email
+                    cmd.CommandText = UsuarioQuery.UsuarioLogin;
+                    cmd.Parameters.Add(new SqliteParameter("@Email", ModeloUsuario.Email));
 
                     using var reader = await cmd.ExecuteReaderAsync();
-                    var usuario = new Usuario();
+                    
+                    // Verifica se encontrou algum registro
                     if (await reader.ReadAsync())
                     {
-
-                        usuario = new Usuario
+                        var usuario = new Usuario
                         {
                             Id = reader.GetInt32(0),
                             Email = reader.GetString(1),
@@ -81,28 +83,23 @@ namespace saborGregoNew.Repository
                             Senha = reader.GetString(4),
                             Telefone = reader.GetString(5),
                         };
+
+                        // Verifica a senha
+                        if (usuario.Senha == ModeloUsuario.Senha)
+                        {
+                            return usuario; // Sucesso!
+                        }
                     }
-                    if (usuario == null)
-                    {
-                        throw new KeyNotFoundException("Usuario não encontrado.");
-                    }
-                    else if (usuario.Senha == ModeloUsuario.Senha)
-                    {
-                        return usuario;
-                    }
-                    else if (usuario.Senha == ModeloUsuario.Senha)
-                    {
-                        throw new UnauthorizedAccessException("Senha incorreta.");
-                    }
-                    else
-                    {
-                        throw new Exception("deus lá sabe oq aconteceu");
-                    }
+                    
+                    // Se chegou aqui, ou não achou usuário ou a senha estava errada.
+                    return null; 
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("erro no banco de dados ao efetuar login", ex);
+                // Log do erro real no servidor (opcional, mas recomendado)
+                Console.WriteLine(ex.Message); 
+                return null; // Retorna null para a tela tratar como "falha no login"
             }
         }
 
@@ -184,7 +181,7 @@ namespace saborGregoNew.Repository
         }
 
         //Atualizar dados do usuario --- ainda não implementado
-        public async Task UpdateById(int id, RegisterDto ModeloUsuario)
+        public async Task UpdateById(int id, RegisterUserDto ModeloUsuario)
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão.");

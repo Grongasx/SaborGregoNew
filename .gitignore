@@ -1,0 +1,19 @@
+# Pastas de build e cache (O "Lixo")
+bin/
+obj/
+
+# Arquivos de IDE (Visual Studio / Rider)
+.idea/
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# Banco de dados local (Geralmente não se commita o banco real)
+*.db
+*.db-shm
+*.db-wal
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db

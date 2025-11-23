@@ -16,7 +16,7 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/database.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="SaborGrego" uuid="0d3f9840-1979-4652-96aa-5966c9de12ba">
+    <data-source source="LOCAL" name="SaborGrego" uuid="517d553d-51e5-4763-8643-c93b8c5927dc">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>

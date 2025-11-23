@@ -3,7 +3,6 @@ using Microsoft.Data.Sqlite;
 using SaborGregoNew.Models;
 using SaborGregoNew.DTOs.Usuario;
 using System.Data.Common;
-using SaborGregoNew.Repository.Query;
 
 namespace SaborGregoNew.Repository
 {
@@ -18,7 +17,7 @@ namespace SaborGregoNew.Repository
         }
 
         //Cria um novo endereço//
-        public async Task Create(EnderecoDTO ModeloEndereco, int usuarioId)//recebe um endereço e o id do usuário.
+        public async Task Create(CadastroEnderecoDTO ModeloEndereco, int usuarioId)//recebe um endereço e o id do usuário.
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//abrir conexão com o banco de dados
                 throw new InvalidOperationException("Falha ao obter conexão");
@@ -29,7 +28,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão com o banco de dados
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = EnderecoQuery.EnderecoInsert;//query para o banco de dados.
+                    cmd.CommandText = Queries.EnderecoInsert;//query para o banco de dados.
 
                     // Parametros dos dados enviado do frontend//
                     cmd.Parameters.Add(new SqliteParameter("@Apelido", ModeloEndereco.Apelido));
@@ -60,7 +59,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão com o banco de dados
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = EnderecoQuery.EnderecoSelectByUserId;//query para o banco de dados.
+                    cmd.CommandText = Queries.EnderecoSelectByUserId;//query para o banco de dados.
 
                     cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));//cria um parametro para buscar o produto pelo id
 
@@ -73,10 +72,10 @@ namespace SaborGregoNew.Repository
                         {
                             Id = reader.GetInt32(0),//le a primeira coluna e coloca no model como Id.
                             Apelido = reader.GetString(1),//le a segunda coluna e coloca no model como Categoria...
-                            Bairro = reader.GetString(2),
-                            Complemento = reader.GetString(3),
-                            Logradouro = reader.GetString(4),
-                            Numero = reader.GetString(5),
+                            Logradouro = reader.GetString(2),
+                            Numero = reader.GetString(3),
+                            Complemento = reader.GetString(4),
+                            Bairro = reader.GetString(5),
                             UsuarioId = reader.GetInt32(6)
                         });
 
@@ -102,26 +101,23 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre uma nova conexão com o banco de dados;
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = EnderecoQuery.EnderecoSelectById; //query para o banco.
+                    cmd.CommandText = Queries.EnderecoSelectById; //query para o banco.
 
                     cmd.Parameters.Add(new SqliteParameter("@Id", id));//parametro do id do endereço
                     using var reader = await cmd.ExecuteReaderAsync();//executa um reader para buscar os dados no anco de dados.
 
-                    var endereco = new Endereco(); //cria um novo objeto de endereço
-
                     if (await reader.ReadAsync())//inicia a leitura do banco de dados.
                     {
-                        endereco = new Endereco
+                        return new Endereco
                         {
                             Id = reader.GetInt32(0),//seleciona o dado q tiver na primeira coluna da tabela
                             Apelido = reader.GetString(1),//seleciona o dado q tiver na segunda coluna da tabela...
-                            Bairro = reader.GetString(2),
-                            Complemento = reader.GetString(3),
-                            Logradouro = reader.GetString(4),
-                            Numero = reader.GetString(5),
+                            Logradouro = reader.GetString(2),
+                            Numero = reader.GetString(3),
+                            Complemento = reader.GetString(4),
+                            Bairro = reader.GetString(5),
                             UsuarioId = reader.GetInt32(6)
                         };
-                        return endereco;//retorna um objeto de endereço
                     }
                     return null;//se n, retorna nulo
                 }
@@ -133,7 +129,7 @@ namespace SaborGregoNew.Repository
         }
 
         //Atualiza um endereço//
-        public async Task UpdateById(int Id, EnderecoDTO ModeloEndereco)//recebe o id e um objeto endereço
+        public async Task UpdateById(int Id, CadastroEnderecoDTO ModeloEndereco)//recebe o id e um objeto endereço
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria a conexão com o banco
                 throw new InvalidOperationException("Falha ao obter conexão");
@@ -165,7 +161,7 @@ namespace SaborGregoNew.Repository
         }
 
         //Seleciona um endereço pelo seu ID e UsuarioId//
-        public async Task<Endereco> GetByIdAndUserIdAsync(int enderecoId, int usuarioId)
+        public async Task<Endereco?> GetByIdAndUserIdAsync(int enderecoId, int usuarioId)
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria a conexão
                 throw new InvalidOperationException("Falha ao obter conexão");
@@ -176,7 +172,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre a conexão
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = EnderecoQuery.EnderecoSelectByIdAndUserId;//query para o banco de dados
+                    cmd.CommandText = Queries.EnderecoSelectByIdAndUserId;//query para o banco de dados
 
                     cmd.Parameters.Add(new SqliteParameter("@Id", enderecoId));//parametro para encontrar o Endereço
                     cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));//parametro para encontrar o usuario
@@ -190,17 +186,16 @@ namespace SaborGregoNew.Repository
                         {
                             Id = reader.GetInt32(0),//pega o dado da primeira coluna e coloca no id do modelo
                             Apelido = reader.GetString(1),//pega o dado da segunda coluna e coloca no apelido do modelo...
-                            Bairro = reader.GetString(2),
-                            Complemento = reader.GetString(3),
-                            Logradouro = reader.GetString(4),
-                            Numero = reader.GetString(5),
+                            Logradouro = reader.GetString(2),
+                            Numero = reader.GetString(3),
+                            Complemento = reader.GetString(4),
+                            Bairro = reader.GetString(5),
                             UsuarioId = reader.GetInt32(6)
                         };
                     }
                     else
                     {
                         return null;
-                        throw new Exception("O endereço não foi encontrado no banco de dados");//caso não encontre o id pelo usuario
                     }
                 }
             }
@@ -213,7 +208,7 @@ namespace SaborGregoNew.Repository
         //Metodo para "deletar" o Endereço//
         public async Task DesativarAsync(int id)
         {
-            if (_connectionFactory.CreateConnection() is not DbConnection conn)//cria a conexão
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria a conexão
                 throw new Exception("Falha ao obter conexão");
 
             try //caso algo de errado pula para catch
@@ -223,7 +218,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = EnderecoQuery.EnderecoDesativar;//muda status de ativo
+                    cmd.CommandText = Queries.EnderecoDesativar;//muda status de ativo
                     cmd.Parameters.Add(new SqliteParameter("@Id", id));//com base no endereço
 
                     await cmd.ExecuteNonQueryAsync();// executa a query
@@ -234,7 +229,6 @@ namespace SaborGregoNew.Repository
                 throw new Exception("Algo deu errado ao desativar endereço no banco de dados.", ex); //caso de alguma merda, acusa aqui
             }
         }
-
 
         //===============================================================//
         //=============Não usar esse metodo em produção==================//

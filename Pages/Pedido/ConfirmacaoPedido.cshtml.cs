@@ -12,37 +12,46 @@ namespace SaborGregoNew.Pages
     {
 
         //modelos para receber as viewbags
-        public Pedido? pedido { get; set; }
+        public SaborGregoNew.Models.Pedido? pedido { get; set; }
         public Endereco? endereco { get; set; }
         public List<DetalhePedido>? detalhesPedido { get; set; }
 
-
         public async Task<IActionResult> OnGetAsync()
         {
+            var session = HttpContext.Session;
 
-           var session = HttpContext.Session;
-
-            var pedidotemp = session.GetObjectFromJson<Pedido>("PedidoConfirmacao");
+            // 1. Ler como DTO (pois foi assim que salvamos no Checkout)
+            var pedidoDto = session.GetObjectFromJson<PedidoDTO>("PedidoConfirmacao");
             var enderecotemp = session.GetObjectFromJson<Endereco>("EnderecoConfirmacao");
             var detalhesPedidotemp = session.GetObjectFromJson<List<DetalhePedido>>("DetalhesConfirmacao");
 
-            // ⭐️ Remover os dados da SESSÃO IMEDIATAMENTE após a leitura ⭐️
+            // Limpa a sessão
             session.Remove("PedidoConfirmacao");
             session.Remove("EnderecoConfirmacao");
             session.Remove("DetalhesConfirmacao");
 
-            // ⚠️ Nota: PedidoDTO deve ser o tipo correto que você está salvando (ou Pedido)
-            if (pedidotemp == null || enderecotemp == null || detalhesPedidotemp == null || detalhesPedidotemp.Count == 0)
+            if (pedidoDto == null || enderecotemp == null || detalhesPedidotemp == null)
             {
-                // Se falhar, redireciona para o carrinho (Sem usar TempData, limpa a mensagem aqui)
-                // session.Remove() já foi feito, então o Redirect é seguro.
                 return RedirectToPage("/Pedido/Carrinho/Carrinho");
             }
 
-            // Atribui os modelos para exibição na página
-            pedido = (Pedido)pedidotemp; // Ajuste o casting se PedidoDTO não for Pedido
+            // 2. Converter DTO para Model manualmente para garantir que os dados batam
+            pedido = new SaborGregoNew.Models.Pedido
+            {
+                Id = pedidoDto.Id,
+                DataPedido = pedidoDto.DataPedido,
+                TotalPedido = pedidoDto.ValorTotal, // CORREÇÃO: Mapeia ValorTotal (DTO) para TotalPedido (Model)
+                Status = pedidoDto.Status,
+                MetodoPagamento = pedidoDto.MetodoPagamento,
+                ClienteId = pedidoDto.ClienteId,
+                EnderecoId = pedidoDto.EnderecoId,
+                
+                // 3. A MÁGICA: Colocar a lista de detalhes dentro do pedido
+                Itens = detalhesPedidotemp 
+            };
+
             endereco = enderecotemp;
-            detalhesPedido = detalhesPedidotemp;
+            detalhesPedido = detalhesPedidotemp; // Mantemos aqui também por garantia
             
             return Page();
         }

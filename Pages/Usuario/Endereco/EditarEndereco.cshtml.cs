@@ -1,110 +1,73 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
-using SaborGregoNew.DTOs.Usuario;
 using SaborGregoNew.Models;
+using SaborGregoNew.Services;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SaborGregoNew.Pages.Usuario
 {
     public class EditarEnderecoModel : PageModel
     {
-        private readonly IEnderecoRepository _enderecoService;
+        private readonly SaborGregoNew.Repository.IEnderecoRepository _enderecoRepository;
 
-        [BindProperty]
-        public EnderecoDTO endereco { get; set; } = new EnderecoDTO();
-        [BindProperty]
-        public Endereco enderecoatualizado { get; set; } = new Endereco();
-        public Endereco enderecoConfirmacao { get; set; } = new Endereco();
-
-        public EditarEnderecoModel(IEnderecoRepository enderecoRepository)
+        public EditarEnderecoModel(SaborGregoNew.Repository.IEnderecoRepository enderecoRepository)
         {
-            _enderecoService = enderecoRepository;
+            _enderecoRepository = enderecoRepository;
         }
 
-        public async Task<IActionResult> OnGet(int Id)
+        [BindProperty]
+        public SaborGregoNew.Models.Endereco Endereco { get; set; }
+
+        public async Task<IActionResult> OnGet(int id)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdString == null)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             {
-                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
                 return RedirectToPage("/Usuario/Login");
             }
-            var UserId = int.Parse(userIdString);
 
-            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
+            Endereco = await _enderecoRepository.SelectByIdAsync(id);
 
-            if (enderecoConfirmacao == null)
+            if (Endereco == null || Endereco.UsuarioId != userId)
             {
-                TempData["MensagemErro"] = "Endereço não encontrado.";
-                return Page();
-            }
-            if (enderecoConfirmacao.UsuarioId != UserId)
-            {
-                TempData["MensagemErro"] = "Este endereço não pertence ao usuário logado.";
                 return Forbid();
             }
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int Id)
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
                 return Page();
             }
 
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             {
-                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
-                return RedirectToPage("/Usuario/Login/Login");
+                return RedirectToPage("/Usuario/Login");
             }
-            var UserId = int.Parse(userIdClaim);
 
-            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
-            if (enderecoConfirmacao == null)
+            var enderecoFromDb = await _enderecoRepository.SelectByIdAsync(Endereco.Id);
+            if (enderecoFromDb == null || enderecoFromDb.UsuarioId != userId)
             {
-                TempData["MensagemErro"] = "Endereço não encontrado.";
-                return Page();
-            }
-            if (enderecoConfirmacao.UsuarioId != UserId)
-            {
-                TempData["MensagemErro"] = "O endereço não pertence ao usuário logado.";
                 return Forbid();
             }
-            var dto = new EnderecoDTO();
-            try
-            {
-                dto = new EnderecoDTO
-                {
-                    Apelido = enderecoatualizado.Apelido,
-                    Logradouro = enderecoatualizado.Logradouro,
-                    Numero = enderecoatualizado.Numero,
-                    Bairro = enderecoatualizado.Bairro,
-                    Complemento = enderecoatualizado.Complemento ?? "",
-                    UsuarioId = enderecoatualizado.UsuarioId
-                };
-                if (enderecoatualizado != enderecoConfirmacao)
-                {
-                    await _enderecoService.UpdateById(enderecoatualizado.Id, dto);
 
-                    TempData["MensagemSucesso"] = "Endereço atualizado com sucesso!";
-                    return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
-                }
-                else
-                {
-                    TempData["MensagemErro"] = "Os dados não foram alterados.";
-                    return Page();
-                }
-            }
-            catch (Exception ex)
+            var dto = new DTOs.Usuario.CadastroEnderecoDTO
             {
-                TempData["MensagemErro"] = "Erro na associação dos dados: " + ex.Message;
-                return Page();
-            }
+                Apelido = Endereco.Apelido,
+                Logradouro = Endereco.Logradouro,
+                Numero = Endereco.Numero,
+                Bairro = Endereco.Bairro,
+                Complemento = Endereco.Complemento
+            };
+
+            await _enderecoRepository.UpdateById(Endereco.Id, dto);
+
+            return RedirectToPage("/Usuario/ListaEnderecos");
         }
     }
 }

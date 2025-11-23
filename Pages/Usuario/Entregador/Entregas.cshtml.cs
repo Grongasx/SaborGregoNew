@@ -16,8 +16,8 @@ namespace SaborGregoNew.Pages.Funcionario // ⬅️ Namespace e Pasta alterados
     {
         private readonly ApplicationDbContext _context;
 
-        public List<Pedido> EntregasSolicitadas { get; set; }
-        public List<Pedido> Entregando { get; set; }
+        public List<SaborGregoNew.Models.Pedido> EntregasSolicitadas { get; set; }
+        public List<SaborGregoNew.Models.Pedido> Entregando { get; set; }
 
 
         public EntregasSolicitadasModel(ApplicationDbContext context)

@@ -49,36 +49,24 @@
             <tbody>
                 @foreach (var item in Model.Carrinho)
                 {
-                    <tr>
+                    <tr id="row-@item.ProdutoId">
                         <td style="width: 100px;">
-                            @* Exibe a imagem, lembrando que ImagemUrl é o caminho relativo *@
                             <img src="@item.Imagem" class="img-thumbnail" style="max-height: 80px;" alt="@item.Nome">
                         </td>
                         <td>@item.Nome</td>
                         <td class="text-center">@item.Preco.ToString("C")</td>
                         
                         <td class="text-center">
-                            @* Formulário para Atualizar Quantidade *@
-                            <form method="post" asp-page-handler="AtualizarQuantidade" class="d-flex align-items-center justify-content-center">
-                                @* Campo oculto para identificar qual produto atualizar *@
-                                <input type="hidden" name="produtoId" value="@item.ProdutoId" />
-                                
-                                <input type="number" 
-                                       name="novaQuantidade" 
-                                       value="@item.Quantidade" 
-                                       min="0" 
-                                       class="form-control text-center" 
-                                       style="width: 70px;" />
-                                
-                                <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Atualizar">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                </button>
-                            </form>
+                            <input type="number" 
+                                   value="@item.Quantidade" 
+                                   min="0" 
+                                   class="form-control text-center mx-auto" 
+                                   style="width: 80px;"
+                                   onchange="atualizarQuantidade(this, @item.ProdutoId)" />
                         </td>
                         
-                        <td class="text-end">@item.SubTotal.ToString("C")</td>
+                        <td class="text-end" id="subtotal-@item.ProdutoId">@item.SubTotal.ToString("C")</td>
                         <td>
-                            @* Formulário para Remover Item *@
                             <form method="post" asp-page-handler="RemoverItem" asp-route-produtoId="@item.ProdutoId">
                                 <button type="submit" class="btn btn-sm btn-danger" title="Remover Item">
                                     <i class="bi bi-trash"></i>
@@ -91,7 +79,7 @@
             <tfoot>
                 <tr class="table-dark">
                     <td colspan="4" class="text-end"><strong>Total do Pedido:</strong></td>
-                    <td class="text-end"><strong>@Model.CarrinhoTotal.ToString("C")</strong></td>
+                    <td class="text-end"><strong id="carrinho-total">@Model.CarrinhoTotal.ToString("C")</strong></td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -103,3 +91,59 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+
+    <script>
+        function atualizarQuantidade(input, produtoId) {
+            const novaQtd = input.value;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // Faz a chamada ao servidor (Note o uso de crases ` ` no URL)
+            fetch(`?handler=AtualizarQuantidadeAjax&produtoId=${produtoId}&novaQuantidade=${novaQtd}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error('Erro na requisição');
+                }
+            })
+            .then(data => {
+                if (!data) return;
+
+                if (data.deveRemover) {
+                    // Se a quantidade for 0, remove a linha visualmente
+                    const linha = document.getElementById(`row-${produtoId}`);
+                    if (linha) linha.remove();
+                } else {
+                    // Atualiza o subtotal do item
+                    const subtotal = document.getElementById(`subtotal-${produtoId}`);
+                    if (subtotal) subtotal.innerText = data.novoSubtotal;
+                }
+                
+                // Atualiza o total geral
+                const total = document.getElementById('carrinho-total');
+                if (total) total.innerText = data.novoTotal;
+                
+                // Atualiza o ícone do carrinho no menu (se existir)
+                const badge = document.getElementById('cartCount');
+                if(badge) {
+                    badge.innerText = data.itensTotal;
+                    badge.style.display = data.itensTotal > 0 ? 'flex' : 'none';
+                }
+                
+                // Se o carrinho esvaziou, recarrega para mostrar mensagem de vazio
+                if (data.itensTotal === 0) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+}

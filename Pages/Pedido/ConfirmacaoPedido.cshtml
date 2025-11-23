@@ -36,7 +36,7 @@
     {
         <div class="card shadow-lg">
             <div class="card-header bg-success text-white text-center">
-                <h1 class="mb-0">pedido Confirmado com Sucesso!</h1>
+                <h1 class="mb-0">Pedido Confirmado com Sucesso!</h1>
                 <p class="lead mb-0">Obrigado por sua compra.</p>
             </div>
             <div class="card-body p-4">
@@ -46,7 +46,7 @@
                         <h4>Detalhes da Transação</h4>
                         <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.pedido.Id</span></p>
                         <p class="mb-1"><strong>Data do Pedido:</strong> @Model.pedido.DataPedido.ToString("dd/MM/yyyy")</p>
-                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")>
+                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")</p>
                         <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.pedido.Status</span></p>
                         <p class="mb-1"><strong>Metodo de Pagamento:</strong> @Model.pedido.MetodoPagamento</p>
                     </div>
@@ -67,14 +67,13 @@
                             <th>Produto</th>
                             <th class="text-center">Qtd.</th>
                             <th class="text-end">Preço Unit.</th>
-                            <th class="text-end">Subtotal</th>s
+                            <th class="text-end">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.pedido.Itens)
                         {
                             <tr>
-                                <img class="" source="@item.Imagem">
                                 <td>@item.NomeProduto</td>
                                 <td class="text-center">@item.Quantidade</td>
                                 <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
@@ -97,7 +96,6 @@
                     <a asp-page="/Index" class="btn btn-primary mt-3 me-2">Continuar Comprando</a>
                     <a asp-page="/Usuario/Pedidos/Lista" class="btn btn-outline-secondary mt-3">Ver Meus Pedidos</a>
                 </div>
-
             </div>
         </div>
     }

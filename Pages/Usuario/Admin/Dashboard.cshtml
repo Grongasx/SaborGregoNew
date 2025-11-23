@@ -1,5 +1,5 @@
 @page "/admin/dashboard"
-@model SaborGregoNew.Pages.Admin.DashboardModel
+@model SaborGregoNew.Pages.Usuario.Admin.DashboardModel
 @{
     ViewData["Title"] = "Dashboard do Administrador";
 }
@@ -124,10 +124,10 @@
         <div class="col-lg-4">
             <div class="card dashboard-card">
                 <div class="card-header dashboard-card-header">
-                    Vendas por Categoria (Mês)
+                    Vendas por Produto (Mês)
                 </div>
                 <div class="card-body dashboard-card-body">
-                    <canvas id="vendasCategoriaChart"></canvas>
+                    <canvas id="vendasProdutosChart"></canvas>
                 </div>
             </div>
         </div>
@@ -141,12 +141,9 @@
             // --- Gráfico 1: Vendas Diárias (Linha) ---
             var vendasDiariasData = @Html.Raw(Model.VendasDiariasJson);
             
-            // Pega o elemento <canvas>
             const ctxDiario = document.getElementById('vendasDiariasChart');
-            
-            // Cria o gráfico
             new Chart(ctxDiario, {
-                type: 'line', // Tipo de gráfico
+                type: 'line', 
                 data: vendasDiariasData,
                 options: {
                     responsive: true,
@@ -160,13 +157,12 @@
             });
 
             // --- Gráfico 2: Vendas por Categoria (Pizza) ---
+            var vendasProdutosData = @Html.Raw(Model.VendasProdutosJson);
             
-            var vendasCategoriaData = @Html.Raw(Model.VendasCategoriaJson);
-            const ctxCategoria = document.getElementById('vendasCategoriaChart');
-            
-            new Chart(ctxCategoria, {
-                type: 'pie', // Tipo de gráfico
-                data: vendasCategoriaData,
+            const ctxProdutos = document.getElementById('vendasProdutosChart');
+            new Chart(ctxProdutos, {
+                type: 'pie',
+                data: vendasProdutosData,
                 options: {
                     responsive: true,
                     maintainAspectRatio: true

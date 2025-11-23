@@ -1,76 +1,38 @@
 @page
 @model SaborGregoNew.Pages.Usuario.ListaEnderecosModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Mvc.ViewFeatures
 
-@{ 
-    ViewData["Title"] = "Meus Endereços";
-    // Define a classe de fundo no Layout ou na div principal, não em uma div vazia
+@{    ViewData["Title"] = "Meus Endereços";
 }
 
-@{
-    var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
-}
-@foreach (var key in keys)
-{
-    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
-    {
-        string alertClass = key switch
-        {
-            "MensagemSucesso" => "alert-success",
-            "MensagemErro" => "alert-danger",
-            _ => "alert-info"
-        };
-        <div class="container mt-3">
-            <div class="alert @alertClass alert-dismissible fade show text-white">
-                @message
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    }
-}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-@{
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");
-}
-
-<div class="container my-5 min-vh-100"> 
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white p-3">
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
             <h4 class="mb-0">@ViewData["Title"]</h4>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body">
             <p class="card-text">Abaixo estão os seus endereços cadastrados. Você pode adicionar novos endereços a qualquer momento.</p>
-            <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-primary mb-4 shadow-sm">
+            <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-success mb-4">
                 <i class="fas fa-plus-circle"></i> Adicionar Novo Endereço
             </a>
 
-            @if (Model.enderecos != null && Model.enderecos.Any())
+            @if (Model.Enderecos != null && Model.Enderecos.Any())
             {
-                <div class="row g-4">
-                    @foreach (var endereco in Model.enderecos)
+                <div class="row">
+                    @foreach (var endereco in Model.Enderecos)
                     {
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100 shadow-sm border-light">
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm address-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-primary">@endereco.Apelido</h5>
-                                    <p class="card-text text-muted small mb-1">
-                                        <i class="fas fa-map-marker-alt me-2"></i> @endereco.Logradouro, @endereco.Numero
-                                    </p>
-                                    <p class="card-text text-muted small mb-0">
-                                        <i class="fas fa-city me-2"></i> @endereco.Bairro @if (!string.IsNullOrEmpty(endereco.Complemento)) { <text>(@endereco.Complemento)</text> }
+                                    <h5 class="card-title">@endereco.Apelido</h5>
+                                    <p class="card-text">
+                                        @endereco.Logradouro, @endereco.Numero<br />
+                                        @endereco.Bairro
                                     </p>
                                 </div>
-                                <div class="card-footer bg-light d-flex justify-content-end gap-2 border-top">
-                                    <a asp-page="EditarEndereco" asp-route-id="@endereco.Id" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </a>
-                                    
-                                    <form method="post" asp-route-id="@endereco.Id" onsubmit="return confirm('Tem certeza que deseja excluir o endereço @endereco.Apelido? Esta ação é irreversível.');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash-alt"></i> Excluir
-                                        </button>
-                                    </form>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <a asp-page="EditarEndereco" asp-route-id="@endereco.Id" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    <a asp-page="ExcluirEndereco" asp-route-id="@endereco.Id" class="btn btn-sm btn-outline-danger">Excluir</a>
                                 </div>
                             </div>
                         </div>
@@ -79,10 +41,14 @@
             }
             else
             {
-                <div class="alert alert-info border-0" role="alert">
-                    <i class="fas fa-info-circle me-2"></i> Nenhum endereço cadastrado ainda. Que tal adicionar um agora?
+                <div class="alert alert-info" role="alert">
+                    Nenhum endereço cadastrado ainda. Que tal adicionar um agora?
                 </div>
             }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+}

@@ -5,8 +5,8 @@
 
 
 <div class="container mt-5">
-    <h1 class="mb-4 text-primary"><i class="bi bi-person-workspace"></i> Painel de Funcionário: Fila de Preparo</h1>
-    <p class="lead">Exibindo Entregas com status: <span class="badge bg-danger">Solicitado</span></p>
+    <h1 class="mb-4 text-primary"><i class="bi bi-person-workspace"></i> Painel do Entregador: Fila de Entregas</h1>
+    <p class="lead">Exibindo Entregas com status: <span class="badge bg-danger">Para Entregar</span></p>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -40,19 +40,19 @@
                             </ul>
 
                             <p class="card-text">
-                                **Endereço:** @pedido.EnderecoId <br/>
-                                **Pagamento:** @pedido.MetodoPagamento <br/>
-                                **Total:** <span class="text-success fw-bold">@pedido.TotalPedido.ToString("C")</span>
+                                Endereço: @pedido.EnderecoId <br/>
+                                Pagamento: @pedido.MetodoPagamento <br/>
+                                Total: <span class="text-success fw-bold">@pedido.TotalPedido.ToString("C")</span>
                             </p>
                         </div>
                         <div class="card-footer text-center">
-                            <form method="post">]
+                            <form method="post">
                             @Html.AntiForgeryToken()
                                 <button type="submit" 
                                         asp-page-handler="IniciarPreparo" 
                                         asp-route-id="@pedido.Id"
                                         class="btn btn-primary w-100">
-                                    <i class="bi bi-play-fill"></i> Iniciar Preparo
+                                    <i class="bi bi-play-fill"></i> Iniciar Entrega
                                 </button>
                             </form>
                         </div>
@@ -69,7 +69,7 @@
         </div>
     }
     <div class="col-lg-6 mb-4">
-        <h2 class="text-warning border-bottom pb-2">2. Em Preparação <span class="badge bg-warning text-dark">@Model.Entregando.Count</span></h2>
+        <h2 class="text-warning border-bottom pb-2">2. Em Rota de Entrega <span class="badge bg-warning text-dark">@Model.Entregando.Count</span></h2>
         <p class="lead">Entregas em andamento, prontos para serem concluídos.</p>
 
         @if (Model.Entregando.Any())
@@ -80,7 +80,7 @@
                     <div class="col-12 mb-3">
                         <div class="card shadow-sm h-100 border-warning border-2">
                             <div class="card-body">
-                                <h5 class="card-title">Pedido #@pedido.Id <span class="float-end badge bg-warning text-dark">Em Preparação</span></h5>
+                                <h5 class="card-title">Pedido #@pedido.Id <span class="float-end badge bg-warning text-dark">Em Rota de Entrega</span></h5>
                                 <small>Iniciado em: @pedido.DataPedido.ToString("HH:mm")</small>
                                 
                                 <h6>Itens:</h6>
@@ -98,7 +98,7 @@
                                             asp-page-handler="ConcluirPreparo" 
                                             asp-route-id="@pedido.Id"
                                             class="btn btn-sm btn-success w-100">
-                                        <i class="bi bi-check-circle-fill"></i> Concluir Preparo
+                                        <i class="bi bi-check-circle-fill"></i> Concluir Entrega
                                     </button>
                                 </form>
                             </div>

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository.Interfaces;
+using SaborGregoNew.Repository;
 using SaborGregoNew.Extensions;
 using SaborGregoNew.Models;
 
@@ -8,7 +8,7 @@ namespace SaborGregoNew.Pages.Usuario;
 public class MeusPedidosModel : PageModel
 {
     private readonly IPedidoRepository _pedidoRepository;
-    public List<Pedido> pedidosPendentes { get; set; }
+    public List<Models.Pedido> pedidosPendentes { get; set; }
 
     public MeusPedidosModel(IPedidoRepository pedidoRepository)
     {

@@ -21,10 +21,9 @@ namespace SaborGregoNew.Models
         public string Complemento { get; set; } = string.Empty;
         [Required]
         public string Bairro { get; set; } = string.Empty;
+        [Required]
         [ForeignKey("UsuarioId")]
         public Usuario? Usuario { get; set; }
-        [Required]
-        public int UsuarioId { get; set; }
-        public bool Ativo { get; set; } = true;
+        public int? UsuarioId { get; set; }
     }
 }

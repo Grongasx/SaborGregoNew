@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace saborGregoNew.DTOs
+namespace SaborGregoNew.DTOs
 {
     public class DashboardPedido
     {
@@ -44,6 +44,12 @@ namespace saborGregoNew.DTOs
     public class VendasPorCategoriaDTO
     {
         public string Categoria { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+    }
+
+    public class VendasPorProdutoDTO
+    {
+        public string Produto { get; set; } = string.Empty;
         public decimal Total { get; set; }
     }
 }

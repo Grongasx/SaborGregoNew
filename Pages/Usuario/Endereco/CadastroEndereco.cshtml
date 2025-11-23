@@ -1,142 +1,120 @@
 @page
-@model SaborGregoNew.Pages.Usuario.CadastroEnderecoModel
+@model SaborGregoNew.Pages.Usuario.CadastroEnderecoModel;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Mvc.ViewFeatures
 
 @{
     ViewData["Title"] = "Cadastro de Endereço";
 }
 
-@{
-    var keys = new List<string>{ "SuccesMessage", "ErrorMessage", "WarningMessage"};
-}
-
-@foreach (var key in keys)
+@if (User.Identity == null)
 {
-    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
-    {
-        string alertClass = key switch
-        {
-            "SuccesMessage" => "alert-success",
-            "ErrorMessage" => "alert-danger",
-            "WarningMessage" => "alert-warning text-dark",
-            _ => "alert-info"
-        };
-        <div class="container mt-3">
-            <div class="alert @alertClass alert-dismissible fade show @(key == "WarningMessage" ? "text-dark" : "text-white")">
-                @message
-                <button type="button" class="btn-close @(key == "WarningMessage" ? "" : "btn-close-white")" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    }
+    <p>Usuario não Autenticado</p>
 }
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
- 
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(247, 147, 30, 0.05) 100%);">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <div class="mb-3">
-                                <i class="bi bi-geo-alt" style="font-size: 3rem; color: #ff6b35;"></i>
+else
+{
+    <div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(247, 147, 30, 0.05) 100%);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-house" style="font-size: 3rem; color: #ff6b35;"></i>
+                                </div>
+                                <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">Cadastrar Endereço</h2>
                             </div>
-                            <h2 class="fw-bold mb-2 text-white" style="color: #ff6b35;">@ViewData["Title"]</h2>
-                            <p class="text-white-50">Adicione um novo local de entrega.</p>
-                        </div>
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
-                        <form method="post" id="CadastroEndereco">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                             
-                            <div class="mb-3">
-                                <label asp-for="endereco.Apelido" class="form-label fw-semibold text-white">
-                                    <i class="bi bi-tag me-1"></i>Nome do Endereço
-                                </label>
-                                <input 
-                                    asp-for="endereco.Apelido" 
-                                    type="text"
-                                    class="form-control form-control-lg" 
-                                    placeholder="Casa/Trabalho (Ex: Casa Principal)"
-                                    required
-                                />
-                                <span asp-validation-for="endereco.Apelido" class="text-danger small"></span>
-                            </div>
 
-                            <div class="mb-3">
-                                <label asp-for="endereco.Logradouro" class="form-label fw-semibold text-white">
-                                    <i class="bi bi-pin-map me-1"></i>Logradouro
-                                </label>
-                                <input 
-                                    asp-for="endereco.Logradouro" 
-                                    type="text"
-                                    class="form-control form-control-lg" 
-                                    placeholder="Rua José João da Silva"
-                                    required
-                                />
-                                <span asp-validation-for="endereco.Logradouro" class="text-danger small"></span>
-                            </div>
+                            <form method="post" id="CadastroEndereco">
+                                <input type="hidden" asp-for="enderecoDTO.Id" />
+                                <div class="mb-3">
+                                    <label for="Apelido" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-signpost-split-fill me-1"></i>Nome do Endereço
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Apelido" 
+                                        id="Apelido" 
+                                        type="text"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Casa/Trabalho"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Apelido" class="text-danger small"></span>
+                                </div>
 
-                            <div class="mb-3">
-                                <label asp-for="endereco.Numero" class="form-label fw-semibold text-white">
-                                    <i class="bi bi-hash me-1"></i>Número
-                                </label>
-                                <input 
-                                    asp-for="endereco.Numero" 
-                                    type="text"
-                                    class="form-control form-control-lg" 
-                                    placeholder="123"
-                                    required
-                                />
-                                <span asp-validation-for="endereco.Numero" class="text-danger small"></span>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="Logradouro" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-house-fill me-1"></i>Logradouro
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Logradouro" 
+                                        id="Logradouro" 
+                                        type="text"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Rua José João da Silva"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Logradouro" class="text-danger small"></span>
+                                </div>
 
-                            <div class="mb-3">
-                                <label asp-for="endereco.Complemento" class="form-label fw-semibold text-white">
-                                    <i class="bi bi-info-circle me-1"></i>Complemento (Opcional)
-                                </label>
-                                <input 
-                                    asp-for="endereco.Complemento" 
-                                    type="text"
-                                    class="form-control form-control-lg" 
-                                    placeholder="Apartamento 101, Bloco A"
-                                />
-                                <span asp-validation-for="endereco.Complemento" class="text-danger small"></span>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="Numero" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-123 me-1"></i>Numero
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Numero" 
+                                        id="Numero" 
+                                        type="text"
+                                        class="form-control form-control-lg" 
+                                        placeholder="123"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Numero" class="text-danger small"></span>
+                                </div>
 
-                            <div class="mb-4">
-                                <label asp-for="endereco.Bairro" class="form-label fw-semibold text-white">
-                                    <i class="bi bi-building me-1"></i>Bairro
-                                </label>
-                                <input 
-                                    asp-for="endereco.Bairro" 
-                                    type="text"
-                                    class="form-control form-control-lg" 
-                                    placeholder="Jardim das Flores"
-                                    required
-                                />
-                                <span asp-validation-for="endereco.Bairro" class="text-danger small"></span>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="Complemento" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-bookmark me-1"></i>Complemento
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Complemento" 
+                                        id="Complemento" 
+                                        type="text"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Em frente ao mercado"
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Complemento" class="text-danger small"></span>
+                                </div>
 
-                            <button 
-                                type="submit" 
-                                class="btn btn-lg w-100 text-white fw-semibold mb-3"
-                                style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;"
-                            >
-                                <i class="bi bi-save me-2"></i>Cadastrar Endereço
-                            </button>
-                        </form>
-                        <div class="text-center">
-                            <a asp-page="/Usuario/Endereco/ListaEnderecos" class="text-white-50 small">Voltar para Meus Endereços</a>
+                                <div class="mb-3">
+                                    <label for="Bairro" class="form-label fw-semibold text-white">
+                                        <i class="bi bi-hash me-1"></i>Bairro
+                                    </label>
+                                    <input 
+                                        asp-for="enderecoDTO.Bairro" 
+                                        id="Bairro" 
+                                        type="text"
+                                        class="form-control form-control-lg" 
+                                        placeholder="Centro"
+                                        required
+                                    />
+                                    <span asp-validation-for="enderecoDTO.Bairro" class="text-danger small"></span>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-lg w-100 text-white fw-semibold mb-3"
+                                    style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;"
+                                >
+                                    <i class="bi bi-download me-2"></i>Salvar
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
