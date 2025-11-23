@@ -1,0 +1,35 @@
+Security.Claims" apareceu anteriormente neste namespace
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\CadastroEndereco.cshtml.cs(4,7): warning CS0105: A diretiva using para "Microsoft.AspNetCore.Mvc" apareceu anteriormente neste namespace
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(3,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(4,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(5,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(6,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(8,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(9,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(10,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(11,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(12,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(13,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(14,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(16,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(17,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(18,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(19,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(24,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(25,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(26,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(27,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(28,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(29,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(30,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(31,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(32,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Repository\Query\Queries.cs(33,29): error CS0116: Um namespace não pode conter diretamente membros, como campos, métodos ou instruções
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\EditarEndereco.cshtml.cs(20,16): error CS0118: "Endereco" é um namespace, mas é usado como um tipo
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\ExcluirEndereco.cshtml.cs(20,16): error CS0118: "Endereco" é um namespace, mas 
+é usado como um tipo
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\ListaEnderecos.cshtml.cs(18,21): error CS0118: "Endereco" é um namespace, mas é usado como um tipo
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\Index.cshtml.cs(11,26): error CS0246: O nome do tipo ou do namespace "IEnderecoRepository" não pode ser encontrado (está faltando uma diretiva using ou uma referência de assembly?)
+    C:\Users\T-GAMER\RiderProjects\SaborGregoNew\Pages\Usuario\Endereco\Index.cshtml.cs(13,27): error CS0246: O nome do tipo ou do namespace "IEnderecoRepository" não pode ser encontrado (está faltando uma diretiva using ou uma referência de assembly?)
+
+Construir falhou com30 erros e 3 avisos em 1,5s

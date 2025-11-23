@@ -1,0 +1,95 @@
+@page
+@model SaborGregoNew.Pages.Usuario.Endereco.IndexModel
+@{
+    ViewData["Title"] = "Meus Endereços";
+}
+
+<div class="min-vh-100 py-5" style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(247, 147, 30, 0.05) 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-white" style="color: #ff6b35;">Meus Endereços</h2>
+            <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-lg text-white fw-semibold" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none;">
+                <i class="bi bi-plus-lg me-2"></i>Novo Endereço
+            </a>
+        </div>
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["MensagemSucesso"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["MensagemErro"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row">
+            @if (Model.Enderecos != null && Model.Enderecos.Any())
+            {
+                @foreach (var endereco in Model.Enderecos)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm border-0 h-100 rounded-4" style="background: rgba(255, 255, 255, 0.9);">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title fw-bold text-dark mb-0">
+                                        <i class="bi bi-geo-alt-fill me-2" style="color: #ff6b35;"></i>@endereco.Apelido
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                                            <li>
+                                                <a class="dropdown-item" asp-page="/Usuario/Endereco/CadastroEndereco" asp-route-id="@endereco.Id">
+                                                    <i class="bi bi-pencil me-2 text-primary"></i>Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@endereco.Id" onsubmit="return confirm('Tem certeza que deseja excluir este endereço?');">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i>Excluir
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted mb-1">
+                                    @endereco.Logradouro, @endereco.Numero
+                                </p>
+                                <p class="card-text text-muted mb-1">
+                                    @endereco.Bairro
+                                </p>
+                                @if (!string.IsNullOrEmpty(endereco.Complemento))
+                                {
+                                    <p class="card-text text-muted small">
+                                        <i class="bi bi-info-circle me-1"></i>@endereco.Complemento
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted mb-3">
+                        <i class="bi bi-geo-alt" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                    <h4 class="text-muted">Nenhum endereço cadastrado</h4>
+                    <p class="text-muted mb-4">Cadastre seu primeiro endereço para facilitar seus pedidos.</p>
+                    <a asp-page="/Usuario/Endereco/CadastroEndereco" class="btn btn-outline-primary rounded-pill px-4">
+                        Cadastrar Agora
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

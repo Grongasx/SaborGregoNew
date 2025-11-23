@@ -1,0 +1,101 @@
+@page "/admin/produtos"
+@model SaborGregoNew.Pages.Usuario.Admin.Produtos.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Gerenciar Produtos";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-page="/Produto/Cadastro" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Cadastrar Novo
+        </a>
+    </div>
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["MensagemSucesso"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["MensagemErro"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (Model.Produtos != null && Model.Produtos.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Imagem</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Preço</th>
+                                <th>Status</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var produto in Model.Produtos)
+                            {
+                                <tr class="@(!produto.Ativo ? "table-secondary text-muted" : "")">
+                                    <td>
+                                        <img src="@produto.Imagem" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td>@produto.Nome</td>
+                                    <td>@produto.Categoria</td>
+                                    <td>@produto.Preco.ToString("C")</td>
+                                    <td>
+                                        @if (produto.Ativo)
+                                        {
+                                            <span class="badge bg-success">Ativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a asp-page="/Produto/Cadastro" asp-route-id="@produto.Id" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </a>
+                                            @if (produto.Ativo)
+                                            {
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@produto.Id" class="d-inline" onsubmit="return confirm('Tem certeza que deseja desativar este produto? Ele não aparecerá mais no cardápio.');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Desativar">
+                                                        <i class="bi bi-trash"></i> Excluir
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page-handler="Ativar" asp-route-id="@produto.Id" class="d-inline" onsubmit="return confirm('Tem certeza que deseja ativar este produto? Ele voltará a aparecer no cardápio.');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Ativar">
+                                                        <i class="bi bi-check-lg"></i> Ativar
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Nenhum produto encontrado.
+        </div>
+    }
+</div>
