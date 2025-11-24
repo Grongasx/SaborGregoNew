@@ -34,6 +34,31 @@
         h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
             color: var(--text-light) !important;
         }
+
+        /* --- CORREÇÃO DE MODAIS (Para ficarem escuros) --- */
+        .modal-content {
+            background-color: var(--card-bg) !important; /* Fundo escuro */
+            border: 1px solid rgba(255, 107, 53, 0.2); /* Borda laranja sutil */
+            color: var(--text-light) !important; /* Texto claro */
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 107, 53, 0.2) !important;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 107, 53, 0.2) !important;
+        }
+
+        .modal-title {
+            color: var(--primary-orange) !important; /* Título em destaque */
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%); /* Torna o X de fechar branco */
+        }
+
+        
         .text-muted {
             color: var(--text-muted) !important; 
         }
@@ -123,6 +148,17 @@
             border: 1px solid rgba(255, 107, 53, 0.2);
             color: var(--text-light);
         }
+
+        /* Força a cor clara especificamente para títulos de card */
+        .card-title, .card-header {
+            color: var(--text-light) !important;
+        }
+        
+        /* Garante que qualquer texto dentro do corpo do card também seja claro */
+        .card-body, .card-text {
+            color: var(--text-light) !important;
+            background: var(--card-bg);
+        }
         
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-orange), var(--primary-gold));
@@ -196,7 +232,7 @@
                                 @User.Identity.Name
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="bi dropdown-item" href="/Usuario/Endereco/ListaEnderecos">Meus Endereços</a></li>
+                                <li><a class="bi dropdown-item" asp-page="/Usuario/Endereco/Index">Meus Endereços</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">

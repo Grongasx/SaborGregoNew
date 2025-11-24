@@ -7,34 +7,38 @@
 <style>
     /* Estilos simples para os cards do dashboard */
     .dashboard-card {
+        /* CORREÇÃO: Fundo escuro para bater com o tema global */
+        background-color: var(--card-bg) !important; 
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
-        border: none;
+        border: 1px solid rgba(255, 107, 53, 0.2) !important; /* Borda laranja sutil */
     }
 
     .dashboard-card-header {
-        background-color: #f8f9fa;
+        /* CORREÇÃO: Cabeçalho um pouco mais claro que o fundo, mas ainda escuro */
+        background-color: rgba(255, 255, 255, 0.05) !important;
         font-weight: 600;
-        color: #495057;
+        color: var(--primary-orange) !important; /* Destaque laranja no título */
         padding: 0.75rem 1.25rem;
-        border-bottom: 1px solid #e9ecef;
+        border-bottom: 1px solid rgba(255, 107, 53, 0.2) !important;
     }
 
     .dashboard-card-body {
         padding: 1.25rem;
+        color: #ffffff !important; /* Texto do corpo branco */
     }
     
     .dashboard-metric {
         font-size: 2.25rem;
         font-weight: 700;
-        color: #007bff;
+        color: var(--primary-gold) !important; /* Dourado para números grandes */
     }
     
     .dashboard-label {
          font-size: 1.1rem;
          font-weight: 500;
-         color: #6c757d;
+         color: #e0e0e0 !important; /* Cinza muito claro para descrições */
     }
 </style>
 

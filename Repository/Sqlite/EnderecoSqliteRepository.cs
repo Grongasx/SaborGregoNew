@@ -129,22 +129,21 @@ namespace SaborGregoNew.Repository
         }
 
         //Atualiza um endereço//
-        public async Task UpdateById(int Id, CadastroEnderecoDTO ModeloEndereco)//recebe o id e um objeto endereço
+        public async Task UpdateById(int Id, CadastroEnderecoDTO ModeloEndereco)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria a conexão com o banco
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão");
             try
             {
                 using (conn)
                 {
-                    await conn.OpenAsync();//abre conexão
+                    await conn.OpenAsync();
 
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = Queries.EnderecoUpdate;//query para o banco
+                    cmd.CommandText = Queries.EnderecoUpdate;
 
-                    //parametros para o update
-                    cmd.Parameters.Add(new SqliteParameter("@Id", Id));//recebe o id do endereço para encontra-lo
-                    cmd.Parameters.Add(new SqliteParameter("@Apelido", ModeloEndereco.Apelido));//cria o dado na tabela...
+                    cmd.Parameters.Add(new SqliteParameter("@Id", Id));
+                    cmd.Parameters.Add(new SqliteParameter("@Apelido", ModeloEndereco.Apelido));
                     cmd.Parameters.Add(new SqliteParameter("@Logradouro", ModeloEndereco.Logradouro));
                     cmd.Parameters.Add(new SqliteParameter("@Numero", ModeloEndereco.Numero));
                     cmd.Parameters.Add(new SqliteParameter("@Complemento", ModeloEndereco.Complemento));
@@ -184,8 +183,8 @@ namespace SaborGregoNew.Repository
                         // Mapeamento manual dos dados da coluna para o objeto Endereco
                         return new Endereco
                         {
-                            Id = reader.GetInt32(0),//pega o dado da primeira coluna e coloca no id do modelo
-                            Apelido = reader.GetString(1),//pega o dado da segunda coluna e coloca no apelido do modelo...
+                            Id = reader.GetInt32(0),
+                            Apelido = reader.GetString(1),
                             Logradouro = reader.GetString(2),
                             Numero = reader.GetString(3),
                             Complemento = reader.GetString(4),
@@ -201,54 +200,48 @@ namespace SaborGregoNew.Repository
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro ao obter os endereços do usuario", ex);//caso de merda ele lança o erro e acusa onde foi
+                throw new Exception("Erro ao obter os endereços do usuario", ex);
             }
         }
 
         //Metodo para "deletar" o Endereço//
         public async Task DesativarAsync(int id)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//cria a conexão
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new Exception("Falha ao obter conexão");
 
-            try //caso algo de errado pula para catch
+            try 
             {
-                using (conn)//usa a conexão
+                using (conn)
                 {
-                    await conn.OpenAsync();//abre conexão
-
+                    await conn.OpenAsync();
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = Queries.EnderecoDesativar;//muda status de ativo
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));//com base no endereço
 
-                    await cmd.ExecuteNonQueryAsync();// executa a query
+                    cmd.CommandText = Queries.EnderecoDesativar; 
+                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Algo deu errado ao desativar endereço no banco de dados.", ex); //caso de alguma merda, acusa aqui
+                throw new Exception("Erro ao desativar o endereço.", ex); 
             }
         }
 
-        //===============================================================//
-        //=============Não usar esse metodo em produção==================//
-        //===============================================================//
-
-        //Realmente deleta o endereço pelo id//
-        public async Task DeleteById(int id)
+        private Endereco LerEndereco(DbDataReader reader)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
-                throw new InvalidOperationException("Falha ao obter conexão");
-            using (conn)
+            return new Endereco
             {
-                await conn.OpenAsync();
-
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = Queries.EnderecoDeleteById;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-
-                await cmd.ExecuteNonQueryAsync();
-            }
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                Apelido = reader.GetString(reader.GetOrdinal("Apelido")),
+                Logradouro = reader.GetString(reader.GetOrdinal("Logradouro")),
+                Numero = reader.GetString(reader.GetOrdinal("Numero")),
+                Complemento = reader.IsDBNull(reader.GetOrdinal("Complemento")) ? string.Empty : reader.GetString(reader.GetOrdinal("Complemento")),
+                Bairro = reader.GetString(reader.GetOrdinal("Bairro")),
+                UsuarioId = reader.GetInt32(reader.GetOrdinal("UsuarioId")),
+                Ativo = reader.GetOrdinal("Ativo") >= 0 ? reader.GetBoolean(reader.GetOrdinal("Ativo")) : true
+            };
         }
     }
 }

@@ -1,59 +1,70 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization;
 using SaborGregoNew.Models;
 using SaborGregoNew.Extensions;
 using SaborGregoNew.DTOs.Pedido;
+using SaborGregoNew.Repository;
 
 namespace SaborGregoNew.Pages
 {
-    // Apenas usuários logados podem ver a confirmação de um pedido
     public class ConfirmacaoPedidoModel : PageModel
     {
+        private readonly IPedidoRepository _pedidoRepository;
+        private readonly IEnderecoRepository _enderecoRepository;
 
-        //modelos para receber as viewbags
+        public ConfirmacaoPedidoModel(IPedidoRepository pedidoRepository, IEnderecoRepository enderecoRepository)
+        {
+            _pedidoRepository = pedidoRepository;
+            _enderecoRepository = enderecoRepository;
+        }
+
         public SaborGregoNew.Models.Pedido? pedido { get; set; }
         public Endereco? endereco { get; set; }
         public List<DetalhePedido>? detalhesPedido { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
-            var session = HttpContext.Session;
+            // CENÁRIO 1: Acesso via Histórico (DB)
+            if (id.HasValue && id > 0)
+            {
+                pedido = await _pedidoRepository.GetPedidoByIdAsync(id.Value);
+                
+                if (pedido != null)
+                {
+                    endereco = await _enderecoRepository.SelectByIdAsync(pedido.EnderecoId);
+                    detalhesPedido = pedido.Itens.ToList();
+                    return Page();
+                }
+            }
 
-            // 1. Ler como DTO (pois foi assim que salvamos no Checkout)
+            var session = HttpContext.Session;
             var pedidoDto = session.GetObjectFromJson<PedidoDTO>("PedidoConfirmacao");
             var enderecotemp = session.GetObjectFromJson<Endereco>("EnderecoConfirmacao");
             var detalhesPedidotemp = session.GetObjectFromJson<List<DetalhePedido>>("DetalhesConfirmacao");
 
-            // Limpa a sessão
             session.Remove("PedidoConfirmacao");
             session.Remove("EnderecoConfirmacao");
             session.Remove("DetalhesConfirmacao");
 
-            if (pedidoDto == null || enderecotemp == null || detalhesPedidotemp == null)
+            if (pedidoDto != null && enderecotemp != null && detalhesPedidotemp != null)
             {
-                return RedirectToPage("/Pedido/Carrinho/Carrinho");
-            }
-
-            // 2. Converter DTO para Model manualmente para garantir que os dados batam
-            pedido = new SaborGregoNew.Models.Pedido
-            {
-                Id = pedidoDto.Id,
-                DataPedido = pedidoDto.DataPedido,
-                TotalPedido = pedidoDto.ValorTotal, // CORREÇÃO: Mapeia ValorTotal (DTO) para TotalPedido (Model)
-                Status = pedidoDto.Status,
-                MetodoPagamento = pedidoDto.MetodoPagamento,
-                ClienteId = pedidoDto.ClienteId,
-                EnderecoId = pedidoDto.EnderecoId,
+                pedido = new SaborGregoNew.Models.Pedido
+                {
+                    Id = pedidoDto.Id,
+                    DataPedido = pedidoDto.DataPedido,
+                    TotalPedido = pedidoDto.ValorTotal,
+                    Status = pedidoDto.Status,
+                    MetodoPagamento = pedidoDto.MetodoPagamento,
+                    ClienteId = pedidoDto.ClienteId,
+                    EnderecoId = pedidoDto.EnderecoId,
+                    Itens = detalhesPedidotemp
+                };
+                endereco = enderecotemp;
+                detalhesPedido = detalhesPedidotemp;
                 
-                // 3. A MÁGICA: Colocar a lista de detalhes dentro do pedido
-                Itens = detalhesPedidotemp 
-            };
-
-            endereco = enderecotemp;
-            detalhesPedido = detalhesPedidotemp; // Mantemos aqui também por garantia
-            
-            return Page();
+                return Page();
+            }
+            return RedirectToPage("/Pedido/Carrinho/Carrinho");
         }
     }
 }

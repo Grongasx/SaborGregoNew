@@ -14,7 +14,5 @@ namespace SaborGregoNew.Repository
         Task UpdateById(int id, ProdutoDTO ModeloProduto);
         Task DesativarAsync(int id);
         Task AtivarAsync(int id);
-
-        Task DeleteById(int id);
     }
 }

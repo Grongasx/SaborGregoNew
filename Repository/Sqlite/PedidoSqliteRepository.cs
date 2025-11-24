@@ -113,49 +113,6 @@ namespace SaborGregoNew.Repository
             }
         }
 
-        //Pegar Pedidos para o fluxo
-        // public async Task<List<Pedido>> GetPedidosFluxoTrabalhoAsync(StatusPedido status, int usuarioId)
-        // {
-        //     //Verifica a conexão com o banco de dados
-        //     if (_connectionFactory.CreateConnection() is not DbConnection conn)
-        //         throw new InvalidOperationException("Falha ao obter conexão");
-
-        //     //abre a conexão com o banco de dados, Configura a query e executa
-        //     using (conn)
-        //     {
-        //         await conn.OpenAsync();
-        //         var cmd = conn.CreateCommand();
-
-        //         //verificação de Status e Usuario
-        //         if (status == StatusPedido.Solicitado || status == StatusPedido.ProntoParaRetirada) //Estados onde todos podem ver
-        //         {
-        //             cmd.CommandText = PedidoQuery.GetPedidosStatus;
-        //         }
-        //         else if (status == StatusPedido.EmPreparacao || status == StatusPedido.EmRotaDeEntrega) //estado onde só quem pegou o pedido pode ver
-        //         {
-        //             if (status == StatusPedido.EmPreparacao) //apenas para cozinheiro
-        //             {
-        //                 cmd.CommandText = PedidoQuery.GetPedidoFuncionario;
-        //             }
-        //             else if (status == StatusPedido.EmRotaDeEntrega) //apenas para entregador
-        //             {
-        //                 cmd.CommandText = PedidoQuery.GetPedidosEntregador;
-        //             }
-        //             cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId)); //seta o tipo de usuario
-        //         }
-        //         else
-        //         {
-        //             return new List<Pedido>(); //caso algo esteja errado, retorna uma lista vazia
-        //         }
-
-        //         cmd.Parameters.Add(new SqliteParameter("@Status", (int)status)); //seta o status para pesquisa
-
-        //         await cmd.ExecuteNonQueryAsync(); //executa a query
-        //     }
-        //     throw new InvalidCastException("a conexão não conseguiu realizar a operação");
-        // }
-        //Pegar Pedidos para o fluxo
-// Pegar Pedidos para o fluxo (Cozinha/Entrega)
         public async Task<List<Pedido>> GetPedidosFluxoTrabalhoAsync(StatusPedido status, int usuarioId)
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
@@ -249,10 +206,6 @@ namespace SaborGregoNew.Repository
             }
         }
 
-        //==========================//
-        //===Metodos para Usuario===//
-        //==========================//
-        //Pegar pedidos pendentes do usuario
         public async Task<List<Pedido>> GetPedidosPendentesAsync(int usuarioId)
         {
             if (_connectionFactory.CreateConnection() is not DbConnection conn)
@@ -388,6 +341,71 @@ namespace SaborGregoNew.Repository
                 cmd.Parameters.Add(new SqliteParameter("@Status", (int)status));
                 cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
                 await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task<Pedido?> GetPedidoByIdAsync(int id)
+        {
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão");
+
+            using (conn)
+            {
+                await conn.OpenAsync();
+                Pedido? pedido = null;
+
+                // 1. Busca o Cabeçalho
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = PedidoQuery.GetPedidoById;
+                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            pedido = new Pedido
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                                DataPedido = reader.GetDateTime(reader.GetOrdinal("DataPedido")),
+                                EnderecoId = reader.GetInt32(reader.GetOrdinal("EnderecoId")),
+                                MetodoPagamento = (MetodoPagamento)reader.GetInt32(reader.GetOrdinal("MetodoPagamento")),
+                                Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status")),
+                                TotalPedido = reader.GetDecimal(reader.GetOrdinal("TotalPedido")),
+                                // Verifica nulos para opcionais
+                                FuncionarioId = !reader.IsDBNull(reader.GetOrdinal("FuncionarioId")) ? reader.GetInt32(reader.GetOrdinal("FuncionarioId")) : null,
+                                EntregadorId = !reader.IsDBNull(reader.GetOrdinal("EntregadorId")) ? reader.GetInt32(reader.GetOrdinal("EntregadorId")) : null
+                            };
+                        }
+                    }
+                }
+
+                if (pedido == null) return null;
+
+                // 2. Busca os Itens
+                using (var cmdItens = conn.CreateCommand())
+                {
+                    cmdItens.CommandText = PedidoQuery.GetDetalhesByPedidoId;
+                    cmdItens.Parameters.Add(new SqliteParameter("@PedidoId", pedido.Id));
+
+                    using (var readerItens = await cmdItens.ExecuteReaderAsync())
+                    {
+                        while (await readerItens.ReadAsync())
+                        {
+                            pedido.Itens.Add(new DetalhePedido
+                            {
+                                PedidoId = readerItens.GetInt32(readerItens.GetOrdinal("PedidoId")),
+                                ProdutoId = readerItens.GetInt32(readerItens.GetOrdinal("ProdutoId")),
+                                Imagem = readerItens.IsDBNull(readerItens.GetOrdinal("Imagem")) ? null : readerItens.GetString(readerItens.GetOrdinal("Imagem")),
+                                NomeProduto = readerItens.GetString(readerItens.GetOrdinal("NomeProduto")),
+                                PrecoUnitario = readerItens.GetDecimal(readerItens.GetOrdinal("PrecoUnitario")),
+                                Quantidade = readerItens.GetInt32(readerItens.GetOrdinal("Quantidade"))
+                            });
+                        }
+                    }
+                }
+                return pedido;
             }
         }
     }

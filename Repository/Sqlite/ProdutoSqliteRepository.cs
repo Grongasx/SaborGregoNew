@@ -8,42 +8,38 @@ namespace SaborGregoNew.Repository
 {
     public class ProdutoSqliteRepository : IProdutoRepository
     {
-        //Conexão com o banco//
         private readonly IDbConnectionFactory _connectionFactory;
         public ProdutoSqliteRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }
-        //criação do Produto//
         public async Task Create(ProdutoDTO ModeloProduto)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//abrir conexão com o banco de dados
-                throw new InvalidOperationException("Falha ao obter conexão.");// caso de errado ele acusa um erro pro
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+                throw new InvalidOperationException("Falha ao obter conexão.");
             using (conn)
             {
                 try
                 {
-                    await conn.OpenAsync();// abre conexão com o banco de dados
+                    await conn.OpenAsync();
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoInsert; // pegando a query para o banco de dados.
-                    // Parâmetros dos dados enviado do frontend
-                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome));
-                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao));
+                    cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoInsert; 
+                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
                     cmd.Parameters.Add(new SqliteParameter("@Preco", ModeloProduto.Preco));
-                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria));
-                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem));
-                    await cmd.ExecuteNonQueryAsync(); //executa a query com os parametros fornecidos
+                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
+                    await cmd.ExecuteNonQueryAsync();
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Falha ao Criar Produto no banco de dados.", ex); // caso de erro ele acusa onde foi
+                    throw new Exception("Falha ao Criar Produto no banco de dados.", ex); 
                 }
             }
         }
-        //Listagem de todos os Produtos//
-        public async Task<List<Produto>> SelectAllAsync() //retorna sempre uma lista de produtos
+        public async Task<List<Produto>> SelectAllAsync() 
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//abrir conexão com o banco de dados
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão.");
             try
             {
@@ -67,18 +63,17 @@ namespace SaborGregoNew.Repository
                             Ativo = reader.GetBoolean(6)
                         });
                     }
-                    return produtos;//retorna a lista para o frontend.
+                    return produtos;
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Falha ao listar Produtos no banco de dados.", ex);//caso algo de erro, ele acusa onde foi.
+                throw new Exception("Falha ao listar Produtos no banco de dados.", ex);
             }
         }
-        //pega apenas um produto com base no id//
-        public async Task<Produto?> SelectByIdAsync(int id) //retorna um produto ou null com base no id fornecido pelo frontend
+        public async Task<Produto?> SelectByIdAsync(int id) 
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn) //abrir conexão com o banco de dados
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn) 
                 throw new InvalidOperationException("Falha ao obter conexão.");
             try
             {
@@ -154,29 +149,10 @@ namespace SaborGregoNew.Repository
                 throw new Exception("Algo deu errado ao ativar produto no banco de dados.", ex); //caso de alguma merda, acusa aqui
             }
         }
-        //===============================================================//
-        //=============Não usar esse metodo em produção==================//
-        //===============================================================//
-        //deleta o produto pelo id//
-        public async Task DeleteById(int id)
-        {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
-                throw new InvalidOperationException("Falha ao obter conexão.");
-            using (conn)
-            {
-                await conn.OpenAsync();
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoDeleteById;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                cmd.ExecuteNonQuery();
-                conn.Close();
-            }
-        }
     
-        //atualiza o produto pelo id//
         public async Task UpdateById(int id, ProdutoDTO ModeloProduto)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)//abrir conexão com o banco de dados
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão.");
             try
             {
@@ -184,20 +160,19 @@ namespace SaborGregoNew.Repository
                 {
                     await conn.OpenAsync();
                     using var cmd = conn.CreateCommand();
-                    cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoUpdate; //query para o banco de dados.
-                    // Parâmetros dos dados enviado do frontend//
+                    cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoUpdate; 
                     cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome));
-                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao));
-                    cmd.Parameters.Add(new SqliteParameter("@Preco", ModeloProduto.Preco));
-                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria));
-                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem));
-                    await cmd.ExecuteNonQueryAsync();//executa a query com os parametros fornecidos
+                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqliteParameter("@Preco", ModeloProduto.Preco)); 
+                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Falha ao atualizar Produto no banco de dados.", ex);//caso algo de erro, ele acusa onde foi.)
+                throw new Exception("Falha ao atualizar Produto no banco de dados.", ex);
             }
         }
     }

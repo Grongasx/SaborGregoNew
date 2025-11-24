@@ -24,4 +24,5 @@ public static class PedidoQuery
     public const string GetPedidosPorCliente = "SELECT * FROM Pedidos WHERE ClienteId = @UsuarioId ORDER BY DataPedido DESC";
     //Pegar detalhes do pedido
     public const string GetDetalhesByPedidoId = "SELECT * FROM DetalhePedido WHERE PedidoId = @PedidoId";
+    public const string GetPedidoById = "SELECT * FROM Pedidos WHERE Id = @Id";
 }

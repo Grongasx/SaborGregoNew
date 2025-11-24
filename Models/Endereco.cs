@@ -25,5 +25,6 @@ namespace SaborGregoNew.Models
         [ForeignKey("UsuarioId")]
         public Usuario? Usuario { get; set; }
         public int? UsuarioId { get; set; }
+        public bool Ativo { get; set; } = true;
     }
 }

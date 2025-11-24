@@ -53,7 +53,7 @@ namespace SaborGregoNew.Pages.Usuario
 
             await _enderecoRepository.DesativarAsync(id);
 
-            return RedirectToPage("/Usuario/ListaEnderecos");
+            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }
 }

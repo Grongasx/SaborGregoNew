@@ -29,6 +29,7 @@ namespace SaborGregoNew.Pages.Usuario
 
             Endereco = await _enderecoRepository.SelectByIdAsync(id);
 
+            // Garante que o endereço existe e pertence ao usuário logado
             if (Endereco == null || Endereco.UsuarioId != userId)
             {
                 return Forbid();
@@ -50,6 +51,7 @@ namespace SaborGregoNew.Pages.Usuario
                 return RedirectToPage("/Usuario/Login");
             }
 
+            // Verificação de segurança duplicada para garantir que ninguém alterou o ID no HTML
             var enderecoFromDb = await _enderecoRepository.SelectByIdAsync(Endereco.Id);
             if (enderecoFromDb == null || enderecoFromDb.UsuarioId != userId)
             {
@@ -62,12 +64,13 @@ namespace SaborGregoNew.Pages.Usuario
                 Logradouro = Endereco.Logradouro,
                 Numero = Endereco.Numero,
                 Bairro = Endereco.Bairro,
-                Complemento = Endereco.Complemento
+                Complemento = Endereco.Complemento,
+                UsuarioId = userId
             };
 
             await _enderecoRepository.UpdateById(Endereco.Id, dto);
 
-            return RedirectToPage("/Usuario/ListaEnderecos");
+            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
         }
     }
 }
