@@ -1,30 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
-
-
+using SaborGregoNew.Repository;
+using SaborGregoNew.Models;
 namespace SaborGregoNew.Pages
 {
     public class CardapioModel : PageModel
     {
         private readonly IProdutoRepository _produtoService;
         private readonly ICarrinhoRepository _carrinhoService;
-
         public CardapioModel(IProdutoRepository produtoService, ICarrinhoRepository carrinhoService)
         {
             _produtoService = produtoService;
             _carrinhoService = carrinhoService;
         }
 
-        // Inicializado para evitar CS8618 e NRE na View
-        public List<Models.Produto> Produtos { get; set; } = new List<Models.Produto>(); 
-
+        public List<SaborGregoNew.Models.Produto> Produtos { get; set; } = new List<SaborGregoNew.Models.Produto>(); 
         public async Task OnGetAsync()
         {
-            Produtos = await _produtoService.SelectAllAsync();
+            var todosProdutos = await _produtoService.SelectAllAsync();
+            Produtos = todosProdutos.Where(p => p.Ativo).ToList();
         }
-
-        // ⭐️ CORREÇÃO: Método assíncrono para usar 'await'
         public async Task<IActionResult> OnPostAsync(int produtoId)
         {
             if (produtoId <= 0)
@@ -32,10 +27,7 @@ namespace SaborGregoNew.Pages
                 TempData["MensagemErro"] = "ID de produto inválido.";
                 return RedirectToPage();
             }
-
-            // 2. Busque o produto completo no banco de dados
             var produto = await _produtoService.SelectByIdAsync(produtoId); 
-
             if (produto == null)
             {
                 TempData["MensagemErro"] = "Produto não encontrado.";
@@ -44,9 +36,7 @@ namespace SaborGregoNew.Pages
             
             try
             {
-                // 3. Adicione o produto completo ao carrinho
                 await _carrinhoService.AdicionarAoCarrinhoAsync(produto);
-
                 TempData["MensagemSucesso"] = "Produto adicionado ao carrinho com sucesso!";
                 return RedirectToPage("/Pedido/Carrinho/Carrinho");
             }

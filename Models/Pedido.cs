@@ -44,7 +44,6 @@ namespace SaborGregoNew.Models
     {
         // Chave Estrangeira para a tabela Pedido
         [Required]
-        [Key]
         [ForeignKey("PedidoId")]
         public int PedidoId { get; set; }
         public Pedido Pedido { get; set; }

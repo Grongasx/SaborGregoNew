@@ -20,7 +20,6 @@
             <tbody>
                 @for (int i = 0; i < Model.Carrinho.Count; i++)
                 {
-                    var item = Model.Carrinho[i]; // Item da lista original (que é a mesma de CarrinhoForm)
                     <tr>
                         <td style="width: 100px;">
                             <img src="@item.Imagem" class="img-thumbnail" style="max-height: 80px;" alt="@item.Nome">
@@ -29,38 +28,25 @@
                         <td class="text-center">@item.Preco.ToString("C")</td>
 
                         <td class="text-center">
-                            <div class="input-group input-group-sm justify-content-center" style="width: 150px;"> 
+                            @* Formulário para Atualizar Quantidade *@
+                            <form method="post" asp-page-handler="AtualizarQuantidade" class="d-flex align-items-center justify-content-center">
+                                @* Campo oculto para identificar qual produto atualizar *@
+                                <input type="hidden" name="produtoId" value="@item.ProdutoId" />
                                 
-                                <button type="button" 
-                                        class="btn btn-danger" 
-                                        onclick="mudarQuantidade(@i, -1)" @* ⭐️ Passa o INDEX (i) *@
-                                        aria-label="Diminuir quantidade do produto">
-                                    <i class="bi bi-dash"></i>
-                                </button>
-
-                                <input type="text" 
-                                       id="quantidadeInput_@i" @* ⭐️ ID baseado no INDEX é mais seguro *@
+                                <input type="number" 
+                                       name="novaQuantidade" 
                                        value="@item.Quantidade" 
-                                       name="CarrinhoForm[@i].Quantidade" 
-                                       onchange="mudarQuantidade(@i, 0)" @* ⭐️ Atualiza o display ao digitar *@
-                                       class="form-control text-center bg-dark text-white border-0" 
-                                       style="width: 50px; border-radius: 0;" />
-
-                                <input type="hidden" name="CarrinhoForm[@i].ProdutoId" value="@item.ProdutoId" /> 
+                                       min="0" 
+                                       class="form-control text-center" 
+                                       style="width: 70px;" />
                                 
-                                <input type="hidden" name="CarrinhoForm[@i].Preco" id="preco_@i" value="@item.Preco" />
-                                
-                                <button type="button" 
-                                        class="btn btn-success" 
-                                        onclick="mudarQuantidade(@i, 1)" @* ⭐️ Passa o INDEX (i) *@
-                                        aria-label="Aumentar quantidade do produto">
-                                    <i class="bi bi-plus"></i>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Atualizar">
+                                    <i class="bi bi-arrow-clockwise"></i>
                                 </button>
-                            </div>
+                            </form>
                         </td>
                         
-                        <td class="text-end" id="subtotalDisplay_@i">@item.SubTotal.ToString("C")</td>
-                        
+                        <td class="text-end">@item.SubTotal.ToString("C")</td>
                         <td>
                             <form method="post" asp-page-handler="RemoverItem" asp-route-produtoId="@item.ProdutoId">
                                 <button type="submit" class="btn btn-sm btn-danger" title="Remover Item">
@@ -74,7 +60,7 @@
             <tfoot>
                 <tr class="table-dark">
                     <td colspan="4" class="text-end"><strong>Total do Pedido:</strong></td>
-                    <td class="text-end" id="carrinhoTotalDisplay"><strong>@Model.CarrinhoTotal.ToString("C")</strong></td>
+                    <td class="text-end"><strong>@Model.CarrinhoTotal.ToString("C")</strong></td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -88,77 +74,3 @@
         </form>
     }
 </div>
-
-@section Scripts {
-    <script>
-        // Função para manipular o valor e disparar o recálculo
-        function mudarQuantidade(itemIndex, delta) {
-            // Usa o INDEX para encontrar o elemento
-            var inputElement = $('#quantidadeInput_' + itemIndex);
-            
-            var quantidadeAtual = parseInt(inputElement.val() || 0); 
-            
-            var novaQuantidade = quantidadeAtual + delta;
-            
-            // Garante que a quantidade mínima seja 1
-            if (novaQuantidade < 1) {
-                // Se a intenção for remover, o usuário deve usar o botão 'Remover Item'.
-                // Mantém o valor atual se o delta for negativo e a quantidade for 1.
-                if (delta < 0) {
-                    novaQuantidade = 1; 
-                } else {
-                    novaQuantidade = 1;
-                }
-            }
-            
-            // 1. Atualiza o valor no input
-            inputElement.val(novaQuantidade);
-
-            // 2. Recalcula os totais (visual)
-            atualizarTotais();
-        }
-
-        // Função para recalcular o Subtotal e Total Geral no front-end
-        function atualizarTotais() {
-            var totalGeral = 0;
-            
-            // Itera sobre todos os inputs de quantidade
-            $('[name^="CarrinhoForm["]').each(function() {
-                var $input = $(this);
-                
-                // Filtra apenas os inputs de Quantidade
-                if ($input.attr('name').includes('.Quantidade')) {
-                    var novaQuantidade = parseInt($input.val() || 0);
-                    var index = $input.attr('name').match(/\[(\d+)\]/)[1];
-                    
-                    // Pega o preço do campo hidden (que usa o INDEX)
-                    var preco = parseFloat($('#preco_' + index).val());
-                    
-                    var subtotal = novaQuantidade * preco;
-                    totalGeral += subtotal;
-
-                    // Formata a moeda e atualiza o display do Subtotal
-                    var subtotalFormatado = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    $('#subtotalDisplay_' + index).text(subtotalFormatado);
-                }
-            });
-
-            // Formata a moeda e atualiza o display do Total Geral
-            var totalFormatado = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            $('#carrinhoTotalDisplay').text(totalFormatado);
-        }
-
-        $(document).ready(function() {
-             // Garante que o recálculo seja feito se o usuário digitar manualmente no campo
-             $('[name^="CarrinhoForm["][name$=".Quantidade"]').on('change', function() {
-                 // Quando o campo muda, chama mudarQuantidade com delta 0 para forçar o recálculo
-                 var index = $(this).attr('name').match(/\[(\d+)\]/)[1];
-                 mudarQuantidade(parseInt(index), 0); 
-             });
-             
-             // Inicializa o cálculo visual no carregamento da página
-             atualizarTotais(); 
-        });
-
-    </script>
-}

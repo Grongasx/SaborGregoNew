@@ -1,44 +1,47 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using saborGregoNew.Repository.Interfaces;
-using saborGregoNew.Repository;
 using SaborGregoNew.Data;
 using SaborGregoNew.Repository;
-using AspNetCoreGeneratedDocument;
-
+using SaborGregoNew.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.Name = "SaborGrego.Session";
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.IsEssential = true;
-    options.Cookie.HttpOnly = true;
-});
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+// --- 1. Configuração dos Serviços (Dependency Injection) ---
+
+// Configuração do DbContext com SQL Server
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//     options.UseSqlite("Data Source=SaborGrego.db"));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=SaborGrego.db"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    
 
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();//uma unica conexão para toda a navegação
-
-builder.Services.AddScoped<ICarrinhoRepository, CarrinhoSessionRepository>();
-builder.Services.AddScoped<IEnderecoRepository, EnderecoSqliteRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioSqliteRepository>();
-builder.Services.AddScoped<IProdutoRepository, ProdutoSqliteRepository>();
+// Registro dos Serviços e Repositórios
+builder.Services.AddHttpContextAccessor(); // Necessário para CarrinhoSessionRepository
+builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<ProdutoSqliteRepository>();
+builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<EnderecoSqliteRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardSqliteRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoSqliteRepository>();
+builder.Services.AddScoped<ICarrinhoRepository, CarrinhoSessionRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioSqliteRepository>();
+builder.Services.AddScoped<IEnderecoRepository, EnderecoSqliteRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoSqliteRepository>();
+builder.Services.AddSession();
+
 
 // Configuração de Autenticação via Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Usuario/Login/Login"; // Redirecionar para login se não autenticado
-        options.AccessDeniedPath = "/AcessoNegado"; // Onde ir se não tiver permissão
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Tempo de vida do cookie
+        options.LoginPath = "/Usuario/Login";
+        options.AccessDeniedPath = "/AcessoNegado";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     });
 
 // Configuração do Razor Pages
@@ -46,6 +49,9 @@ builder.Services.AddRazorPages()
     .WithRazorPagesRoot("/Pages"); // Usar a pasta Pages como root (se não for a pasta padrão)
 
 var app = builder.Build();
+
+// Inicializar o banco de dados
+DatabaseInitializer.Initialize(app.Services);
 
 // --- 2. Pipeline de Middleware (ORDEM CRÍTICA) ---
 
@@ -61,15 +67,14 @@ else
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-app.UseStaticFiles();
-// Opcional: Força o uso de HTTPS
-app.UseHttpsRedirection();
 
-// A Ordem Correta é: Roteamento -> Autenticação/Autorização -> Mapeamento de Endpoints
+// 0.5 ATIVAR ARQUIVOS ESTÁTICOS (Necessário para imagens, css, js)
+app.UseStaticFiles();
 
 // 1. ATIVAR O ROTEAMENTO (Necessário para saber para onde ir)
 app.UseRouting();
 
+// 1.5 ATIVAR SESSÃO (Necessário para carrinho)
 app.UseSession();
 
 // 2. HABILITAR SEGURANÇA (Necessário para identificar o usuário antes de checar as regras)

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 using SaborGregoNew.Models;
 
 namespace SaborGregoNew.Pages
@@ -42,22 +42,21 @@ namespace SaborGregoNew.Pages
             return RedirectToPage();
         }
 
-        // Handler para Atualizar a Quantidade (Mantido, mas não será mais usado pelos botões +/-, 
-        // a menos que você queira que ele seja chamado via AJAX, o que você descartou)
+        // Handler para Atualizar a Quantidade
         public IActionResult OnPostAtualizarQuantidade(int produtoId, int novaQuantidade)
         {
-             // ... Lógica de atualização (mantida) ...
-             if (novaQuantidade <= 0)
-             {
-                 _carrinhoService.RemoverItem(produtoId);
-             }
-             else
-             {
-                 _carrinhoService.AtualizarQuantidade(produtoId, novaQuantidade);
-             }
-             return RedirectToPage();
+            if (novaQuantidade <= 0)
+            {
+                // Se a nova quantidade for <= 0, usa o método de remover item
+                _carrinhoService.RemoverItem(produtoId);
+            }
+            else
+            {
+                _carrinhoService.AtualizarQuantidade(produtoId, novaQuantidade);
+            }
+
+            return RedirectToPage();
         }
-        
         public IActionResult OnPostLimparCarrinho()
         {
             _carrinhoService.ClearCarrinho();

@@ -72,7 +72,7 @@ namespace SaborGregoNew.Repository
                     ProdutoId = produto.Id,
                     Quantidade = 1, //seta a quantidade automaticamente para 1
                     Preco = produto.Preco,
-                    Imagem = produto.Imagem,
+                    Imagem = produto.Imagem ?? string.Empty,
                 });
 
                 SaveCarrinho(carrinho);//salva o carrinho no arquivo json

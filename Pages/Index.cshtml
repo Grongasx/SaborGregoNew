@@ -1,35 +1,133 @@
 @page
-@model SaborGregoNew.Pages.IndexModel;
-
-
-
+@using SaborGregoNew.Enums
+@using SaborGregoNew.Extensions
+@model SaborGregoNew.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Home";
 }
-
-<div>
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
+<div class="container mt-4">
+    @if (User.IsInRole("Admin"))
     {
-        <p>usuario está autenticado</p>
+        <h2 class="mb-4">Visão Geral do Dia</h2>
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Vendas Hoje</h6>
+                        <h3 class="card-title">@Model.DashboardData?.VendasHoje.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Pedidos Hoje</h6>
+                        <h3 class="card-title">@Model.DashboardData?.PedidosHoje</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Vendas Mês</h6>
+                        <h3 class="card-title">@Model.DashboardData?.VendasMes.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Pedidos Mês</h6>
+                        <h3 class="card-title">@Model.DashboardData?.PedidosMes</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="mb-3">Ações Rápidas</h4>
+        <div class="d-flex gap-2">
+            <a asp-page="/Usuario/Admin/Funcionarios/Index" class="btn btn-primary">Gerenciar Funcionários</a>
+            <a asp-page="/Usuario/Admin/Produtos/Index" class="btn btn-primary">Gerenciar Produtos</a>
+        </div>
     }
-    @if (User.IsInRole( "Cliente"))
+    else if (User.Identity is { IsAuthenticated: true })
     {
-        <p>usuario é um Cliente</p>
+        <!-- CENÁRIO B: CLIENTE LOGADO -->
+        <h2 class="mb-4">Meus Últimos Pedidos</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-dark">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Valor Total</th>
+                        <th>Status</th>
+                        <th>Ver Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PedidosRecentes.Any())
+                    {
+                        foreach (var pedido in Model.PedidosRecentes)
+                        {
+                            <tr>
+                                <td>@pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@pedido.TotalPedido.ToString("C")</td>
+                                <td>
+                                    @{
+                                        string badgeClass = "badge bg-secondary";
+                                        switch (pedido.Status)
+                                        {
+                                            case StatusPedido.Solicitado:
+                                                badgeClass = "badge status-pending";
+                                                break;
+                                            case StatusPedido.EmPreparacao:
+                                                badgeClass = "badge status-preparing";
+                                                break;
+                                            case StatusPedido.ProntoParaRetirada:
+                                                badgeClass = "badge status-ready";
+                                                break;
+                                            case StatusPedido.EmRotaDeEntrega:
+                                                badgeClass = "badge status-delivering";
+                                                break;
+                                            case StatusPedido.Entregue:
+                                                badgeClass = "badge bg-success";
+                                                break;
+                                            case StatusPedido.Cancelado:
+                                                badgeClass = "badge bg-danger";
+                                                break;
+                                        }
+                                    }
+                                    <span class="@badgeClass">@pedido.Status.GetDisplayName()</span>
+                                    <td>
+                                        <a asp-page="/Pedido/ConfirmacaoPedido" asp-route-id="@pedido.Id" class="btn btn-primary">Detalhes</a>
+                                    </td>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center">Nenhum pedido encontrado.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
-    @if (User.IsInRole( "Cozinheiro"))
+    else
     {
-        <p>usuario é um Cozinheiro</p>
-    }
-    @if (User.IsInRole( "Entregador"))
-    {
-        <p>usuario é um Entregador</p>
-    }
-    @if (User.IsInRole( "Admin"))
-    {
-        <p>usuario é um Admin</p>
-    }
-    @if (User.Identity == null || !User.Identity.IsAuthenticated)
-    {
-        <p>usuario não está autenticado</p>
+        <!-- CENÁRIO C: VISITANTE -->
+        <div class="px-4 py-5 my-5 text-center">
+            <h1 class="display-5 fw-bold">Bem-vindo ao Sabor Grego</h1>
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mb-4">Experimente o melhor da culinária grega. Faça seu pedido agora mesmo!</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a asp-page="/Usuario/Login" class="btn btn-primary btn-lg px-4 gap-3">Login</a>
+                    <a asp-page="/Usuario/Cadastro" class="btn btn-outline-secondary btn-lg px-4">Cadastre-se</a>
+                </div>
+            </div>
+        </div>
     }
 </div>

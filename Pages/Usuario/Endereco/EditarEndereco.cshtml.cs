@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
-using SaborGregoNew.DTOs.Usuario;
 using SaborGregoNew.Models;
+using SaborGregoNew.Services;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SaborGregoNew.Pages.Usuario
 {
@@ -12,48 +12,45 @@ namespace SaborGregoNew.Pages.Usuario
         private readonly IEnderecoRepository _enderecoService;
 
         [BindProperty]
-        public Endereco endereco { get; set; } = new Endereco();
+        public Endereco enderecoatualizado { get; set; } = new Endereco();
+        public Endereco enderecoConfirmacao { get; set; } = new Endereco();
 
         public EditarEnderecoModel(IEnderecoRepository enderecoRepository)
         {
             _enderecoService = enderecoRepository;
         }
 
-        public async Task<IActionResult> OnGet(int Id)
+        public async Task<IActionResult> OnGet(int id)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdString == null)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             {
-                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
                 return RedirectToPage("/Usuario/Login");
             }
             var UserId = int.Parse(userIdString);
 
-            endereco = await _enderecoService.SelectByIdAsync(Id);
+            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
 
-            if (endereco == null)
+            if (enderecoConfirmacao == null)
             {
                 TempData["MensagemErro"] = "Endereço não encontrado.";
                 return Page();
             }
-            if (endereco.UsuarioId != UserId)
+            if (enderecoConfirmacao.UsuarioId != UserId)
             {
-                TempData["MensagemErro"] = "Este endereço não pertence ao usuário logado.";
                 return Forbid();
             }
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int Id)
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
                 return Page();
             }
 
-            // 2. Segurança: Obter o ID do usuário logado
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -62,33 +59,47 @@ namespace SaborGregoNew.Pages.Usuario
             }
             var UserId = int.Parse(userIdClaim);
 
-            // 3. Carregar o Endereço ORIGINAL do banco para SEGURANÇA E PROPRIEDADE
-            var enderecoOriginal = await _enderecoService.SelectByIdAsync(Id);
-            
-            if (enderecoOriginal == null || enderecoOriginal.UsuarioId != UserId)
+            enderecoConfirmacao = await _enderecoService.SelectByIdAsync(Id);
+            if (enderecoConfirmacao == null)
             {
-                TempData["MensagemErro"] = "Endereço não encontrado ou não pertence ao usuário logado.";
-                return Forbid(); // Retorna 403 (Proibido) se não for o dono
+                TempData["MensagemErro"] = "Endereço não encontrado.";
+                return Page();
             }
-
-            // 4. Mapear os dados EDITADOS (contidos em this.endereco) para o DTO
-            // Os dados do formulário (this.endereco) são usados, mas o ID do usuário é obtido do original.
-            var enderecodto = new EnderecoDTO
+            if (enderecoConfirmacao.UsuarioId != UserId)
             {
-                Apelido = endereco.Apelido,
-                Logradouro = endereco.Logradouro,
-                Numero = endereco.Numero,
-                Bairro = endereco.Bairro,
-                Complemento = endereco.Complemento ?? "",
-                // ⭐️ IMPORTANTÍSSIMO: Usar o ID ORIGINAL DO BANCO para garantir a integridade
-                UsuarioId = enderecoOriginal.UsuarioId 
-            };
+                TempData["MensagemErro"] = "O endereço não pertence ao usuário logado.";
+                return Forbid();
+            }
+            var dto = new EnderecoDTO();
+            try
+            {
+                dto = new EnderecoDTO
+                {
+                    Apelido = enderecoatualizado.Apelido,
+                    Logradouro = enderecoatualizado.Logradouro,
+                    Numero = enderecoatualizado.Numero,
+                    Bairro = enderecoatualizado.Bairro,
+                    Complemento = enderecoatualizado.Complemento ?? "",
+                    UsuarioId = enderecoatualizado.UsuarioId
+                };
+                if (enderecoatualizado != enderecoConfirmacao)
+                {
+                    await _enderecoService.UpdateById(enderecoatualizado.Id, dto);
 
-            // 5. Atualizar no Banco de Dados
-            await _enderecoService.UpdateById(Id, enderecodto);
-
-            TempData["MensagemSucesso"] = "Endereço atualizado com sucesso!";
-            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
+                    TempData["MensagemSucesso"] = "Endereço atualizado com sucesso!";
+                    return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
+                }
+                else
+                {
+                    TempData["MensagemErro"] = "Os dados não foram alterados.";
+                    return Page();
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = "Erro na associação dos dados: " + ex.Message;
+                return Page();
+            }
         }
     }
 }

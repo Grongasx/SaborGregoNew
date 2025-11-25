@@ -1,7 +1,7 @@
 using SaborGregoNew.DTOs.Produtos;
 using SaborGregoNew.Models;
 
-namespace saborGregoNew.Repository
+namespace SaborGregoNew.Repository
 {
     public interface IProdutoRepository
     {
@@ -12,7 +12,7 @@ namespace saborGregoNew.Repository
         Task<Produto?> SelectByIdAsync(int id);
 
         Task UpdateById(int id, ProdutoDTO ModeloProduto);
-
-        Task DeleteById(int id);
+        Task DesativarAsync(int id);
+        Task AtivarAsync(int id);
     }
 }

@@ -1,7 +1,7 @@
 
 using SaborGregoNew.Models;
 
-namespace saborGregoNew.Repository
+namespace SaborGregoNew.Repository
 {
     public interface ICarrinhoRepository
     {

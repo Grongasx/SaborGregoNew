@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 using SaborGregoNew.DTOs.Produtos;
-
 
 namespace SaborGregoNew.Pages.Produto
 {
@@ -20,39 +19,96 @@ namespace SaborGregoNew.Pages.Produto
             _hostEnvironment = hostEnvironment;
         }
 
-        public void OnGet()
+        public async Task OnGet(int? id)
         {
+            if (id.HasValue && id.Value > 0)
+            {
+                var produto = await _produtoService.SelectByIdAsync(id.Value);
+                if (produto != null)
+                {
+                    ProdutoDto = new ProdutoDTO
+                    {
+                        Id = produto.Id,
+                        Nome = produto.Nome,
+                        Descricao = produto.Descricao ?? string.Empty,
+                        Preco = produto.Preco,
+                        Categoria = produto.Categoria,
+                        Imagem = produto.Imagem ?? string.Empty 
+                    };
+                }
+                else
+                {
+                    ProdutoDto = new ProdutoDTO();
+                }
+            }
+            else
+            {
+                ProdutoDto = new ProdutoDTO();
+            }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+public async Task<IActionResult> OnPostAsync()
         {
+            // Remove validação automática da imagem (nós tratamos manualmente)
+            ModelState.Remove("ProdutoDto.Imagem");
+            ModelState.Remove("ProdutoDto.ImagemUpload");
+
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("O modelo nao e valido");
                 return Page();
             }
-            string wwwRootPath = _hostEnvironment.WebRootPath;
-            string pathDaImagem = Path.Combine(wwwRootPath, "images");
-            string nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(ProdutoDto.ImagemUpload.FileName);
-            string filePath = Path.Combine(pathDaImagem, nomeArquivo);
-            Directory.CreateDirectory(pathDaImagem);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            // 1. Lógica de Upload (Se o usuário enviou um arquivo novo)
+            if (ProdutoDto.ImagemUpload != null)
             {
-                await ProdutoDto.ImagemUpload.CopyToAsync(fileStream);
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string pathDaImagem = Path.Combine(wwwRootPath, "images");
+                
+                if (!Directory.Exists(pathDaImagem)) Directory.CreateDirectory(pathDaImagem);
+
+                string nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(ProdutoDto.ImagemUpload.FileName);
+                string filePath = Path.Combine(pathDaImagem, nomeArquivo);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ProdutoDto.ImagemUpload.CopyToAsync(fileStream);
+                }
+                ProdutoDto.Imagem = "/images/" + nomeArquivo;
             }
-            ProdutoDto.Imagem = "/images/" + nomeArquivo;
+            // 2. Lógica de Recuperação (Se é edição e NÃO enviou foto nova)
+            else if (ProdutoDto.Id > 0)
+            {
+                if (string.IsNullOrEmpty(ProdutoDto.Imagem))
+                {
+                    var produtoOriginal = await _produtoService.SelectByIdAsync(ProdutoDto.Id);
+                    if (produtoOriginal != null)
+                    {
+                        ProdutoDto.Imagem = produtoOriginal.Imagem;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(ProdutoDto.Imagem))
+            {
+                ModelState.AddModelError("ProdutoDto.ImagemUpload", "A imagem é obrigatória.");
+                return Page();
+            }
 
             try
             {
-                Console.WriteLine("Cadastro de produto");
-                await _produtoService.Create(ProdutoDto);
-                return RedirectToPage("/Index");
+                if (ProdutoDto.Id > 0)
+                {
+                     await _produtoService.UpdateById(ProdutoDto.Id, ProdutoDto);
+                }
+                else
+                {
+                    await _produtoService.Create(ProdutoDto);
+                }
+                return RedirectToPage("/Produto/Cardapio");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Cadastro de produto nao foi");
-                ModelState.AddModelError(string.Empty, "Ocorreu um erro ao salvar o produto.");
+                ModelState.AddModelError(string.Empty, "Erro ao salvar: " + ex.Message);
                 return Page();
             }
         }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using saborGregoNew.Repository;
+using SaborGregoNew.Repository;
 
 namespace SaborGregoNew.ViewComponents
 {

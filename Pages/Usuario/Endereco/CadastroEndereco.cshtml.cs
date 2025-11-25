@@ -1,53 +1,75 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using saborGregoNew.Repository;
 using SaborGregoNew.DTOs.Usuario;
 
 namespace SaborGregoNew.Pages.Usuario
 {
     public class CadastroEnderecoModel : PageModel
     {
-        private readonly IEnderecoRepository _enderecoService;
+        private readonly SaborGregoNew.Repository.IEnderecoRepository _enderecoRepository;
 
-        public CadastroEnderecoModel(IEnderecoRepository enderecoService)
+        public CadastroEnderecoModel(SaborGregoNew.Repository.IEnderecoRepository enderecoRepository)
         {
-            _enderecoService = enderecoService;
+            _enderecoRepository = enderecoRepository;
         }
 
         [BindProperty]
-        public EnderecoDTO endereco { get; set; } = new EnderecoDTO();
+        public CadastroEnderecoDTO? enderecoDTO { get; set; }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet(int? id)
         {
+            if (id.HasValue && id.Value > 0)
+            {
+                var endereco = await _enderecoRepository.SelectByIdAsync(id.Value);
+                if (endereco != null)
+                {
+                    enderecoDTO = new CadastroEnderecoDTO
+                    {
+                        Id = endereco.Id,
+                        Apelido = endereco.Apelido,
+                        Logradouro = endereco.Logradouro,
+                        Numero = endereco.Numero,
+                        Complemento = endereco.Complemento,
+                        Bairro = endereco.Bairro,
+                        UsuarioId = endereco.UsuarioId
+                    };
+                }
+            }
+            
+            if (enderecoDTO == null)
+            {
+                enderecoDTO = new CadastroEnderecoDTO();
+            }
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-
-
             if (!ModelState.IsValid)
             {
-                TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
                 return Page();
             }
-            
             var UserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (UserIdString == null)
+            if (string.IsNullOrEmpty(UserIdString))
             {
-                TempData["MensagemErro"] = "Para acessar esta página, você precisa estar logado.";
                 return Unauthorized();
             }
 
             var UserId = int.Parse(UserIdString);
-            
-            await _enderecoService.Create(endereco, UserId);
+            enderecoDTO.UsuarioId = UserId;
 
+            if (enderecoDTO.Id > 0)
+            {
+                await _enderecoRepository.UpdateById(enderecoDTO.Id, enderecoDTO);
+            }
+            else
+            {
+                await _enderecoRepository.Create(enderecoDTO, UserId);
+            }
 
-            TempData["MensagemSucesso"] = "Endereço cadastrado com sucesso!";
-            return RedirectToPage("/Usuario/Endereco/ListaEnderecos");
+            return RedirectToPage("/Usuario/Endereco/Index");
         }
     }
 }
-        

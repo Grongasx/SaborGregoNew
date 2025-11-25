@@ -1,4 +1,4 @@
-namespace saborGregoNew.Interfaces;
+namespace SaborGregoNew.Repository;
 
 public interface ICarrinhoServices
 {
