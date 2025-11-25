@@ -13,7 +13,8 @@ namespace SaborGregoNew.Data
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    context.Database.EnsureCreated();
+                    //context.Database.EnsureCreated();
+                    context.Database.Migrate();
                 }
                 catch (Exception ex)
                 {

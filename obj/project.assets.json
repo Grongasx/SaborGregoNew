@@ -663,7 +663,7 @@
           }
         }
       },
-      "Microsoft.Data.SqlClient/6.1.2": {
+      "Microsoft.Data.SqlClient/6.1.3": {
         "type": "package",
         "dependencies": {
           "Azure.Core": "1.47.1",
@@ -3453,10 +3453,10 @@
         "microsoft.codeanalysis.workspaces.msbuild.nuspec"
       ]
     },
-    "Microsoft.Data.SqlClient/6.1.2": {
-      "sha512": "q0GxRC0fgwfZgU14pU34ro0MW7Gs8S6NDmKCcEqymvZljT8UQa633BbEmk/Rb5upNF9NHZ3/jVm7zLiWbM8uTA==",
+    "Microsoft.Data.SqlClient/6.1.3": {
+      "sha512": "ys/z8Tx8074CDU20EilNvBRJuJdwKSthpHkzUpt3JghnjB6GjbZusoOcCtNbhPCCWsEJqN8bxaT7HnS3UZuUDQ==",
       "type": "package",
-      "path": "microsoft.data.sqlclient/6.1.2",
+      "path": "microsoft.data.sqlclient/6.1.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3509,7 +3509,7 @@
         "lib/net9.0/zh-Hant/Microsoft.Data.SqlClient.resources.dll",
         "lib/netstandard2.0/Microsoft.Data.SqlClient.dll",
         "lib/netstandard2.0/Microsoft.Data.SqlClient.xml",
-        "microsoft.data.sqlclient.6.1.2.nupkg.sha512",
+        "microsoft.data.sqlclient.6.1.3.nupkg.sha512",
         "microsoft.data.sqlclient.nuspec",
         "ref/net462/Microsoft.Data.SqlClient.dll",
         "ref/net462/Microsoft.Data.SqlClient.xml",
@@ -5793,7 +5793,7 @@
   "projectFileDependencyGroups": {
     "net9.0": [
       "Microsoft.AspNetCore.Authentication.Cookies >= 2.3.0",
-      "Microsoft.Data.SqlClient >= 6.1.2",
+      "Microsoft.Data.SqlClient >= 6.1.3",
       "Microsoft.Data.Sqlite >= 9.0.10",
       "Microsoft.Data.Sqlite.Core >= 9.0.10",
       "Microsoft.EntityFrameworkCore >= 9.0.10",
@@ -5857,7 +5857,7 @@
           },
           "Microsoft.Data.SqlClient": {
             "target": "Package",
-            "version": "[6.1.2, )"
+            "version": "[6.1.3, )"
           },
           "Microsoft.Data.Sqlite": {
             "target": "Package",

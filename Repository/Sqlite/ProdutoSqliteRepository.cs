@@ -1,5 +1,5 @@
 using SaborGregoNew.DTOs.Produtos;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using SaborGregoNew.Models;
 using System.Data.Common;
 using SaborGregoNew.Repository;
@@ -24,11 +24,11 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoInsert; 
-                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Preco", ModeloProduto.Preco));
-                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Preco", ModeloProduto.Preco));
+                    cmd.Parameters.Add(new SqlParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
                     await cmd.ExecuteNonQueryAsync();
                 }
                 catch (Exception ex)
@@ -82,7 +82,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão com o banco de dados
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoSelectById;//query para o banco de dados.
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));//cria um parametro para buscar o produto pelo id
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));//cria um parametro para buscar o produto pelo id
                     using var reader = await cmd.ExecuteReaderAsync();//executa um reader para ler cada coluna no banco de dados
                     if (await reader.ReadAsync())
                     {
@@ -118,7 +118,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoDesativar;//muda status de ativo
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));//com base no endereço
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));//com base no endereço
                     await cmd.ExecuteNonQueryAsync();// executa a query
                 }
             }
@@ -140,7 +140,7 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();//abre conexão
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoAtivar;//muda status de ativo
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));//com base no endereço
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));//com base no endereço
                     await cmd.ExecuteNonQueryAsync();// executa a query
                 }
             }
@@ -161,12 +161,12 @@ namespace SaborGregoNew.Repository
                     await conn.OpenAsync();
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = SaborGregoNew.Repository.Queries.ProdutoUpdate; 
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Preco", ModeloProduto.Preco)); 
-                    cmd.Parameters.Add(new SqliteParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
-                    cmd.Parameters.Add(new SqliteParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));
+                    cmd.Parameters.Add(new SqlParameter("@Nome", ModeloProduto.Nome ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Descricao", ModeloProduto.Descricao ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Preco", ModeloProduto.Preco)); 
+                    cmd.Parameters.Add(new SqlParameter("@Categoria", ModeloProduto.Categoria ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Imagem", ModeloProduto.Imagem ?? (object)DBNull.Value));
                     await cmd.ExecuteNonQueryAsync();
                 }
             }

@@ -22,6 +22,7 @@ namespace SaborGregoNew.Data
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configuração de Precisão para Pedidos e Produtos
             modelBuilder.Entity<Pedido>()
                 .Property(p => p.TotalPedido)
                 .HasPrecision(10, 2);
@@ -30,11 +31,23 @@ namespace SaborGregoNew.Data
                 .Property(p => p.Preco)
                 .HasPrecision(10, 2); 
 
+            modelBuilder.Entity<Carrinho>()
+                .Property(c => c.Total)
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<CarrinhoItem>()
+                .Property(ci => ci.Preco)
+                .HasPrecision(10, 2);
+
             modelBuilder.Entity<ItensPedido>()
                 .HasKey(ip => new { ip.PedidoId, ip.ProdutoId });
 
-            modelBuilder.Entity<DetalhePedido>()
-                .HasKey(dp => new { dp.PedidoId, dp.ProdutoId });
+            modelBuilder.Entity<DetalhePedido>(entity => 
+            {
+                entity.HasKey(dp => new { dp.PedidoId, dp.ProdutoId });
+                entity.ToTable("DetalhePedido");
+                entity.Property(dp => dp.PrecoUnitario).HasPrecision(10, 2); 
+            });
 
             base.OnModelCreating(modelBuilder);
         }

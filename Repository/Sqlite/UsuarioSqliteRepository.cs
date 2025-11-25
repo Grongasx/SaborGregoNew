@@ -1,5 +1,5 @@
 using SaborGregoNew.DTOs.Usuario;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using SaborGregoNew.Models;
 using System.Data.Common;
 using SaborGregoNew.Repository.Query; // Se UsuarioQuery estiver aqui
@@ -38,11 +38,11 @@ namespace SaborGregoNew.Repository
                     cmd.CommandText = UsuarioQuery.UsuarioRegistrar;//query para o banco de dados
 
                     //parametros para criação do usuario (seta o Usuario como cliente)
-                    cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloUsuario.Nome));//insere o dado na coluna dele...
-                    cmd.Parameters.Add(new SqliteParameter("@Telefone", ModeloUsuario.Telefone));
-                    cmd.Parameters.Add(new SqliteParameter("@Email", ModeloUsuario.Email));
-                    cmd.Parameters.Add(new SqliteParameter("@Senha", ModeloUsuario.Senha));
-                    cmd.Parameters.Add(new SqliteParameter("@Role", (int)ModeloUsuario.Role)); //------------------------------------arrumar aqui ele deve setar no repository apenas------------------//
+                    cmd.Parameters.Add(new SqlParameter("@Nome", ModeloUsuario.Nome));//insere o dado na coluna dele...
+                    cmd.Parameters.Add(new SqlParameter("@Telefone", ModeloUsuario.Telefone));
+                    cmd.Parameters.Add(new SqlParameter("@Email", ModeloUsuario.Email));
+                    cmd.Parameters.Add(new SqlParameter("@Senha", ModeloUsuario.Senha));
+                    cmd.Parameters.Add(new SqlParameter("@Role", (int)ModeloUsuario.Role)); //------------------------------------arrumar aqui ele deve setar no repository apenas------------------//
 
                     await cmd.ExecuteNonQueryAsync();//executa a query
                 }
@@ -67,7 +67,7 @@ namespace SaborGregoNew.Repository
 
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = UsuarioQuery.UsuarioLogin;
-                    cmd.Parameters.Add(new SqliteParameter("@Email", ModeloUsuario.Email));
+                    cmd.Parameters.Add(new SqlParameter("@Email", ModeloUsuario.Email));
 
                     using var reader = await cmd.ExecuteReaderAsync();
                     
@@ -157,7 +157,7 @@ namespace SaborGregoNew.Repository
 
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = UsuarioQuery.UsuarioById;
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));
                     using var reader = await cmd.ExecuteReaderAsync();
                     if (await reader.ReadAsync())
                     {
@@ -192,23 +192,19 @@ namespace SaborGregoNew.Repository
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = UsuarioQuery.UsuarioUpdateById;
 
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                cmd.Parameters.Add(new SqliteParameter("@Nome", ModeloUsuario.Nome));
-                cmd.Parameters.Add(new SqliteParameter("@Telefone", ModeloUsuario.Telefone));
-                cmd.Parameters.Add(new SqliteParameter("@Email", ModeloUsuario.Email));
-                cmd.Parameters.Add(new SqliteParameter("@Senha", ModeloUsuario.Senha));
-                cmd.Parameters.Add(new SqliteParameter("@Role", (int)ModeloUsuario.Role));
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                cmd.Parameters.Add(new SqlParameter("@Nome", ModeloUsuario.Nome));
+                cmd.Parameters.Add(new SqlParameter("@Telefone", ModeloUsuario.Telefone));
+                cmd.Parameters.Add(new SqlParameter("@Email", ModeloUsuario.Email));
+                cmd.Parameters.Add(new SqlParameter("@Senha", ModeloUsuario.Senha));
+                cmd.Parameters.Add(new SqlParameter("@Role", (int)ModeloUsuario.Role));
 
                 await cmd.ExecuteNonQueryAsync();
             }
         }
         
         
-        
-        //==============================================//
-        //===========Não usar em produção===============//
-        //==============================================//
-        //deleta o usuario do banco de dados
+
         public async Task DeleteById(int id)
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
@@ -219,7 +215,7 @@ namespace SaborGregoNew.Repository
 
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = UsuarioQuery.UsuarioDeleteById;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
 
                 await cmd.ExecuteNonQueryAsync();
             }

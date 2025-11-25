@@ -1,5 +1,5 @@
 using System.Data.Common;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using SaborGregoNew.DTOs.Pedido;
 using SaborGregoNew.Models;
 using SaborGregoNew.Enums;
@@ -53,25 +53,31 @@ namespace SaborGregoNew.Repository
                 }
             }
         }
-        private async Task<int> CriarPedidoAsync(DbConnection conn, DbTransaction transaction, PedidoDTO ModeloPedido)
+
+private async Task<int> CriarPedidoAsync(DbConnection conn, DbTransaction transaction, PedidoDTO ModeloPedido)
         {
             using var cmd = conn.CreateCommand();
             cmd.Transaction = transaction;
-            cmd.CommandText = PedidoQuery.PedidoInsert;
+            cmd.CommandText = PedidoQuery.PedidoInsert + " SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-            cmd.Parameters.Add(new SqliteParameter("@ClienteId", ModeloPedido.ClienteId));
-            cmd.Parameters.Add(new SqliteParameter("@DataPedido", ModeloPedido.DataPedido));
-            cmd.Parameters.Add(new SqliteParameter("@EnderecoId", ModeloPedido.EnderecoId));
-            cmd.Parameters.Add(new SqliteParameter("@MetodoPagamento", ModeloPedido.MetodoPagamento.ToString()));
-            cmd.Parameters.Add(new SqliteParameter("@Status", (int)ModeloPedido.Status));
-            cmd.Parameters.Add(new SqliteParameter("@ValorTotal", ModeloPedido.ValorTotal));
+            cmd.Parameters.Add(new SqlParameter("@ClienteId", ModeloPedido.ClienteId));
+            cmd.Parameters.Add(new SqlParameter("@DataPedido", ModeloPedido.DataPedido));
+            cmd.Parameters.Add(new SqlParameter("@EnderecoId", ModeloPedido.EnderecoId));
+            cmd.Parameters.Add(new SqlParameter("@MetodoPagamento", (int)ModeloPedido.MetodoPagamento));
+            cmd.Parameters.Add(new SqlParameter("@Status", (int)ModeloPedido.Status));
+            cmd.Parameters.Add(new SqlParameter("@ValorTotal", ModeloPedido.ValorTotal));
 
-            await cmd.ExecuteNonQueryAsync();
-            cmd.CommandText = "select last_insert_rowid();";
-            long newId = (long)await cmd.ExecuteScalarAsync();
+            object result = await cmd.ExecuteScalarAsync();
 
-            return (int)newId;
+            // Verificação de segurança para não quebrar com DBNull
+            if (result == null || result == DBNull.Value)
+            {
+                throw new Exception("Falha ao recuperar o ID do pedido. O registro pode não ter sido salvo.");
+            }
+
+            return Convert.ToInt32(result);
         }
+
         private async Task AddDetalhesAsync(DbConnection conn, DbTransaction transaction, IEnumerable<DetalhePedido> detalhes)
         {
             foreach (var detalhe in detalhes)
@@ -81,21 +87,16 @@ namespace SaborGregoNew.Repository
                 cmd.CommandText = PedidoQuery.DetalhePedidoInsert;
 
                 // Parâmetros
-                cmd.Parameters.Add(new SqliteParameter("@PedidoId", detalhe.PedidoId));
-                cmd.Parameters.Add(new SqliteParameter("@ProdutoId", detalhe.ProdutoId));
-                cmd.Parameters.Add(new SqliteParameter("@Imagem", detalhe.Imagem));
-                cmd.Parameters.Add(new SqliteParameter("@NomeProduto", detalhe.NomeProduto));
-                cmd.Parameters.Add(new SqliteParameter("@PrecoUnitario", detalhe.PrecoUnitario));
-                cmd.Parameters.Add(new SqliteParameter("@Quantidade", detalhe.Quantidade));
+                cmd.Parameters.Add(new SqlParameter("@PedidoId", detalhe.PedidoId));
+                cmd.Parameters.Add(new SqlParameter("@ProdutoId", detalhe.ProdutoId));
+                cmd.Parameters.Add(new SqlParameter("@Imagem", detalhe.Imagem ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@NomeProduto", detalhe.NomeProduto));
+                cmd.Parameters.Add(new SqlParameter("@PrecoUnitario", detalhe.PrecoUnitario));
+                cmd.Parameters.Add(new SqlParameter("@Quantidade", detalhe.Quantidade));
 
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-
-
-        //====================//
-        //==Fluxos de Pedido==//
-        //====================//
 
         //atualizar status conforme o fluxo de trabalho
         public async Task UpdateStatusByIdAsync(int id, StatusPedido status)
@@ -107,8 +108,8 @@ namespace SaborGregoNew.Repository
                 await conn.OpenAsync();
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = PedidoQuery.PedidoUpdateStatus;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                cmd.Parameters.Add(new SqliteParameter("@Status", (int)status));
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                cmd.Parameters.Add(new SqlParameter("@Status", (int)status));
                 await cmd.ExecuteNonQueryAsync();
             }
         }
@@ -142,14 +143,14 @@ namespace SaborGregoNew.Repository
                             cmd.CommandText = PedidoQuery.GetPedidosEntregador;
 
                         // Só adicionamos este parâmetro se a query filtrar por funcionário
-                        cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
+                        cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
                     }
                     else
                     {
                         return new List<Pedido>();
                     }
 
-                    cmd.Parameters.Add(new SqliteParameter("@Status", (int)status));
+                    cmd.Parameters.Add(new SqlParameter("@Status", (int)status));
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -182,7 +183,7 @@ namespace SaborGregoNew.Repository
                     using (var cmdItens = conn.CreateCommand())
                     {
                         cmdItens.CommandText = PedidoQuery.GetDetalhesByPedidoId;
-                        cmdItens.Parameters.Add(new SqliteParameter("@PedidoId", pedido.Id));
+                        cmdItens.Parameters.Add(new SqlParameter("@PedidoId", pedido.Id));
 
                         using (var readerItens = await cmdItens.ExecuteReaderAsync())
                         {
@@ -220,7 +221,7 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = PedidoQuery.GetPedidosPendentes;
 
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
+                    cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
 
                     using var reader = await cmd.ExecuteReaderAsync();
                     var pedidos = new List<Pedido>();
@@ -261,7 +262,7 @@ namespace SaborGregoNew.Repository
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = PedidoQuery.GetPedidosPorCliente;
-                        cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
+                        cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
                         
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
@@ -299,7 +300,7 @@ namespace SaborGregoNew.Repository
                         using (var cmdItens = conn.CreateCommand())
                         {
                             cmdItens.CommandText = PedidoQuery.GetDetalhesByPedidoId;
-                            cmdItens.Parameters.Add(new SqliteParameter("@PedidoId", pedido.Id));
+                            cmdItens.Parameters.Add(new SqlParameter("@PedidoId", pedido.Id));
                             
                             using (var readerItens = await cmdItens.ExecuteReaderAsync())
                             {
@@ -337,9 +338,9 @@ namespace SaborGregoNew.Repository
                 await conn.OpenAsync();
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = PedidoQuery.PedidoUpdateStatusAndFuncionario;
-                cmd.Parameters.Add(new SqliteParameter("@Id", id));
-                cmd.Parameters.Add(new SqliteParameter("@Status", (int)status));
-                cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                cmd.Parameters.Add(new SqlParameter("@Status", (int)status));
+                cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
                 await cmd.ExecuteNonQueryAsync();
             }
         }
@@ -358,7 +359,7 @@ namespace SaborGregoNew.Repository
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = PedidoQuery.GetPedidoById;
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -387,7 +388,7 @@ namespace SaborGregoNew.Repository
                 using (var cmdItens = conn.CreateCommand())
                 {
                     cmdItens.CommandText = PedidoQuery.GetDetalhesByPedidoId;
-                    cmdItens.Parameters.Add(new SqliteParameter("@PedidoId", pedido.Id));
+                    cmdItens.Parameters.Add(new SqlParameter("@PedidoId", pedido.Id));
 
                     using (var readerItens = await cmdItens.ExecuteReaderAsync())
                     {

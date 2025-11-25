@@ -1,8 +1,8 @@
 using System.Data;
-using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration; // Necessário para IConfiguration
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
-namespace SaborGregoNew.Repository // Corrigido de "saborGregoNew" para "SaborGregoNew"
+namespace SaborGregoNew.Repository
 {
     public class DbConnectionFactory : IDbConnectionFactory
     {
@@ -10,19 +10,20 @@ namespace SaborGregoNew.Repository // Corrigido de "saborGregoNew" para "SaborGr
 
         public DbConnectionFactory(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("SQLiteConnection")
-                ?? "Data Source=SaborGrego.db"; 
+            // Busca a string de conexão correta
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public IDbConnection CreateConnection()
         {
-            // Como estamos usando SQLite, o padrão deve retornar SQLite também
-            return new SqliteConnection(_connectionString);
+            // Retorna conexão SQL Server
+            return new SqlConnection(_connectionString);
         }
-
+        
         public IDbConnection CreateSqliteConnection()
         {
-            return new SqliteConnection(_connectionString);
+            return new SqlConnection(_connectionString);
         }
     }
 }

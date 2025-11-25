@@ -1,5 +1,5 @@
 using saborGregoNew.Repository;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using SaborGregoNew.Models;
 using SaborGregoNew.DTOs.Usuario;
 using System.Data.Common;
@@ -31,12 +31,12 @@ namespace SaborGregoNew.Repository
                     cmd.CommandText = Queries.EnderecoInsert;//query para o banco de dados.
 
                     // Parametros dos dados enviado do frontend//
-                    cmd.Parameters.Add(new SqliteParameter("@Apelido", ModeloEndereco.Apelido));
-                    cmd.Parameters.Add(new SqliteParameter("@Logradouro", ModeloEndereco.Logradouro));
-                    cmd.Parameters.Add(new SqliteParameter("@Numero", ModeloEndereco.Numero));
-                    cmd.Parameters.Add(new SqliteParameter("@Complemento", ModeloEndereco.Complemento));
-                    cmd.Parameters.Add(new SqliteParameter("@Bairro", ModeloEndereco.Bairro));
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));
+                    cmd.Parameters.Add(new SqlParameter("@Apelido", ModeloEndereco.Apelido));
+                    cmd.Parameters.Add(new SqlParameter("@Logradouro", ModeloEndereco.Logradouro));
+                    cmd.Parameters.Add(new SqlParameter("@Numero", ModeloEndereco.Numero));
+                    cmd.Parameters.Add(new SqlParameter("@Complemento", ModeloEndereco.Complemento));
+                    cmd.Parameters.Add(new SqlParameter("@Bairro", ModeloEndereco.Bairro));
+                    cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
 
                     await cmd.ExecuteNonQueryAsync(); //executa a query com os parametros fornecidos
                 }
@@ -61,7 +61,7 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = Queries.EnderecoSelectByUserId;//query para o banco de dados.
 
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));//cria um parametro para buscar o produto pelo id
+                    cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));//cria um parametro para buscar o produto pelo id
 
                     using var reader = await cmd.ExecuteReaderAsync();//executa um reader para ler cada coluna no banco de dados
 
@@ -103,7 +103,7 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = Queries.EnderecoSelectById; //query para o banco.
 
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));//parametro do id do endereço
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));//parametro do id do endereço
                     using var reader = await cmd.ExecuteReaderAsync();//executa um reader para buscar os dados no anco de dados.
 
                     if (await reader.ReadAsync())//inicia a leitura do banco de dados.
@@ -142,13 +142,13 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = Queries.EnderecoUpdate;
 
-                    cmd.Parameters.Add(new SqliteParameter("@Id", Id));
-                    cmd.Parameters.Add(new SqliteParameter("@Apelido", ModeloEndereco.Apelido));
-                    cmd.Parameters.Add(new SqliteParameter("@Logradouro", ModeloEndereco.Logradouro));
-                    cmd.Parameters.Add(new SqliteParameter("@Numero", ModeloEndereco.Numero));
-                    cmd.Parameters.Add(new SqliteParameter("@Complemento", ModeloEndereco.Complemento));
-                    cmd.Parameters.Add(new SqliteParameter("@Bairro", ModeloEndereco.Bairro));
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", ModeloEndereco.UsuarioId));
+                    cmd.Parameters.Add(new SqlParameter("@Id", Id));
+                    cmd.Parameters.Add(new SqlParameter("@Apelido", ModeloEndereco.Apelido));
+                    cmd.Parameters.Add(new SqlParameter("@Logradouro", ModeloEndereco.Logradouro));
+                    cmd.Parameters.Add(new SqlParameter("@Numero", ModeloEndereco.Numero));
+                    cmd.Parameters.Add(new SqlParameter("@Complemento", ModeloEndereco.Complemento));
+                    cmd.Parameters.Add(new SqlParameter("@Bairro", ModeloEndereco.Bairro));
+                    cmd.Parameters.Add(new SqlParameter("@UsuarioId", ModeloEndereco.UsuarioId));
 
                     await cmd.ExecuteNonQueryAsync();//executa a query
                 }
@@ -173,8 +173,8 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = Queries.EnderecoSelectByIdAndUserId;//query para o banco de dados
 
-                    cmd.Parameters.Add(new SqliteParameter("@Id", enderecoId));//parametro para encontrar o Endereço
-                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId));//parametro para encontrar o usuario
+                    cmd.Parameters.Add(new SqlParameter("@Id", enderecoId));//parametro para encontrar o Endereço
+                    cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));//parametro para encontrar o usuario
 
                     using var reader = await cmd.ExecuteReaderAsync();//executa a leitura do banco de dados
 
@@ -218,7 +218,7 @@ namespace SaborGregoNew.Repository
                     using var cmd = conn.CreateCommand();
 
                     cmd.CommandText = Queries.EnderecoDesativar; 
-                    cmd.Parameters.Add(new SqliteParameter("@Id", id));
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));
 
                     await cmd.ExecuteNonQueryAsync();
                 }

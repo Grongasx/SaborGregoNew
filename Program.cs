@@ -12,8 +12,11 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // --- 1. Configuração dos Serviços (Dependency Injection) ---
 
 // Configuração do DbContext com SQL Server
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//     options.UseSqlite("Data Source=SaborGrego.db"));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=SaborGrego.db"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
     
 
 // Registro dos Serviços e Repositórios

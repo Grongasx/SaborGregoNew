@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SaborGregoNew.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InicialSqlServer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,10 +15,10 @@ namespace SaborGregoNew.Migrations
                 name: "Carrinhos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
-                    Total = table.Column<decimal>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SessionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,9 +29,9 @@ namespace SaborGregoNew.Migrations
                 name: "ItensPedidos",
                 columns: table => new
                 {
-                    PedidoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProdutoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantidade = table.Column<int>(type: "INTEGER", nullable: false)
+                    PedidoId = table.Column<int>(type: "int", nullable: false),
+                    ProdutoId = table.Column<int>(type: "int", nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,14 +42,14 @@ namespace SaborGregoNew.Migrations
                 name: "Produtos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Nome = table.Column<string>(type: "TEXT", nullable: false),
-                    Preco = table.Column<decimal>(type: "TEXT", precision: 10, scale: 2, nullable: false),
-                    Categoria = table.Column<string>(type: "TEXT", nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", nullable: true),
-                    Imagem = table.Column<byte[]>(type: "BLOB", nullable: false),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Preco = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Imagem = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ativo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,13 +60,13 @@ namespace SaborGregoNew.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Nome = table.Column<string>(type: "TEXT", nullable: false),
-                    Telefone = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Senha = table.Column<string>(type: "TEXT", nullable: false),
-                    Role = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Senha = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,14 +77,14 @@ namespace SaborGregoNew.Migrations
                 name: "CarrinhoItens",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Nome = table.Column<string>(type: "TEXT", nullable: false),
-                    ProdutoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantidade = table.Column<int>(type: "INTEGER", nullable: false),
-                    Preco = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Imagem = table.Column<string>(type: "TEXT", nullable: false),
-                    CarrinhoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProdutoId = table.Column<int>(type: "int", nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    Preco = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Imagem = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CarrinhoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -106,17 +106,17 @@ namespace SaborGregoNew.Migrations
                 name: "Pedidos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FuncionarioId = table.Column<int>(type: "INTEGER", nullable: true),
-                    EntregadorId = table.Column<int>(type: "INTEGER", nullable: true),
-                    DataPedido = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TotalPedido = table.Column<decimal>(type: "TEXT", precision: 10, scale: 2, nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    EnderecoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    MetodoPagamento = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProdutoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    FuncionarioId = table.Column<int>(type: "int", nullable: true),
+                    EntregadorId = table.Column<int>(type: "int", nullable: true),
+                    DataPedido = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPedido = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    EnderecoId = table.Column<int>(type: "int", nullable: false),
+                    MetodoPagamento = table.Column<int>(type: "int", nullable: false),
+                    ProdutoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -132,14 +132,15 @@ namespace SaborGregoNew.Migrations
                 name: "Enderecos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Apelido = table.Column<string>(type: "TEXT", nullable: false),
-                    Logradouro = table.Column<string>(type: "TEXT", nullable: false),
-                    Numero = table.Column<string>(type: "TEXT", nullable: false),
-                    Complemento = table.Column<string>(type: "TEXT", nullable: false),
-                    Bairro = table.Column<string>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Apelido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Logradouro = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Numero = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Complemento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Bairro = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    Ativo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,21 +157,19 @@ namespace SaborGregoNew.Migrations
                 name: "DetalhePedido",
                 columns: table => new
                 {
-                    PedidoId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PedidoId1 = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProdutoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    NomeProduto = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Imagem = table.Column<string>(type: "TEXT", nullable: true),
-                    Quantidade = table.Column<int>(type: "INTEGER", nullable: false),
-                    PrecoUnitario = table.Column<decimal>(type: "decimal(18, 2)", nullable: false)
+                    PedidoId = table.Column<int>(type: "int", nullable: false),
+                    ProdutoId = table.Column<int>(type: "int", nullable: false),
+                    NomeProduto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Imagem = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    PrecoUnitario = table.Column<decimal>(type: "decimal(18,2)", precision: 10, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetalhePedido", x => x.PedidoId);
+                    table.PrimaryKey("PK_DetalhePedido", x => new { x.PedidoId, x.ProdutoId });
                     table.ForeignKey(
-                        name: "FK_DetalhePedido_Pedidos_PedidoId1",
-                        column: x => x.PedidoId1,
+                        name: "FK_DetalhePedido_Pedidos_PedidoId",
+                        column: x => x.PedidoId,
                         principalTable: "Pedidos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -191,11 +190,6 @@ namespace SaborGregoNew.Migrations
                 name: "IX_CarrinhoItens_ProdutoId",
                 table: "CarrinhoItens",
                 column: "ProdutoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DetalhePedido_PedidoId1",
-                table: "DetalhePedido",
-                column: "PedidoId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetalhePedido_ProdutoId",
