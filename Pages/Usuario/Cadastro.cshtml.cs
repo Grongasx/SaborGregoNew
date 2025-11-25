@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaborGregoNew.DTOs.Usuario;
 using SaborGregoNew.Enums;
-using SaborGregoNew.Services;
-using SaborGregoNew.Repository;
 
 namespace SaborGregoNew.Pages.Usuario;
 
@@ -17,7 +15,7 @@ public class CadastroModel : PageModel
     }
 
     [BindProperty]
-    public RegisterUserDto? Usuario  { get; set; }
+    public RegisterDto? Usuario  { get; set; }
     
     public IActionResult OnGet()
     {
@@ -35,9 +33,43 @@ public class CadastroModel : PageModel
         {
             Usuario.Role = UserRole.Cliente;
             
-            await _usuarioRepository.Create(Usuario);
+            await _usuarioService.Create(Usuario);
         }
-            
+
         return RedirectToPage("/Index");
+    }
+
+    private async Task claimar(Models.Usuario usuarioLogado)
+    {
+        var claims = new List<Claim>
+                {
+                    // A ClaimTypes.NameIdentifier armazena o ID único do usuário
+                    new Claim(ClaimTypes.NameIdentifier, usuarioLogado.Id.ToString()),
+                    
+                    // A ClaimTypes.Name armazena o nome (útil para exibição)
+                    new Claim(ClaimTypes.Name, usuarioLogado.Nome),
+                    
+                    // A ClaimTypes.Role armazena a função/papel (IMPORTANTE para autorização)
+                    new Claim(ClaimTypes.Role, usuarioLogado.Role.ToString()) 
+                    
+                    // Você pode adicionar mais Claims aqui, como o Email, Telefone, etc.
+                };
+
+                // 3. Criação da identidade principal
+                var claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // 4. Criação das propriedades de autenticação (opcional, mas útil)
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // Manter o usuário logado entre sessões (Remember Me)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+
+                // 5. Efetua o Login (Assina o usuário e cria o Cookie de Autenticação)
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
     }
 }

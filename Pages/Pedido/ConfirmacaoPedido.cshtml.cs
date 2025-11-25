@@ -21,6 +21,7 @@ namespace SaborGregoNew.Pages
         public SaborGregoNew.Models.Pedido? pedido { get; set; }
         public Endereco? endereco { get; set; }
         public List<DetalhePedido>? detalhesPedido { get; set; }
+        public decimal CarrinhoTotal { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -41,6 +42,7 @@ namespace SaborGregoNew.Pages
             var pedidoDto = session.GetObjectFromJson<PedidoDTO>("PedidoConfirmacao");
             var enderecotemp = session.GetObjectFromJson<Endereco>("EnderecoConfirmacao");
             var detalhesPedidotemp = session.GetObjectFromJson<List<DetalhePedido>>("DetalhesConfirmacao");
+            CarrinhoTotal = session.GetObjectFromJson<decimal>("CarrinhoTotal");
 
             session.Remove("PedidoConfirmacao");
             session.Remove("EnderecoConfirmacao");

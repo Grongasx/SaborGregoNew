@@ -7,6 +7,7 @@ namespace SaborGregoNew.Repository
     public class CarrinhoSessionRepository : ICarrinhoRepository
     {
         private readonly IProdutoRepository _produtoRepository; //conexão com o repositorio de pedidos
+        private const string CarrinhoKey = "Carrinho";
 
         //conexão com a sessão
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -106,9 +107,17 @@ namespace SaborGregoNew.Repository
         //soma o valor dos itens no carrinho (usado para quando for salvar no pedido)
         public decimal CalcularTotal()
         {
-            return GetCarrinho().Sum(i => i.SubTotal);//soma todos os valores dos itens e retorna um decimal
-        }
+            var itens = GetCarrinho();
 
+            // 1. Verifica se a lista é nula ou vazia.
+            if (itens == null || !itens.Any())
+            {
+                return 0.00m; // Retorna 0.00 se o carrinho estiver vazio.
+            }
+
+            // 2. Tenta somar os SubTotais
+            return itens.Sum(i => i.SubTotal);
+        }
         //Atualiza a quantidade de itens em um unico item do carrinho
         public void AtualizarQuantidade(int produtoId, int novaQuantidade)//recebe o id do produto e a quantidade nova
         {
@@ -129,6 +138,19 @@ namespace SaborGregoNew.Repository
                 // ✅ CORREÇÃO: Usar o próprio SaveCarrinho()
                 SaveCarrinho(carrinho);
             }
+        }
+        public void AtualizarCarrinhoCompleto(List<CarrinhoItem> novosItensCarrinho)
+        {
+            var session = _httpContextAccessor.HttpContext.Session;
+
+            // 1. Opcional: Filtra itens com Quantidade <= 0
+            var carrinhoFinal = novosItensCarrinho
+                .Where(item => item.Quantidade > 0)
+                .ToList();
+
+            // 2. Sobrescreve o carrinho completo na sessão
+            // (Você precisará de um método SetObjectFromJson, geralmente em SessionExtensions)
+            session.SetObjectFromJson(CarrinhoKey, carrinhoFinal);
         }
     }
 }

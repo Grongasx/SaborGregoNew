@@ -28,6 +28,14 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Edu/Pages/Funcionario/Entregas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnVuY2lvbmFyaW9cRW50cmVnYXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Edu/Pages/Funcionario/Pedidos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnVuY2lvbmFyaW9cUGVkaWRvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -64,31 +72,7 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcQ2FycmluaG9cRGVmYXVsdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Admin/Dashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xBZG1pblxEYXNoYm9hcmQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Admin/Funcionarios/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xBZG1pblxGdW5jaW9uYXJpb3NcQ3JlYXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Admin/Funcionarios/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xBZG1pblxGdW5jaW9uYXJpb3NcRWRpdC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Admin/Funcionarios/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xBZG1pblxGdW5jaW9uYXJpb3NcSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Admin/Produtos/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xBZG1pblxQcm9kdXRvc1xJbmRleC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Cadastro.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xDYWRhc3Ryby5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Cozinheiro/Pedidos.cshtml]
+[C:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Edu/Pages/Usuario/Cozinheiro/Pedidos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xDb3ppbmhlaXJvXFBlZGlkb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
@@ -100,15 +84,11 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbmRlcmVjb1xFZGl0YXJFbmRlcmVjby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Endereco/ExcluirEndereco.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbmRlcmVjb1xFeGNsdWlyRW5kZXJlY28uY3NodG1s
+[C:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Edu/Pages/Usuario/Endereco/ListaEnderecos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbmRlcmVjb1xMaXN0YUVuZGVyZWNvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Endereco/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbmRlcmVjb1xJbmRleC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/T-GAMER/RiderProjects/SaborGregoNew/Pages/Usuario/Entregador/Entregas.cshtml]
+[C:/Users/Latitude/OneDrive/Área de Trabalho/SaborGregoNewaa/Edu/Pages/Usuario/Entregador/Entregas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXN1YXJpb1xFbnRyZWdhZG9yXEVudHJlZ2FzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 

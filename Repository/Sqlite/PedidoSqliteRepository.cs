@@ -98,118 +98,79 @@ private async Task<int> CriarPedidoAsync(DbConnection conn, DbTransaction transa
             }
         }
 
+
+        //====================//
+        //==Fluxos de Pedido==//
+        //====================//
+
         //atualizar status conforme o fluxo de trabalho
         public async Task UpdateStatusByIdAsync(int id, StatusPedido status)
         {
             if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
-                throw new InvalidOperationException("Falha ao obter conexão");
+                throw new InvalidOperationException("Falha ao obter conexão com o banco de dados.");
+
             using (conn)
             {
                 await conn.OpenAsync();
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = PedidoQuery.PedidoUpdateStatus;
-                cmd.Parameters.Add(new SqlParameter("@Id", id));
-                cmd.Parameters.Add(new SqlParameter("@Status", (int)status));
+                cmd.Parameters.Add(new SqliteParameter("@Id", id));
+                cmd.Parameters.Add(new SqliteParameter("@Status", status));
                 await cmd.ExecuteNonQueryAsync();
             }
         }
 
+        //Pegar Pedidos para o fluxo
         public async Task<List<Pedido>> GetPedidosFluxoTrabalhoAsync(StatusPedido status, int usuarioId)
         {
-            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
+
+            //Verifica a conexão com o banco de dados
+            if (_connectionFactory.CreateConnection() is not DbConnection conn)
                 throw new InvalidOperationException("Falha ao obter conexão");
 
+            //abre a conexão com o banco de dados, Configura a query e executa
             using (conn)
             {
                 await conn.OpenAsync();
-                
-                var pedidos = new List<Pedido>();
 
-                // 1. Busca os Cabeçalhos dos Pedidos
-                using (var cmd = conn.CreateCommand())
+                var cmd = conn.CreateCommand();
+
+                //verificação de Status e Usuario
+                if (status == StatusPedido.Solicitado || status == StatusPedido.ProntoParaRetirada) //Estados onde todos podem ver
                 {
-                    // LÓGICA CRÍTICA: Definir qual Query usar
-                    if (status == StatusPedido.Solicitado || status == StatusPedido.ProntoParaRetirada)
-                    {
-                        // Solicitado = Todos veem (sem filtro de funcionário)
-                        cmd.CommandText = PedidoQuery.GetPedidosStatus;
-                    }
-                    else if (status == StatusPedido.EmPreparacao || status == StatusPedido.EmRotaDeEntrega)
-                    {
-                        // Em Preparação = Apenas o cozinheiro responsável vê
-                        if (status == StatusPedido.EmPreparacao)
-                            cmd.CommandText = PedidoQuery.GetPedidoFuncionario;
-                        else 
-                            cmd.CommandText = PedidoQuery.GetPedidosEntregador;
-
-                        // Só adicionamos este parâmetro se a query filtrar por funcionário
-                        cmd.Parameters.Add(new SqlParameter("@UsuarioId", usuarioId));
-                    }
-                    else
-                    {
-                        return new List<Pedido>();
-                    }
-
-                    cmd.Parameters.Add(new SqlParameter("@Status", (int)status));
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            var pedido = new Pedido
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
-                                DataPedido = reader.GetDateTime(reader.GetOrdinal("DataPedido")),
-                                EnderecoId = reader.GetInt32(reader.GetOrdinal("EnderecoId")),
-                                MetodoPagamento = (MetodoPagamento)reader.GetInt32(reader.GetOrdinal("MetodoPagamento")),
-                                Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status")),
-                                TotalPedido = reader.GetDecimal(reader.GetOrdinal("TotalPedido"))
-                            };
-                            
-                            // Verifica se as colunas opcionais não são nulas antes de ler
-                            int ordFunc = reader.GetOrdinal("FuncionarioId");
-                            if (!reader.IsDBNull(ordFunc)) pedido.FuncionarioId = reader.GetInt32(ordFunc);
-
-                            int ordEnt = reader.GetOrdinal("EntregadorId");
-                            if (!reader.IsDBNull(ordEnt)) pedido.EntregadorId = reader.GetInt32(ordEnt);
-
-                            pedidos.Add(pedido);
-                        }
-                    }
+                    cmd.CommandText = PedidoQuery.GetPedidosStatus;
                 }
-                foreach (var pedido in pedidos)
+                else if (status == StatusPedido.EmPreparacao || status == StatusPedido.EmRotaDeEntrega) //estado onde só quem pegou o pedido pode ver
                 {
-                    using (var cmdItens = conn.CreateCommand())
+                    if (status == StatusPedido.EmPreparacao) //apenas para cozinheiro
                     {
-                        cmdItens.CommandText = PedidoQuery.GetDetalhesByPedidoId;
-                        cmdItens.Parameters.Add(new SqlParameter("@PedidoId", pedido.Id));
-
-                        using (var readerItens = await cmdItens.ExecuteReaderAsync())
-                        {
-                            while (await readerItens.ReadAsync())
-                            {
-                                pedido.Itens.Add(new DetalhePedido
-                                {
-                                    PedidoId = readerItens.GetInt32(readerItens.GetOrdinal("PedidoId")),
-                                    ProdutoId = readerItens.GetInt32(readerItens.GetOrdinal("ProdutoId")),
-                                    // Tratamento de nulo para imagem
-                                    Imagem = readerItens.IsDBNull(readerItens.GetOrdinal("Imagem")) ? null : readerItens.GetString(readerItens.GetOrdinal("Imagem")),
-                                    NomeProduto = readerItens.GetString(readerItens.GetOrdinal("NomeProduto")),
-                                    PrecoUnitario = readerItens.GetDecimal(readerItens.GetOrdinal("PrecoUnitario")),
-                                    Quantidade = readerItens.GetInt32(readerItens.GetOrdinal("Quantidade"))
-                                });
-                            }
-                        }
+                        cmd.CommandText = PedidoQuery.GetPedidoFuncionario;
                     }
+                    else if (status == StatusPedido.EmRotaDeEntrega) //apenas para entregador
+                    {
+                        cmd.CommandText = PedidoQuery.GetPedidosEntregador;
+                    }
+                    cmd.Parameters.Add(new SqliteParameter("@UsuarioId", usuarioId)); //seta o tipo de usuario
                 }
-                return pedidos;
+                else
+                {
+                    return new List<Pedido>(); //caso algo esteja errado, retorna uma lista vazia
+                }
+
+                cmd.Parameters.Add(new SqliteParameter("@Status", (int)status)); //seta o status para pesquisa
+
+                await cmd.ExecuteNonQueryAsync(); //executa a query
             }
+            throw new InvalidCastException("a conexão não conseguiu realizar a operação");
         }
 
+        //==========================//
+        //===Metodos para Usuario===//
+        //==========================//
+        //Pegar pedidos pendentes do usuario
         public async Task<List<Pedido>> GetPedidosPendentesAsync(int usuarioId)
         {
-            if (_connectionFactory.CreateConnection() is not DbConnection conn)
+            if (_connectionFactory.CreateSqliteConnection() is not DbConnection conn)
                 throw new Exception("Falha ao obter conexão");
 
             try

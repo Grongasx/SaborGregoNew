@@ -2,59 +2,81 @@
 @model SaborGregoNew.Pages.ConfirmacaoPedidoModel
 @using SaborGregoNew.Enums
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
-    var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
+    ViewData["Title"] = "Confirmação de Pedido";
 }
-@foreach (var key in keys)
+
+@* --- 1. Exibição de Mensagens (TempData) --- *@
+@if (TempData["MensagemSucesso"] is string successMessage)
 {
-    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
-    {
-        string alertClass = key switch
-        {
-            "MensagemSucesso" => "alert-success",
-            "MensagemErro" => "alert-danger",
-            _ => "alert-info"
-        };
-        <div class="container mt-3">
-            <div class="alert @alertClass alert-dismissible fade show text-white">
-                @message
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show text-white" role="alert">
+            @successMessage
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Fechar"></button>
         </div>
-    }
+    </div>
 }
+
+@if (TempData["MensagemErro"] is string errorMessage)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show text-white" role="alert">
+            @errorMessage
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    </div>
+}
+
+
 <div class="container my-5">
+    @* --- 2. Pedido Não Encontrado --- *@
     @if (Model.pedido == null)
     {
-        <div class="alert alert-danger text-center">
-            <h3>pedido não encontrado.</h3>
+        <div class="alert alert-danger text-center shadow-sm" role="alert">
+            <h3 class="alert-heading">Pedido não encontrado.</h3>
             <p>Por favor, verifique o número do pedido ou acesse sua área de pedidos.</p>
             <a asp-page="/Index" class="btn btn-primary mt-3">Voltar ao Início</a>
         </div>
     }
+    @* --- 3. Confirmação do Pedido --- *@
     else
     {
         <div class="card shadow-lg">
             <div class="card-header bg-success text-white text-center">
-                <h1 class="mb-0">Pedido Confirmado com Sucesso!</h1>
+                <h1 class="mb-0">pedido Confirmado com Sucesso!</h1>
                 <p class="lead mb-0">Obrigado por sua compra.</p>
             </div>
-            <div class="card-body p-4">
+            
+            <div class="card-body p-4 p-md-5">
                 
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <h4>Detalhes da Transação</h4>
                         <p class="mb-1"><strong>Nº do Pedido:</strong> <span class="badge bg-primary fs-6">#@Model.pedido.Id</span></p>
                         <p class="mb-1"><strong>Data do Pedido:</strong> @Model.pedido.DataPedido.ToString("dd/MM/yyyy")</p>
-                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")</p>
+                        <p class="mb-1"><strong>Horario do Pedido:</strong> @Model.pedido.DataPedido.ToString("HH:mm")>
                         <p class="mb-1"><strong>Status Atual:</strong> <span class="badge bg-warning text-dark">@Model.pedido.Status</span></p>
                         <p class="mb-1"><strong>Metodo de Pagamento:</strong> @Model.pedido.MetodoPagamento</p>
                     </div>
+
+                    @* Detalhes da Entrega *@
                     <div class="col-md-6">
-                        <h4>Entrega</h4>
-                        <p class="mb-1"><strong>Total:</strong> <span class="fs-5 text-success">@Model.pedido.TotalPedido.ToString("C")</span></p>
-                        <p class="mb-1"><strong>Endereço de Entrega:</strong></p>
-                        <p class="text-muted">@Model.endereco.Logradouro, @Model.endereco.Numero</p>
+                        <h4 class="border-bottom pb-2 mb-3 text-success">Entrega e Valores</h4>
+                        <p class="mb-3"><strong>Total Pago:</strong> <span class="fs-4 text-success fw-bold">@Model.CarrinhoTotal.ToString("C")</span></p>
+                        
+                        <h5 class="mb-1">Endereço de Entrega:</h5>
+                        <address class="text-muted">
+                            @Model.endereco.Logradouro, @Model.endereco.Numero
+                            @if (!string.IsNullOrEmpty(Model.endereco.Complemento))
+                            {
+                                <text> (@Model.endereco.Complemento)</text>
+                            }
+                            <br />
+                            @Model.endereco.Bairro
+                            <br />
+                            @Model.endereco.Apelido (Referência)
+                        </address>
                     </div>
                 </div>
 
@@ -67,13 +89,14 @@
                             <th>Produto</th>
                             <th class="text-center">Qtd.</th>
                             <th class="text-end">Preço Unit.</th>
-                            <th class="text-end">Subtotal</th>
+                            <th class="text-end">Subtotal</th>s
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.pedido.Itens)
                         {
                             <tr>
+                                <img class="" source="@item.Imagem">
                                 <td>@item.NomeProduto</td>
                                 <td class="text-center">@item.Quantidade</td>
                                 <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
@@ -93,8 +116,8 @@
 
                 <div class="text-center">
                     <p class="text-muted">Você receberá um e-mail de confirmação com os detalhes da sua compra.</p>
-                    <a asp-page="/Produto/Cardapio" class="btn btn-primary mt-3 me-2">Continuar Comprando</a>
-                    <a asp-page="/Index" class="btn btn-outline-secondary mt-3">Ver Meus Pedidos</a>
+                    <a asp-page="/Index" class="btn btn-primary mt-3 me-2">Continuar Comprando</a>
+                    <a asp-page="/Usuario/Pedidos/Lista" class="btn btn-outline-secondary mt-3">Ver Meus Pedidos</a>
                 </div>
             </div>
         </div>

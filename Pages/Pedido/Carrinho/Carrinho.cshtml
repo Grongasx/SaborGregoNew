@@ -1,26 +1,9 @@
 @page
 @model SaborGregoNew.Pages.CarrinhoModel
 @addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+@Html.AntiForgeryToken()
 @{
     var keys = new List<string>{ "MensagemSucesso", "MensagemErro"};
-}
-@foreach (var key in keys)
-{
-    if (TempData[key] is string message && !string.IsNullOrEmpty(message))
-    {
-        string alertClass = key switch
-        {
-            "MensagemSucesso" => "alert-success",
-            "MensagemErro" => "alert-danger",
-            _ => "alert-info"
-        };
-        <div class="container mt-3">
-            <div class="alert @alertClass alert-dismissible fade show text-white">
-                @message
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    }
 }
 <div class="container mt-5">
     <h2><i class="bi bi-cart"></i> Seu Carrinho de Compras</h2>
@@ -28,44 +11,42 @@
 
     @if (Model.Carrinho == null || !Model.Carrinho.Any())
     {
-        <div class="alert alert-info" role="alert">
-            Seu carrinho está vazio. Adicione alguns produtos!
-        </div>
-        <p><a asp-page="/Produto/Cardapio" class="btn btn-secondary"><i class="bi bi-chevron-left"></i>Continuar Comprando</a></p>
-    }
+        }
     else
     {
+        <form method="post" id="formCarrinho" asp-page-handler="Checkout">
+        
         <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Produto</th>
-                    <th class="text-center">Preço</th>
-                    <th class="text-center" style="width: 150px;">Quantidade</th>
-                    <th class="text-end">Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
             <tbody>
-                @foreach (var item in Model.Carrinho)
+                @for (int i = 0; i < Model.Carrinho.Count; i++)
                 {
-                    <tr id="row-@item.ProdutoId">
+                    <tr>
                         <td style="width: 100px;">
                             <img src="@item.Imagem" class="img-thumbnail" style="max-height: 80px;" alt="@item.Nome">
                         </td>
                         <td>@item.Nome</td>
                         <td class="text-center">@item.Preco.ToString("C")</td>
-                        
+
                         <td class="text-center">
-                            <input type="number" 
-                                   value="@item.Quantidade" 
-                                   min="0" 
-                                   class="form-control text-center mx-auto" 
-                                   style="width: 80px;"
-                                   onchange="atualizarQuantidade(this, @item.ProdutoId)" />
+                            @* Formulário para Atualizar Quantidade *@
+                            <form method="post" asp-page-handler="AtualizarQuantidade" class="d-flex align-items-center justify-content-center">
+                                @* Campo oculto para identificar qual produto atualizar *@
+                                <input type="hidden" name="produtoId" value="@item.ProdutoId" />
+                                
+                                <input type="number" 
+                                       name="novaQuantidade" 
+                                       value="@item.Quantidade" 
+                                       min="0" 
+                                       class="form-control text-center" 
+                                       style="width: 70px;" />
+                                
+                                <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Atualizar">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </form>
                         </td>
                         
-                        <td class="text-end" id="subtotal-@item.ProdutoId">@item.SubTotal.ToString("C")</td>
+                        <td class="text-end">@item.SubTotal.ToString("C")</td>
                         <td>
                             <form method="post" asp-page-handler="RemoverItem" asp-route-produtoId="@item.ProdutoId">
                                 <button type="submit" class="btn btn-sm btn-danger" title="Remover Item">
@@ -79,7 +60,7 @@
             <tfoot>
                 <tr class="table-dark">
                     <td colspan="4" class="text-end"><strong>Total do Pedido:</strong></td>
-                    <td class="text-end"><strong id="carrinho-total">@Model.CarrinhoTotal.ToString("C")</strong></td>
+                    <td class="text-end"><strong>@Model.CarrinhoTotal.ToString("C")</strong></td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -87,63 +68,9 @@
 
         <div class="d-flex justify-content-between mt-4">
             <a asp-page="/Produto/Cardapio" class="btn btn-secondary"><i class="bi bi-chevron-left"></i> Continuar Comprando</a>
-            <a asp-page="/Pedido/Carrinho/Checkout" class="btn btn-success">Finalizar Compra <i class="bi bi-chevron-right"></i></a>
+            <button type="submit" class="btn btn-success">Finalizar Compra <i class="bi bi-chevron-right"></i></button>
         </div>
+        
+        </form>
     }
 </div>
-
-@section Scripts {
-    @Html.AntiForgeryToken()
-
-    <script>
-        function atualizarQuantidade(input, produtoId) {
-            const novaQtd = input.value;
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-            // Faz a chamada ao servidor (Note o uso de crases ` ` no URL)
-            fetch(`?handler=AtualizarQuantidadeAjax&produtoId=${produtoId}&novaQuantidade=${novaQtd}`, {
-                method: 'POST',
-                headers: {
-                    'RequestVerificationToken': token
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    console.error('Erro na requisição');
-                }
-            })
-            .then(data => {
-                if (!data) return;
-
-                if (data.deveRemover) {
-                    // Se a quantidade for 0, remove a linha visualmente
-                    const linha = document.getElementById(`row-${produtoId}`);
-                    if (linha) linha.remove();
-                } else {
-                    // Atualiza o subtotal do item
-                    const subtotal = document.getElementById(`subtotal-${produtoId}`);
-                    if (subtotal) subtotal.innerText = data.novoSubtotal;
-                }
-                
-                // Atualiza o total geral
-                const total = document.getElementById('carrinho-total');
-                if (total) total.innerText = data.novoTotal;
-                
-                // Atualiza o ícone do carrinho no menu (se existir)
-                const badge = document.getElementById('cartCount');
-                if(badge) {
-                    badge.innerText = data.itensTotal;
-                    badge.style.display = data.itensTotal > 0 ? 'flex' : 'none';
-                }
-                
-                // Se o carrinho esvaziou, recarrega para mostrar mensagem de vazio
-                if (data.itensTotal === 0) {
-                    location.reload();
-                }
-            })
-            .catch(error => console.error('Erro:', error));
-        }
-    </script>
-}

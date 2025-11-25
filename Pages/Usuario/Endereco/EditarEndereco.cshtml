@@ -12,8 +12,9 @@
         </div>
         <div class="card-body">
             <form method="post">
-                <input type="hidden" asp-for="Endereco.Id" />
-                <input type="hidden" asp-for="Endereco.UsuarioId" />
+                <input type="hidden" asp-for="enderecoatualizado.Id" />
+                <input type="hidden" asp-for="endereco.UsuarioId" />
+                
                 <div class="mb-3">
                     <label asp-for="Endereco.Apelido"></label>
                     <input asp-for="Endereco.Apelido" class="form-control" />

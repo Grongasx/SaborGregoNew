@@ -14,34 +14,40 @@ namespace SaborGregoNew.Pages
             _carrinhoService = carrinhoService;
         }
 
-        // Propriedade pública para ser acessada na View
+        // Propriedade pública para carregar o carrinho na exibição (OnGet)
         public List<CarrinhoItem> Carrinho { get; set; } = new List<CarrinhoItem>();
         
         // Propriedade calculada para o total
         public decimal CarrinhoTotal { get; set; }
+        
+        // ⭐️ NOVO: Propriedade para RECEBER a lista atualizada do formulário no POST
+        [BindProperty]
+        public List<CarrinhoItem> CarrinhoForm { get; set; } = new List<CarrinhoItem>();
 
         public void OnGet()
         {
-            // Carrega o carrinho via Service
+            // Carrega o carrinho via Service para EXIBIR
             Carrinho = _carrinhoService.GetCarrinho();
             CarrinhoTotal = _carrinhoService.CalcularTotal();
+
+            // ⭐️ IMPORTANTE: Popula CarrinhoForm para que os valores dos inputs sejam exibidos
+            // Isso é um padrão comum em Razor Pages para formulários complexos.
+            CarrinhoForm = Carrinho;
         }
 
-        // Handler para Remover um Item
+        // Handler para Remover um Item (Mantido, funciona com POST separado)
         public IActionResult OnPostRemoverItem(int produtoId)
         {
             _carrinhoService.RemoverItem(produtoId);
-            
-            // Redireciona para a mesma página para atualizar o estado
             return RedirectToPage();
         }
 
         // Handler para Atualizar a Quantidade
-        // Novo método para AJAX
-        public IActionResult OnPostAtualizarQuantidadeAjax(int produtoId, int novaQuantidade)
+        public IActionResult OnPostAtualizarQuantidade(int produtoId, int novaQuantidade)
         {
             if (novaQuantidade <= 0)
             {
+                // Se a nova quantidade for <= 0, usa o método de remover item
                 _carrinhoService.RemoverItem(produtoId);
             }
             else
@@ -49,31 +55,31 @@ namespace SaborGregoNew.Pages
                 _carrinhoService.AtualizarQuantidade(produtoId, novaQuantidade);
             }
 
-            // Recalcula tudo para devolver ao front-end
-            var carrinho = _carrinhoService.GetCarrinho();
-            var total = _carrinhoService.CalcularTotal();
-            var itemAtualizado = carrinho.FirstOrDefault(x => x.ProdutoId == produtoId);
-            var qtdTotalItens = carrinho.Sum(x => x.Quantidade);
-
-            // Retorna JSON com os dados formatados
-            return new JsonResult(new 
-            { 
-                deveRemover = novaQuantidade <= 0,
-                novoSubtotal = itemAtualizado?.SubTotal.ToString("C"),
-                novoTotal = total.ToString("C"),
-                itensTotal = qtdTotalItens
-            });
+            return RedirectToPage();
         }
-
         public IActionResult OnPostLimparCarrinho()
         {
             _carrinhoService.ClearCarrinho();
             return RedirectToPage();
         }
 
+        // ⭐️ HANDLER DE CHECKOUT CORRIGIDO
         public IActionResult OnPostCheckout()
         {
-            return RedirectToPage("/Pedido/Carrinho/Checkout");
+            // ⭐️ O CarrinhoForm agora contém os dados alterados nos inputs.
+            // Aqui, você deve atualizar o carrinho na sessão/DB com os novos valores
+            // (após validação de estoque, etc.) ANTES de prosseguir para o pagamento.
+            if (CarrinhoForm != null && CarrinhoForm.Any())
+            {
+                // 1. Atualiza o serviço do carrinho com os valores do formulário
+                _carrinhoService.AtualizarCarrinhoCompleto(CarrinhoForm); // **Você precisa implementar este método no seu ICarrinhoRepository**
+                
+                // 2. Redireciona para o checkout
+                return RedirectToPage("/Pedido/Carrinho/Checkout");
+            }
+            
+            TempData["MensagemErro"] = "O carrinho está vazio ou ocorreu um erro na submissão.";
+            return RedirectToPage();
         }
     }
 }
