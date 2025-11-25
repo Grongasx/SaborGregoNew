@@ -1,4 +1,4 @@
-#arquivos corretos estão na branch Arquivos-Recuperados
+# arquivos corretos estão na branch Arquivos-Recuperados
 
 # 🏛️ Sabor Grego — E-commerce de Restaurante 🍽️  
 
