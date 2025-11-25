@@ -39,18 +39,6 @@ O sistema conta com **quatro perfis principais**, cada um com funcionalidades es
 
 ---
 
-## 📚 Estrutura do Projeto  
-SaborGrego/  
-│  
-├── Controllers/  
-├── Models/  
-├── Views/  
-├── Data/  
-├── wwwroot/  
-└── Logs/  
- 
----
-
 ## 💡 Aprendizados  
 - Aplicação dos princípios da **Programação Orientada a Objetos (POO)**.  
 - Desenvolvimento de **aplicações web MVC com ASP.NET Core**.  
