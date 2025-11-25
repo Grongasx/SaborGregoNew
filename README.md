@@ -51,7 +51,7 @@ O sistema conta com **quatro perfis principais**, cada um com funcionalidades es
 
 ## 👩‍💻 Autores  
 Projeto desenvolvido pelos alunos:
-- **Gustavo Vinicius Hernandes Batista**
-- **Cauê Ralho Nunes**
+- **Gustavo Vinicius Hernandes Batista**.
+- **Cauê Ralho Nunes**.
 do curso de **Análise e Desenvolvimento de Sistemas – FATEC**,  
 na disciplina de **Programação Orientada a Objetos**.  
