@@ -1,4 +1,4 @@
-# Arquivos corretos estão na branch [Recuperação-Arquivos](https://github.com/Grongasx/SaborGregoNew/tree/recuperacao-arquivos) e devidamemte configurado para o SQLSERVER
+# Arquivos corretos estão na branch [Recuperação-Arquivos](https://github.com/Grongasx/SaborGregoNew/tree/recuperacao-arquivos) e devidamemte configurados para o SQLSERVER
 
 # 🏛️ Sabor Grego — E-commerce de Restaurante 🍽️  
 
