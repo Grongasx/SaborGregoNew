@@ -1,4 +1,5 @@
 # Arquivos corretos estão na branch [Recuperação-Arquivos](https://github.com/Grongasx/SaborGregoNew/tree/recuperacao-arquivos) e devidamente configurados para o SQLSERVER
+OBS: Os arquivos do Repositroy estão com a nomenclatura SQLite porém estão configurados para o SQLServer
 
 # 🏛️ Sabor Grego — E-commerce de Restaurante 🍽️  
 
