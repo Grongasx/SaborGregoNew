@@ -1,0 +1,103 @@
+@page "{id:int}"
+@using SaborGregoNew.Enums
+@model SaborGregoNew.Pages.Usuario.Admin.Funcionarios.EditModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Editar Funcionário";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 mb-0">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="Input.Senha" /> <!-- Preserve password if not changing, or handle differently -->
+                        <!-- Actually, RegisterDto requires Password. If we are editing, maybe we don't want to require password change. 
+                             But the repository UpdateById takes RegisterDto which has Required Password.
+                             We might need to adjust the DTO or the Repository to allow optional password update.
+                             For now, let's assume we re-enter password or keep it. 
+                             Wait, if I put hidden input, it will be the hashed password? No, we don't have the password.
+                             We only have the hash.
+                             If the user leaves password blank, we should probably not update it.
+                             But RegisterDto has [Required] on Senha.
+                             I might need a separate UpdateDto or handle this in the page model.
+                             Let's see.
+                        -->
+                        
+                        <div class="mb-3">
+                            <label asp-for="Input.Nome" class="form-label">Nome Completo</label>
+                            <input asp-for="Input.Nome" class="form-control" />
+                            <span asp-validation-for="Input.Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Input.Email" class="form-label">Email</label>
+                                <input asp-for="Input.Email" class="form-control" type="email" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Input.Telefone" class="form-label">Telefone</label>
+                                <input asp-for="Input.Telefone" class="form-control" id="telefone" maxlength="15" />
+                                <span asp-validation-for="Input.Telefone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Input.Senha" class="form-label">Nova Senha (Opcional)</label>
+                                <input asp-for="Input.Senha" class="form-control" type="password" placeholder="Deixe em branco para manter" value="" />
+                                <span asp-validation-for="Input.Senha" class="text-danger"></span>
+                                <small class="text-muted">Preencha apenas se desejar alterar a senha.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Input.Role" class="form-label">Cargo</label>
+                                <select asp-for="Input.Role" class="form-select" asp-items="Html.GetEnumSelectList<UserRole>()">
+                                </select>
+                                <span asp-validation-for="Input.Role" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+</div>
+
+@section Scripts {
+        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    }
+
+    <script>
+        // Função que aplica a máscara
+        const handlePhone = (event) => {
+            let input = event.target
+            input.value = phoneMask(input.value)
+        }
+
+        const phoneMask = (value) => {
+            if (!value) return ""
+            value = value.replace(/\D/g,'')
+            value = value.replace(/(\d{2})(\d)/,"($1) $2")
+            value = value.replace(/(\d)(\d{4})$/,"$1-$2")
+            return value
+        }
+
+        // Seleciona o elemento pelo ID adicionado no passo 1
+        const inputTelefone = document.getElementById('telefone');
+
+        if(inputTelefone) {
+            inputTelefone.addEventListener('keyup', handlePhone);
+        }
+    </script>
+
+</div>

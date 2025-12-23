@@ -1,0 +1,34 @@
+using System.ComponentModel.DataAnnotations;
+using SaborGregoNew.Enums;
+
+namespace SaborGregoNew.Models
+{
+    public class Carrinho
+    {
+        [Required]
+        public int Id { get; set; }
+        [Required]
+        public string SessionId { get; set; } = string.Empty;
+        public ICollection<CarrinhoItem> Produtos { get; set; } = new List<CarrinhoItem>();
+        [Required]
+        public decimal Total { get; set; } = 0.0M;
+    }
+    public class CarrinhoItem
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Nome { get; set; } = string.Empty;
+        [Required]
+        public int ProdutoId { get; set; }
+        public Produto? Produto { get; set; }
+        [Required]
+        public int Quantidade { get; set; } = 1;
+        [Required]
+        public decimal Preco { get; set; } = 0.0M;
+        public decimal SubTotal => Preco * Quantidade;
+        [Required]
+        public string Imagem { get; set; } = string.Empty;
+    
+    }
+}

@@ -1,0 +1,177 @@
+@page "/admin/dashboard"
+@model SaborGregoNew.Pages.Usuario.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard do Administrador";
+}
+
+<style>
+    /* Estilos simples para os cards do dashboard */
+    .dashboard-card {
+        /* CORREÇÃO: Fundo escuro para bater com o tema global */
+        background-color: var(--card-bg) !important; 
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 107, 53, 0.2) !important; /* Borda laranja sutil */
+    }
+
+    .dashboard-card-header {
+        /* CORREÇÃO: Cabeçalho um pouco mais claro que o fundo, mas ainda escuro */
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        font-weight: 600;
+        color: var(--primary-orange) !important; /* Destaque laranja no título */
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid rgba(255, 107, 53, 0.2) !important;
+    }
+
+    .dashboard-card-body {
+        padding: 1.25rem;
+        color: #ffffff !important; /* Texto do corpo branco */
+    }
+    
+    .dashboard-metric {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--primary-gold) !important; /* Dourado para números grandes */
+    }
+    
+    .dashboard-label {
+         font-size: 1.1rem;
+         font-weight: 500;
+         color: #e0e0e0 !important; /* Cinza muito claro para descrições */
+    }
+</style>
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Vendas de Hoje
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.VendasHoje.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Vendas do Mês
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.VendasMes.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Pedidos de Hoje
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.PedidosHoje</h5>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-header dashboard-card-header">
+                    Pedidos do Mês
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <h5 class="dashboard-metric">@Model.DashboardData.PedidosMes</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Produto Mais Vendido (Hoje)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <p class="dashboard-label">@Model.DashboardData.ProdutoMaisVendidoHoje</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Produto Mais Vendido (Mês)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <p class="dashboard-label">@Model.DashboardData.ProdutoMaisVendidoMes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Vendas Diárias (Mês Atual)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <canvas id="vendasDiariasChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    Vendas por Produto (Mês)
+                </div>
+                <div class="card-body dashboard-card-body">
+                    <canvas id="vendasProdutosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        (function() {
+            // --- Gráfico 1: Vendas Diárias (Linha) ---
+            var vendasDiariasData = @Html.Raw(Model.VendasDiariasJson);
+            
+            const ctxDiario = document.getElementById('vendasDiariasChart');
+            new Chart(ctxDiario, {
+                type: 'line', 
+                data: vendasDiariasData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // --- Gráfico 2: Vendas por Categoria (Pizza) ---
+            var vendasProdutosData = @Html.Raw(Model.VendasProdutosJson);
+            
+            const ctxProdutos = document.getElementById('vendasProdutosChart');
+            new Chart(ctxProdutos, {
+                type: 'pie',
+                data: vendasProdutosData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        })();
+    </script>
+}

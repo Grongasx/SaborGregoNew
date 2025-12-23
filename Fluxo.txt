@@ -1,0 +1,21 @@
+--cadastro cliente
+Sergio
+sergio@email.com
+17123456789
+sergio
+
+--funcionário
+lucas@email.com
+lucas1
+
+--funcionario2
+cozinheiro@email.com
+cozinheiro
+
+--entregador
+pedro@email.com
+pedro1
+
+--administrador
+admin@email.com
+admin
